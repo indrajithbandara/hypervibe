@@ -3,13 +3,13 @@
 (use 'clojure.core.matrix)
 
 ;TODO Have functions comply with dataframes
+(defprotocol Ordinal)
 
-(defprotocol Test
-  (t-test [tt] "Conducts a TTest")
-  (chi-square [s] "Conducts a Chi Square test"))
+(defprotocol Numerical
+  (t-test [tt] "Conducts a TTest on a numerical data set"))
 
 (defrecord OneSample [sample-mean sample-standard-deviation sample-hypothetical-mean sample-size]
-  Test
+  Numerical
   (t-test [type]
     (assoc type
       :t-statistic (/ (- sample-mean
@@ -20,7 +20,7 @@
 
 
 (defrecord EqualVariance [mean population-mean pooled-variance size]
-  Test
+  Numerical
   (t-test [type]
     (let [[mean-one mean-two] mean
           [population-mean-one population-mean-two] population-mean
@@ -35,7 +35,7 @@
 
 
 (defrecord Welch [mean sample-variance size]
-  Test
+  Numerical
   (t-test [type]
     (let [[mean-one mean-two] mean
           [sample-variance-one sample-variance-two] sample-variance
@@ -57,7 +57,7 @@
 
 
 (defrecord RepeatedMeasure [difference-mean population-mean standard-deviation size]
-  Test
+  Numerical
   (t-test [type]
     (let [[population-mean-one population-mean-two] population-mean]
       (assoc type
@@ -67,4 +67,12 @@
                            (Math/sqrt size)))
         :dof (- size 1)))))
 
+
+(defprotocol Categorical
+  (pearson-chi-square [s] "Conducts a Chi Square test on a categorical data set"))
+
+(defrecord Independance [observed expected]
+  Categorical
+  (pearson-chi-square [type]
+    ))
 

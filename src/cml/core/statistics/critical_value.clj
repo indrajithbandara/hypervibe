@@ -3,7 +3,6 @@
 (use 'clojure.core.matrix)
 
 
-
 (defn one-tail-cv [{:keys [dof alpha]}]
   {:critical-value
           (mget t-table (dec dof)

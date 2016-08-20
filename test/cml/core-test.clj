@@ -11,12 +11,12 @@
 
 (deftest one-sample-t-test-test
   (is (= (one-sample-ttest {:sample population-one :h-mean 400})
-         #cml.statistics.test.OneSample{:sample-mean                                   579.0,
-                                                            :sample-standard-deviation 65.05553183413554,
-                                                            :sample-hypothetical-mean  400,
-                                                            :sample-size               10,
-                                                            :t-statistic               8.700992601418207,
-                                                            :dof                       9})))
+         #cml.statistics.test.OneSample{:sample-mean               579.0,
+                                        :sample-standard-deviation 65.05553183413554,
+                                        :sample-hypothetical-mean  400,
+                                        :sample-size               10,
+                                        :t-statistic               8.700992601418207,
+                                        :dof                       9})))
 
 
 (deftest two-sample-t-test-equal-variance
