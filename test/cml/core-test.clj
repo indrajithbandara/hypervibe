@@ -80,7 +80,7 @@
 ;WORKSPACE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def dataset "/Users/gregadebesin/IdeaProjects/cml/resources/datasets/adult/adult.data")
+(def dataset "/Users/gra11/IdeaProjects/cml/resources/datasets/adult/adult.data")
 
 (data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status

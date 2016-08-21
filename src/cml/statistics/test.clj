@@ -74,6 +74,7 @@
 (defrecord Independance [observed expected]
   Categorical
   (pearson-chi-square [type]
-    ))
-
-()
+    (assoc type :chi
+                (/ (* (- observed expected)
+                      (- observed expected))
+                   expected))))
