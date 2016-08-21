@@ -38,8 +38,10 @@
 (def lung-cancer-data [[60 300]
                        [10 390]])
 
-(map #(reduce + %) lung-cancer-data)                        ;rows
-(map #(reduce + %) (columns lung-cancer-data))              ;columns
+(partition 2 (map #(/ % (double (esum lung-cancer-data)))
+                  (for [rt (map #(reduce + %) lung-cancer-data)
+                        ct (map #(reduce + %) (columns lung-cancer-data))]
+                    (* rt ct))))
 
 (pearson-chi-square (Independance. 60 33.16))
 
