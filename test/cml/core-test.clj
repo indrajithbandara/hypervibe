@@ -80,7 +80,7 @@
 ;WORKSPACE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def dataset "/Users/gra11/IdeaProjects/cml/resources/datasets/adult/adult.data")
+(def dataset "/Users/gregadebesin/IdeaProjects/cml/resources/datasets/adult/adult.data")
 
 (data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status
@@ -115,3 +115,31 @@
     (confidence-interval (TwoSample. @(future (map mean sample))
                                      @(future (map #(:variance (variance (Sample. (mean %) %))) sample))
                                      @(future (map count sample)) critical-value)))
+
+
+
+(def observed [[60 300] [10 390]])
+
+(def expected [[60 300] [10 390]])
+(def total (double (esum observed)))
+(def row-total (map #(reduce + %) observed))
+(def column-total (map #(reduce + %) (columns observed)))
+(mmul [row-total column-total])
+
+(def expected-val '(33.1578947368421 326.8421052631579 36.8421052631579 363.1578947368421))
+
+(for [x (mmul [row-total column-total])]
+  x)
+(map #(/ % (double (esum observed)))
+     (for [rt (map #(reduce + %) observed)
+           ct (map #(reduce + %) (columns observed))]
+       (* rt ct)))
+
+(for [rt (map #(reduce + %) observed)
+      ct (map #(reduce + %) (columns observed))]
+  (* rt ct))
+
+(pearson-chi-square (Independance. 60 33.16))
+
+
+

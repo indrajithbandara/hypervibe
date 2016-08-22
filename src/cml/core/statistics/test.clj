@@ -35,13 +35,4 @@
                               (:standard-deviation (standard-deviation (Sample. population-mean-difference (difference population))))
                               (/ (+ (count population-one) (count population-two)) 2)))))
 
-(def lung-cancer-data [[60 300]
-                       [10 390]])
-
-(partition 2 (map #(/ % (double (esum lung-cancer-data)))
-                  (for [rt (map #(reduce + %) lung-cancer-data)
-                        ct (map #(reduce + %) (columns lung-cancer-data))]
-                    (* rt ct))))
-
-(pearson-chi-square (Independance. 60 33.16))
 
