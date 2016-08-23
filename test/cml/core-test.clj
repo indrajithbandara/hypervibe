@@ -120,20 +120,21 @@
 
 (def observed [[60 300] [10 390]])
 
-(def expected [[60 300] [10 390]])
+
 (def total (double (esum observed)))
 (def row-total (map #(reduce + %) observed))
 (def column-total (map #(reduce + %) (columns observed)))
+
 (mmul [row-total column-total])
 
 (def expected-val '(33.1578947368421 326.8421052631579 36.8421052631579 363.1578947368421))
 
-(for [x (mmul [row-total column-total])]
-  x)
-(map #(/ % (double (esum observed)))
-     (for [rt (map #(reduce + %) observed)
-           ct (map #(reduce + %) (columns observed))]
-       (* rt ct)))
+(for [x (mmul [row-total column-total])] x)
+
+(def expected
+  (for [rt (map #(reduce + %) observed)
+        ct (map #(reduce + %) (columns observed))]
+    (/ (* rt ct) (double (esum observed)))))
 
 (for [rt (map #(reduce + %) observed)
       ct (map #(reduce + %) (columns observed))]
@@ -141,5 +142,18 @@
 
 (pearson-chi-square (Independance. 60 33.16))
 
+(loop [out []
+       in [[1 2] [3 4]]
+       cnt (count [11 12 13 14])]
+  (if (not (zero? cnt))
+    (recur
+      (conj out (first (first in)))
+      (if (empty? (first in))
+        (next in)
+        (next in))
+      (dec cnt))
+    out))
+
+(map #(map (fn [x] (- x %)) [11 22 33 44]) [[1 2] [3 4]])
 
 
