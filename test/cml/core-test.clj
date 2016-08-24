@@ -116,6 +116,7 @@
                                      @(future (map #(:variance (variance (Sample. (mean %) %))) sample))
                                      @(future (map count sample)) critical-value)))
 
+;http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/stat/inference/ChiSquareTest.html
 
 
 (def observed [[60 300] [10 390]])
@@ -143,4 +144,17 @@
 
 (pearson-chi-square (Independance. 60 33.16))
 
+;TODO seperate out observed vs expected values and use below (values) of (fn [observed expected] ...)
+(defn chi-square
+  "Assumes data to be in the form
+  [[x1 observed, x1 expected] [x2 observed, x2 expected]].
+   The Chi-square test computes the sum of the squares of the differences in values"
+  [values]
+  (reduce + 0
+          (map
+            (fn [[observed expected]]
+              (double
+                (/ (pow (- observed expected) 2)
+                   expected)))
+            values)))
 
