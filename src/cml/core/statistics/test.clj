@@ -1,7 +1,8 @@
 (ns cml.core.statistics.test
   (:require [cml.statistics.test :refer [t-test pearson-chi-square]]
             [cml.utils.variation :refer [standard-deviation variance]]
-            [cml.utils.central-tendancy :refer [mean difference]])
+            [cml.utils.central-tendancy :refer [mean difference]]
+            [clojure.core.matrix.operators :as op])
   (:import [cml.statistics.test OneSample EqualVariance Welch RepeatedMeasure Independance]
            [cml.utils.variation Sample Pooled]))
 (use 'clojure.core.matrix)
@@ -34,6 +35,5 @@
                               (map mean (partition 1 hp-mean))
                               (:standard-deviation (standard-deviation (Sample. population-mean-difference (difference population))))
                               (/ (+ (count population-one) (count population-two)) 2)))))
-
 
 
