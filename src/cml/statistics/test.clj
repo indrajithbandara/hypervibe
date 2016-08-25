@@ -1,6 +1,6 @@
 (ns cml.statistics.test
-  (:require [cml.utils.tables :refer [t-table]]))
-(use 'clojure.core.matrix)
+  (:require [cml.utils.tables :refer [t-table]]
+            [clojure.core.matrix :as matrix]))
 
 ;TODO Have functions comply with dataframes
 (defprotocol Ordinal)
@@ -74,9 +74,15 @@
 (defrecord Independance [observed expected]
   Categorical
   (pearson-chi-square [type]
-    (assoc type :chi
-                (/ (* (- observed expected)
-                      (- observed expected))
-                   expected))))
+    (let [exp (atom (conj expected :sentinal))]
+      (assoc type
+        :expected expected
+        :observed observed
+        :chi (matrix/esum (matrix/emap
+                            (fn [nums]
+                              (do (swap! exp next)
+                                  (/ (* (- nums (first @exp))
+                                        (- nums (first @exp)))
+                                     (first @exp)))) observed))))))
 
 

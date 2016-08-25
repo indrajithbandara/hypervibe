@@ -1,9 +1,12 @@
 (ns cml.core.statistics.test
   (:require [cml.statistics.test :refer [t-test pearson-chi-square]]
             [cml.utils.variation :refer [standard-deviation variance]]
-            [cml.utils.central-tendancy :refer [mean difference]])
+            [cml.utils.central-tendancy :refer [mean difference]]
+            [cml.utils.probability.functions :refer [expected-values]])
   (:import [cml.statistics.test OneSample EqualVariance Welch RepeatedMeasure Independance]
            [cml.utils.variation Sample Pooled]))
+
+;TODO seperate out tests into differnt packages depending on the data types eg numerical/categorocal etc
 
 (defn one-sample-ttest [{:keys [sample h-mean]}]
   (let [mean ^double (mean sample)]
@@ -33,5 +36,8 @@
                               (:standard-deviation (standard-deviation (Sample. population-mean-difference (difference population))))
                               (/ (+ (count population-one) (count population-two)) 2)))))
 
+
+(defn chi-square-test [{:keys [observed]}]
+  (chi-square-test (Independance. observed (expected-values observed))))
 
 

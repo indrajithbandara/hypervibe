@@ -138,30 +138,6 @@
                           expected))
 
 
-;TODO seperate out observed vs expected values and use below (values) of (fn [observed expected] ...)
-(defn chi-square
-  "Assumes data to be in the form
-  [[x1 observed, x1 expected] [x2 observed, x2 expected]].
-   The Chi-square test computes the sum of the squares of the differences in values"
-  [values]
-  (reduce + 0
-          (map (fn [[observed expected]]
-                 (double (/ (matrix/pow (- observed expected) 2) expected))) values)))
-
-(let [observed (atom [2 3 4 5])]
-  (walk/walk (fn [vecs] (map (fn [nums] (do (* (first @observed) nums) (swap! observed next))) vecs)) vec [[1 2] [3 34]]))
-
-(let [exp (atom '(0 33.1578947368421 326.8421052631579 36.8421052631579 363.1578947368421))]
-  (matrix/emap (fn [x] (do (swap! exp pop) (* x (first @exp)))) observed))
-
-
-(matrix/esum
-  (let [exp (atom '(0 33.1578947368421 326.8421052631579 36.8421052631579 363.1578947368421))]
-    (matrix/emap
-      (fn [nums]
-        (do (swap! exp pop) (/ (* (- nums (first @exp)) (- nums (first @exp))) (first @exp)))) observed)))
-
-
 (defn chi-square [observed]
   (let [expected (atom (conj (for [row-total (map #(reduce + %) observed)
                                    column-total (map #(reduce + %) (matrix/columns observed))]
