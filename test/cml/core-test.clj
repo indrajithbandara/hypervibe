@@ -5,16 +5,13 @@
             [cml.extract :refer [file-lines]]
             [cml.utils :refer [zip]]
             [cml.core.statistics.estimate :refer [one-sample-conf-inter two-sample-conf-inter]]
-            [cml.core.statistics.test :refer [one-sample-ttest equal-var-ttest welch-ttest rep-measure-ttest]]
+            [cml.core.statistics.numerical.test :refer [one-sample-ttest equal-var-ttest welch-ttest rep-measure-ttest]]
             [cml.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]
-            [clojure.core.matrix.operators :as op]
-            [clojure.core.matrix :as matrix]
-            [clojure.walk :as walk]))
-(use 'com.rpl.specter)
+            [clojure.core.matrix.operators :as op]))
 
 (deftest one-sample-t-test-test
   (is (= (one-sample-ttest {:sample population-one :h-mean 400})
-         #cml.statistics.test.OneSample{:sample-mean               579.0,
+         #cml.statistics.numerical.test.OneSample{:sample-mean               579.0,
                                         :sample-standard-deviation 65.05553183413554,
                                         :sample-hypothetical-mean  400,
                                         :sample-size               10,
@@ -24,7 +21,7 @@
 
 (deftest two-sample-t-test-equal-variance
   (is (= (equal-var-ttest {:sample [ballet-dancers football-players] :hp-mean [0 0]})
-         #cml.statistics.test.EqualVariance{:mean                                (87.94999999999999 85.19),
+         #cml.statistics.numerical.test.EqualVariance{:mean                                (87.94999999999999 85.19),
                                                                 :population-mean (0.0 0.0),
                                                                 :pooled-variance (32.382777777777775 31.181000000000015),
                                                                 :size            (10 10),
@@ -33,7 +30,7 @@
 
 (deftest two-sample-t-test-unequal-variance
   (is (= (welch-ttest {:sample [ballet-dancers football-players]})
-         #cml.statistics.test.Welch{:mean                      (87.94999999999999 85.19),
+         #cml.statistics.numerical.test.Welch{:mean                      (87.94999999999999 85.19),
                                               :sample-variance (32.382777777777775 31.181000000000015),
                                               :size            (10 10),
                                               :t-statistic     1.0947229724603922,
@@ -42,7 +39,7 @@
 
 (deftest two-sample-repeated-measure-test
   (is (= (rep-measure-ttest {:population [after before] :hp-mean [0 0]})
-         #cml.statistics.test.RepeatedMeasure{:difference-mean                        -11.0,
+         #cml.statistics.numerical.test.RepeatedMeasure{:difference-mean                        -11.0,
                                                                   :population-mean    (0.0 0.0),
                                                                   :standard-deviation 13.90443574307614,
                                                                   :size               10,
@@ -83,7 +80,7 @@
 ;WORKSPACE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def dataset "/Users/gregadebesin/IdeaProjects/cml/resources/datasets/adult/adult.data")
+(def dataset "/Users/gra11/IdeaProjects/cml/resources/datasets/adult/adult.data")
 
 (data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status
@@ -120,33 +117,5 @@
                                      @(future (map count sample)) critical-value)))
 ;http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/stat/inference/ChiSquareTest.html
 
-
-(def observed [[60 300] [10 390]])
-(def total (double (matrix/esum observed)))
-(def row-total (map #(reduce + %) observed))
-(def column-total (map #(reduce + %) (matrix/columns observed)))
-
-(def expected-val '(33.1578947368421 326.8421052631579 36.8421052631579 363.1578947368421))
-
-(def expected
-  (partition 2
-             (for [rt (map #(reduce + %) observed)
-                   ct (map #(reduce + %) (matrix/columns observed))]
-               (/ (* rt ct) (double (matrix/esum observed))))))
-
-(matrix/esum (matrix/emap op// (matrix/emap (fn [x] (op/* x x)) (matrix/sub observed expected))
-                          expected))
-
-
-(defn chi-square [observed]
-  (let [expected (atom (conj (for [row-total (map #(reduce + %) observed)
-                                   column-total (map #(reduce + %) (matrix/columns observed))]
-                               (/ (* row-total column-total)
-                                  (double (matrix/esum observed)))) :sentinal))]
-    (matrix/esum (matrix/emap (fn [nums]
-                                (do (swap! expected next)
-                                    (/ (* (- nums (first @expected))
-                                          (- nums (first @expected)))
-                                       (first @expected)))) observed))))
 
 
