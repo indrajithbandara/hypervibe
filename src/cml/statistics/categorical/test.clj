@@ -10,13 +10,10 @@
   (pearson-chi-square [type]
     (let [exp (atom (conj expected :sentinal))]
       (assoc type
-        :expected expected
-        :observed observed
-        :chi (matrix/esum (matrix/emap
-                            (fn [nums]
+        :chi (matrix/esum
+               (matrix/emap (fn [nums]
                               (do (swap! exp next)
                                   (/ (* (- nums (first @exp))
                                         (- nums (first @exp)))
                                      (first @exp)))) observed))))))
-
 

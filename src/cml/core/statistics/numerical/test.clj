@@ -2,8 +2,7 @@
   (:require [cml.statistics.numerical.test :refer [t-test]]
             [cml.statistics.categorical.test :refer [pearson-chi-square]]
             [cml.utils.variation :refer [standard-deviation variance]]
-            [cml.utils.central-tendancy :refer [mean difference]]
-           )
+            [cml.utils.central-tendancy :refer [mean difference]])
   (:import [cml.statistics.numerical.test OneSample EqualVariance Welch RepeatedMeasure]
            [cml.utils.variation Sample Pooled]))
 
