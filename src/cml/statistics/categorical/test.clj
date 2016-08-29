@@ -10,7 +10,7 @@
   (pearson-chi-square [type]
     (let [exp (atom (conj expected :sentinal))]
       (assoc type
-        :chi (matrix/esum (matrix/emap
+        :chi (matrix/esum (matrix/emap                      ;TODO move sequential operations out
                             (fn [nums] (do (swap! exp next)
                                            (/ (* (- nums (first @exp))
                                                  (- nums (first @exp)))
