@@ -1,5 +1,4 @@
-;(ns cml.core.data.specifications
-;  (:require [clojure.spec :as s]))
+(ns cml.core.data.specifications)
 ;
 ;
 ;(s/def ::sample (s/and not-empty (s/coll-of number?)))

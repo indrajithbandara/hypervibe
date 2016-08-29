@@ -1,9 +1,8 @@
 (ns cml.core.statistics.estimate
-  (:require [clojure.spec :as s]
-            [cml.utils.variation :refer [standard-deviation variance]]
+  (:require [cml.utils.variation :refer [standard-deviation variance]]
             [cml.statistics.estimate :refer [confidence-interval]]
             [cml.utils.central-tendancy :refer [mean]]
-            [cml.core.data.specifications :refer [data explain]])
+            )
   (:import [cml.utils.variation Sample]
            [cml.statistics.estimate OneSample TwoSample]))
 (use 'criterium.core)
@@ -13,10 +12,10 @@
                                    (:standard-deviation (standard-deviation (Sample. (mean sample) sample)))
                                    (count sample) critical-value)))
 
-(s/fdef one-sample-conf-inter
-        :args {:sample         (s/and not-empty (s/coll-of int?))
-               :critical-value number?}
-        :ret map?)
+;(s/fdef one-sample-conf-inter
+;        :args {:sample         (s/and not-empty (s/coll-of int?))
+;               :critical-value number?}
+;        :ret map?)
 
 
 (defn two-sample-conf-inter [{:keys [sample critical-value]}]
@@ -24,9 +23,9 @@
                                    (map #(:variance (variance (Sample. (mean %) %))) sample)
                                    (map count sample) critical-value)))
 
-(s/fdef two-sample-conf-inter
-        :args {:sample         (or [sequential? sequential?] '(sequential? sequential?))
-               :critical-value number?}
-        :ret map?)
+;(s/fdef two-sample-conf-inter
+;        :args {:sample         (or [sequential? sequential?] '(sequential? sequential?))
+;               :critical-value number?}
+;        :ret map?)
 
 

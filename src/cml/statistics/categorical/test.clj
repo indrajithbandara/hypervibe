@@ -1,7 +1,5 @@
 (ns cml.statistics.categorical.test
-  (:require [clojure.core.matrix :as matrix]
-            [uncomplicate.neanderthal.core :as neanderthal]
-            [uncomplicate.neanderthal.native :as neanderthal-native]))
+  (:require [clojure.core.matrix :as matrix]))
 
 
 (defprotocol Categorical
@@ -17,3 +15,5 @@
                                            (/ (* (- nums (first @exp))
                                                  (- nums (first @exp)))
                                               (first @exp)))) observed))))))
+
+

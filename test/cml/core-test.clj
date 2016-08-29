@@ -6,8 +6,7 @@
             [cml.utils :refer [zip]]
             [cml.core.statistics.estimate :refer [one-sample-conf-inter two-sample-conf-inter]]
             [cml.core.statistics.numerical.test :refer [one-sample-ttest equal-var-ttest welch-ttest rep-measure-ttest]]
-            [cml.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]
-            [clojure.core.matrix.operators :as op]))
+            [cml.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]))
 
 (deftest one-sample-t-test-test
   (is (= (one-sample-ttest {:sample population-one :h-mean 400})
@@ -77,10 +76,7 @@
          {:critical-value 1.8331, :dof 9, :alpha 0.05})))
 
 
-;WORKSPACE
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(def dataset "/Users/gra11/IdeaProjects/cml/resources/datasets/adult/adult.data")
+(def dataset "/Users/gregadebesin/IdeaProjects/cml/resources/datasets/adult/adult.data")
 
 (data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status
@@ -91,7 +87,6 @@
              :type         :csv/read
              :return '()})
 
-; 0.121288
 (data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status
                             :job :family-status :race
@@ -102,20 +97,5 @@
              :xform        (comp clojure.string/upper-case
                                  #(clojure.string/replace % #" " ""))
              :return       []})
-
-
-;(pvalues ((comp one-sample-conf-inter) (data {:sample (range 1 1000000) :critical-value 2 :spec :one-sample-conf-inter})))
-
-;;Data is specd not functions
-;((comp one-sample-conf-inter) (data {:sample (range 1 1000000) :critical-value 2 :spec :one-sample-conf-inter}))
-
-
-
-#_(defn two-sample-conf-inter2 [{:keys [sample critical-value]}]
-    (confidence-interval (TwoSample. @(future (map mean sample))
-                                     @(future (map #(:variance (variance (Sample. (mean %) %))) sample))
-                                     @(future (map count sample)) critical-value)))
-;http://commons.apache.org/proper/commons-math/apidocs/org/apache/commons/math3/stat/inference/ChiSquareTest.html
-
 
 
