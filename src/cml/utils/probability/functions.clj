@@ -17,7 +17,7 @@
 (def obs [[60 300] [10 390]])
 
 (def a (neanderthal-native/dge 2 3 [60 10 300 390 4 5]))
-a
+
 (def x (neanderthal/entry! (neanderthal-native/dv 2) 1.0))
 
 (neanderthal/mv! (neanderthal/trans (neanderthal-native/dge 2 2 [60 10 300 390])) (neanderthal/entry! (neanderthal-native/dv 2) 1.0) (neanderthal-native/dv 2))

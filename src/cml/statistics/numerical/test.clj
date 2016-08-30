@@ -1,5 +1,8 @@
 (ns cml.statistics.numerical.test
-  (:require [cml.utils.tables :refer [t-table]]))
+  (:require [cml.utils.tables :refer [t-table]]
+            [cml.utils.central-tendancy :refer [mean]]
+            [cml.utils.variation :refer [standard-deviation variance]])
+  (:import [cml.utils.variation Sample Pooled]))
 
 ;TODO Have functions comply with dataframes
 (defprotocol Ordinal)
@@ -7,30 +10,42 @@
 (defprotocol Numerical
   (t-test [tt] "Conducts a TTest on a numerical data set"))
 
-(defrecord OneSample [sample-mean sample-standard-deviation sample-hypothetical-mean sample-size]
+(defrecord OneSample [sample h-mean]
   Numerical
   (t-test [type]
-    (assoc type
-      :t-statistic (/ (- sample-mean
-                         sample-hypothetical-mean)
-                      (/ sample-standard-deviation
-                         (Math/sqrt sample-size)))
-      :dof (dec sample-size))))
+    (let [pcalcs (pvalues (mean sample)
+                          (:standard-deviation (standard-deviation (Sample. (mean sample) sample)))
+                          (count sample))
+          [mean sample-standard-deviation sample-size] pcalcs]
+      (assoc type
+        :t-statistic (/ (- mean h-mean)
+                        (/ sample-standard-deviation
+                           (Math/sqrt sample-size)))
+        :dof (dec sample-size)
+        :sample-mean mean
+        :sample-standard-deviation sample-standard-deviation
+        :sample-size sample-size))))
 
 
-(defrecord EqualVariance [mean population-mean pooled-variance size]
+(defrecord EqualVariance [sample h-mean]
   Numerical
   (t-test [type]
-    (let [[mean-one mean-two] mean
-          [population-mean-one population-mean-two] population-mean
-          [pooled-variance-one pooled-variance-two] pooled-variance
-          [size-one size-two] size]
+    (let [pcalcs (pvalues (map mean sample)
+                          (map mean (partition 1 h-mean))
+                          (map #(:variance (variance (Pooled. (mean %) % (- (count %) 1)))) sample)
+                          (map count sample))
+          [[mean-one mean-two] [population-mean-one population-mean-two]
+           [pooled-variance-one pooled-variance-two] [sample-size-one sample-size-two]] pcalcs]
       (assoc type
         :t-statistic (/ (- (- mean-one mean-two)
                            (- population-mean-one population-mean-two))
                         (Math/sqrt (* (/ (+ pooled-variance-one pooled-variance-two) 2)
-                                      (+ (/ 1 size-one) (/ 1 size-two)))))
-        :dof (- (+ size-one size-two) 2)))))
+                                      (+ (/ 1 sample-size-one) (/ 1 sample-size-two)))))
+        :dof (- (+ sample-size-one sample-size-two) 2)
+        :sample-means [mean-one mean-two]
+        :population-means [population-mean-one population-mean-two]
+        :pooled-variances [pooled-variance-one pooled-variance-two]
+        :sample-sizes [sample-size-one sample-size-two]))))
 
 
 (defrecord Welch [mean sample-variance size]
