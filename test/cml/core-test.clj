@@ -32,23 +32,28 @@
                                                       :sample-sizes [10 10]})))
 
 
-(deftest two-sample-t-test-unequal-variance
+(deftest two-sample-t-test-unequal-variance-welch
   (is (= (welch-ttest {:sample [ballet-dancers football-players]})
-         #cml.statistics.numerical.test.Welch{:mean                      (87.94999999999999 85.19),
-                                              :sample-variance (32.382777777777775 31.181000000000015),
-                                              :size            (10 10),
-                                              :t-statistic     1.0947229724603922,
-                                              :dof             17.993567997176537})))
+         #cml.statistics.numerical.test.Welch{:sample [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+                                                       [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                              :t-statistic 1.0947229724603922,
+                                              :dof 17.993567997176537,
+                                              :sample-means [87.94999999999999 85.19],
+                                              :sample-variances [32.382777777777775 31.181000000000015],
+                                              :sample-sizes [10 10]})))
 
 
 (deftest two-sample-repeated-measure-test
-  (is (= (rep-measure-ttest {:population [after before] :hp-mean [0 0]})
-         #cml.statistics.numerical.test.RepeatedMeasure{:difference-mean                        -11.0,
-                                                                  :population-mean    (0.0 0.0),
-                                                                  :standard-deviation 13.90443574307614,
-                                                                  :size               10,
-                                                                  :t-statistic        -2.5017235438103813,
-                                                                  :dof                9})))
+  (is (= (rep-measure-ttest {:population [after before] :h-mean [0 0]})
+         #cml.statistics.numerical.test.RepeatedMeasure{:population [[200 210 210 170 220 180 190 190 220 210]
+                                                                     [220 240 225 180 210 190 195 200 210 240]],
+                                                        :h-mean [0 0],
+                                                        :t-statistic -2.5017235438103813,
+                                                        :dof 9,
+                                                        :population-means [0.0 0.0],
+                                                        :standard-deviation 13.90443574307614,
+                                                        :population-size 10,
+                                                        :difference-mean -11.0})))
 
 
 (deftest one-sample-conf-inter-test
