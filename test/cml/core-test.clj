@@ -31,6 +31,7 @@
                                                       :pooled-variances [32.382777777777775 31.181000000000015],
                                                       :sample-sizes [10 10]})))
 
+
 (deftest two-sample-t-test-unequal-variance
   (is (= (welch-ttest {:sample [ballet-dancers football-players]})
          #cml.statistics.numerical.test.Welch{:mean                      (87.94999999999999 85.19),
