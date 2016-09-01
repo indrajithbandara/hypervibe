@@ -7,11 +7,7 @@
 (use 'criterium.core)
 
 ;TODO look at using reducers
-(defn expected-values [observed]
-  (for [row-total (map #(reduce + %) observed)
-        column-total (map #(reduce + %) (matrix/columns observed))]
-    (/ (* row-total column-total)
-       (double (matrix/esum observed)))))
+
 
 
 (def obs [[60 300] [10 390]])
