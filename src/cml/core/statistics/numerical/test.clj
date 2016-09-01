@@ -17,17 +17,10 @@
 
 
 (defn welch-ttest [{:keys [sample]}]
-  (t-test (Welch. (map mean sample)
-                  (map #(:variance (variance (Sample. (mean %) %))) sample)
-                  (map count sample))))
+  (t-test (Welch. sample)))
 
 
-(defn rep-measure-ttest [{:keys [population hp-mean]}]
-  (let [[population-one population-two] population
-        population-mean-difference ^double (mean (difference population))]
-    (t-test (RepeatedMeasure. population-mean-difference
-                              (map mean (partition 1 hp-mean))
-                              (:standard-deviation (standard-deviation (Sample. population-mean-difference (difference population))))
-                              (/ (+ (count population-one) (count population-two)) 2)))))
+(defn rep-measure-ttest [{:keys [population h-mean]}]
+  (t-test (RepeatedMeasure. population h-mean)))
 
 
