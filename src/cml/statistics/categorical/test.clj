@@ -13,12 +13,15 @@
 (defrecord -Independance [observed nrows ncols]
   Categorical
   (pearson-chi-square [type]
-    (let [expected (for [row-total (map #(neanderthal/sum (neanderthal-native/dv %)) (neanderthal/rows (neanderthal-native/dge nrows ncols observed)))
-                         column-total (neanderthal/mv! (neanderthal/trans (neanderthal-native/dge nrows ncols observed))
-                                                       (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
-                                                       (neanderthal-native/dv ncols))]
-                     (/ (* row-total column-total)
-                        (reduce + (map #(neanderthal/sum (neanderthal-native/dv %)) (neanderthal-native/dge nrows ncols observed)))))]
+    (let [expected (let [mtrx (neanderthal-native/dge nrows ncols observed)]
+                     (for [row-total (map #(neanderthal/sum (neanderthal-native/dv %)) (neanderthal/rows mtrx))
+                           column-total (neanderthal/mv! (neanderthal/trans mtrx)
+                                                         (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
+                                                         (neanderthal-native/dv ncols))]
+                       (/ (* row-total column-total)
+                          (neanderthal/sum
+                            (neanderthal-native/dv (neanderthal-native/dv observed))))))]
+
       (assoc type :chi (reduce + (map (fn [obs exp]
                                         (/ (* (- obs exp)
                                               (- obs exp)) exp)) observed expected))))))
@@ -101,3 +104,8 @@
 (map p+ (neanderthal-native/dv observed-vals) (neanderthal-native/dv observed-vals))
 
 (neanderthal/sum (fmap -chi (neanderthal-native/dv [60 10 300 390]) (neanderthal-native/dv expected-vals)))
+
+
+(neanderthal/col (neanderthal/trans (neanderthal-native/dge 2 2 observed-vals)) 0)
+(neanderthal/col (neanderthal/trans (neanderthal-native/dge 2 2 observed-vals)) 1)
+
