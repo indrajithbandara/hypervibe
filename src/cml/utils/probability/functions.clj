@@ -9,10 +9,15 @@
 ;TODO look at using reducers
 
 
+(defn expected-values [observed]
+  (for [row-total (map #(reduce + %) observed)
+        column-total (map #(reduce + %) (matrix/columns observed))]
+    (/ (* row-total column-total)
+       (double (matrix/esum observed)))))
 
 (def obs [[60 300] [10 390]])
 
-(def a (neanderthal-native/dge 2 3 [60 10 300 390 4 5]))
+(def a (neanderthal-native/dge 2 3 [60 10 300 390]))
 
 (def x (neanderthal/entry! (neanderthal-native/dv 2) 1.0))
 
