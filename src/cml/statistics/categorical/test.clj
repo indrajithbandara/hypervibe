@@ -19,8 +19,7 @@
                                                          (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
                                                          (neanderthal-native/dv ncols))]
                        (/ (* row-total column-total)
-                          (neanderthal/sum
-                            (neanderthal-native/dv (neanderthal-native/dv observed))))))]
+                          (neanderthal/sum (neanderthal-native/dv observed)))))]
 
       (assoc type :chi (reduce + (map (fn [obs exp]
                                         (/ (* (- obs exp)
@@ -53,19 +52,12 @@
                                         (neanderthal-native/dv ncols))]
       (/ (* row-total column-total)
          (neanderthal/sum
-           (neanderthal-native/dv (neanderthal-native/dv matrix)))))))
+            (neanderthal-native/dv matrix))))))
 
-
-(def obs [[60 300] [10 390]])
 (def observed-vals [60 300 10 390])
 (def expected-vals '(33.1578947368421 36.8421052631579 326.8421052631579 363.1578947368421))
 
-(def expected-val '(33.1578947368421 326.8421052631579 36.8421052631579 363.1578947368421))
-
-(def obs [[60 300] [10 390]])
-
-(matrix/columns obs)
-
+(def expected-vals-mtrx (neanderthal-native/dge 2 2 expected-vals))
 
 (reduce +
         (map
@@ -89,10 +81,8 @@
 (defn ptimes ^double [^double x ^double y]
   (* x y))
 
-
 (defn pdiv ^double [^double x ^double y]
   (/ x y))
-
 
 (defn pminus ^double [^double x ^double y]
   (- x y))
@@ -100,13 +90,20 @@
 (defn sqr ^double [^double x]
   (* x x))
 
+(defn add-one ^double [^double x]
+  (+ x 1))
 
-(map p+ (neanderthal-native/dv observed-vals) (neanderthal-native/dv observed-vals))
-
-(neanderthal/sum (fmap -chi (neanderthal-native/dv [60 10 300 390]) (neanderthal-native/dv expected-vals)))
-
-
+(neanderthal/subvector (neanderthal-native/dv [1 2 3 4 5 6 7 8 9]) 2 5)
 (neanderthal/col (neanderthal/trans (neanderthal-native/dge 2 2 observed-vals)) 0)
 (neanderthal/col (neanderthal/trans (neanderthal-native/dge 2 2 observed-vals)) 1)
+
+(reduce +
+  (fmap -chi [60 10 300 390] expected-vals))
+(fmap -chi [60 10 300 390] expected-vals)
+
+(fmap -chi
+      (neanderthal/col (neanderthal/trans (neanderthal-native/dge 2 2 observed-vals)) 0)
+      (neanderthal/col  expected-vals-mtrx 0))
+
 
 
