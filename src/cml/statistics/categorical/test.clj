@@ -105,5 +105,5 @@
       (neanderthal/col (neanderthal/trans (neanderthal-native/dge 2 2 observed-vals)) 0)
       (neanderthal/col  expected-vals-mtrx 0))
 
-
+(fmap -chi (neanderthal/trans (neanderthal-native/dge 2 2 observed-vals)) expected-vals-mtrx)
 
