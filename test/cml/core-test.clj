@@ -6,7 +6,8 @@
             [cml.utils :refer [zip]]
             [cml.core.statistics.estimate :refer [one-sample-conf-inter two-sample-conf-inter]]
             [cml.core.statistics.numerical.test :refer [one-sample-ttest equal-var-ttest welch-ttest rep-measure-ttest]]
-            [cml.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]))
+            [cml.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]
+            [cml.core.statistics.categorical.test :refer [chi-square-test]]))
 
 
 (deftest one-sample-t-test-test
@@ -86,6 +87,10 @@
   (is (= (one-tail-cv {:dof 9 :alpha 0.05})
          {:critical-value 1.8331, :dof 9, :alpha 0.05})))
 
+
+(deftest chi-square-test-test
+  (is (= (chi-square-test {:observed [60 300 10 390] :nrows 2 :ncols 2})
+         #cml.statistics.categorical.test.Independance{:observed [60 300 10 390], :nrows 2, :ncols 2, :chi 45.47412008281575})))
 
 (def dataset "/Users/gregadebesin/IdeaProjects/cml/resources/datasets/adult/adult.data")
 

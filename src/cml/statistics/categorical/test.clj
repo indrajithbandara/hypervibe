@@ -30,4 +30,41 @@
                                                         (- x y)) y))
                                                 (neanderthal/trans mtrx) (neanderthal-native/dge nrows ncols expected)) one-v zero-v))))))
 
-(neanderthal/mv! (fmap neanderthal/sum (neanderthal-native/dge 2 2 [1 2 3 4]) [1.0 1.0] [0 0]))
+;(neanderthal/mv! (fmap neanderthal/sum (neanderthal-native/dge 2 2 [1 2 3 4]) [1.0 1.0] [0 0]))
+
+(def a (range 100000))
+
+(def mtrx (neanderthal-native/dge 2 2 observed-vals))
+
+
+(for [x (neanderthal/mv! mtrx (neanderthal-native/dv [1 1]) (neanderthal-native/dv [0 0]))]
+  (println x))
+
+;;row
+(neanderthal/mv! (neanderthal/trans mtrx) (neanderthal-native/dv [1 1]) (neanderthal-native/dv [0 0]))
+
+;;cols
+(neanderthal/mv! mtrx (neanderthal-native/dv [1 1]) (neanderthal-native/dv [0 0]))
+
+(defrecord -Independance [observed nrows ncols]
+  Categorical
+  (pearson-chi-square [type]
+    (let [mtrx (neanderthal-native/dge nrows ncols observed)
+          one-v (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
+          zero-v (neanderthal-native/dv ncols)
+          expected (for [row-total (neanderthal/mv! (neanderthal/trans mtrx) one-v zero-v)
+                         column-total (neanderthal/mv! mtrx one-v zero-v)]
+                     (/ (* row-total column-total)
+                        (neanderthal/sum (neanderthal-native/dv observed))))] ;TODO in process of getting rid of for loop
+      (assoc type :chi (neanderthal/sum (neanderthal/mv!
+                                          (fmap (fn ^double [^double x ^double y]
+                                                  (/ (* (- x y)
+                                                        (- x y)) y))
+                                                (neanderthal/trans mtrx) (neanderthal-native/dge nrows ncols expected)) one-v zero-v))))))
+
+
+(def row-total (neanderthal/mv! (neanderthal/trans mtrx) (neanderthal-native/dv [1 1]) (neanderthal-native/dv [0 0])))
+(def column-total (neanderthal/mv! mtrx (neanderthal-native/dv [1 1]) (neanderthal-native/dv [0 0])))
+(def sum-obvs (neanderthal/sum (neanderthal-native/dv observed-vals)))
+
+

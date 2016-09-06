@@ -4,6 +4,6 @@
   (:import [cml.statistics.categorical.test Independance]))
 (use 'criterium.core)
 
-(defn chi-square-test [{:keys [observed]}]
-  (pearson-chi-square (Independance. observed)))
+(defn chi-square-test [{:keys [observed nrows ncols]}]
+  (pearson-chi-square (Independance. observed nrows ncols)))
 
