@@ -8,6 +8,8 @@
 
 
 (def observed-vals [60 300 10 390])
+(def expected-vals '(33.1578947368421 36.8421052631579 326.8421052631579 363.1578947368421))
+
 ;TODO swap out map for fmap and look at changing
 ;TODO move the creation of a matrix outside of the function eg pull mtrx out
 
@@ -54,7 +56,7 @@
           zero-v (neanderthal-native/dv ncols)
           expected (for [row-total (neanderthal/mv! (neanderthal/trans mtrx) one-v zero-v)
                          column-total (neanderthal/mv! mtrx one-v zero-v)]
-                     (/ (* row-total column-total)
+                     (/ (* row-total column-total)          ;TODO outer product§
                         (neanderthal/sum (neanderthal-native/dv observed))))] ;TODO in process of getting rid of for loop
       (assoc type :chi (neanderthal/sum (neanderthal/mv!
                                           (fmap (fn ^double [^double x ^double y]
@@ -66,5 +68,8 @@
 (def row-total (neanderthal/mv! (neanderthal/trans mtrx) (neanderthal-native/dv [1 1]) (neanderthal-native/dv [0 0])))
 (def column-total (neanderthal/mv! mtrx (neanderthal-native/dv [1 1]) (neanderthal-native/dv [0 0])))
 (def sum-obvs (neanderthal/sum (neanderthal-native/dv observed-vals)))
+
+(def rt [360 400])
+(def ct [70  690])
 
 
