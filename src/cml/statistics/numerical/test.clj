@@ -12,7 +12,7 @@
 (defrecord OneSample [sample h-mean]
   Numerical
   (t-test [type]
-    (let [pcalcs (pvalues (mean sample)
+    (let [pcalcs (pvalues (mean sample) ;TODO remove (:standard-deviation.. ) call have fn return num not map. Do for all other util functins like this
                           (:standard-deviation (standard-deviation (Sample. (mean sample) sample)))
                           (count sample))
           [mean sample-standard-deviation sample-size] pcalcs]
