@@ -92,7 +92,7 @@
   (is (= (chi-square-test {:observed [60 300 10 390] :nrows 2 :ncols 2})
          #cml.statistics.categorical.test.Independance{:observed [60 300 10 390], :nrows 2, :ncols 2, :chi 45.47412008281575})))
 
-(def dataset "/Users/gregadebesin/IdeaProjects/cml/resources/datasets/adult/adult.data")
+(def dataset "/Users/gra11/IdeaProjects/cml/resources/datasets/adult/adult.data")
 
 (data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status

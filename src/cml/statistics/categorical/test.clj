@@ -22,7 +22,8 @@
     (let [mtrx (neanderthal-native/dge nrows ncols observed)
           one-v (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
           zero-v (neanderthal-native/dv ncols)
-          expected (for [row-total (map #(neanderthal/sum (neanderthal-native/dv %)) (neanderthal/rows mtrx))
+          expected (for [row-total (map #(neanderthal/sum (neanderthal-native/dv %))
+                                        (neanderthal/rows mtrx))
                          column-total (neanderthal/mv! (neanderthal/trans mtrx) one-v zero-v)]
                      (/ (* row-total column-total)
                         (neanderthal/sum (neanderthal-native/dv observed))))]
@@ -30,7 +31,9 @@
                                           (fmap (fn ^double [^double x ^double y]
                                                   (/ (* (- x y)
                                                         (- x y)) y))
-                                                (neanderthal/trans mtrx) (neanderthal-native/dge nrows ncols expected)) one-v zero-v))))))
+                                                (neanderthal/trans mtrx)
+                                                (neanderthal-native/dge nrows ncols expected))
+                                          one-v zero-v))))))
 
 ;(neanderthal/mv! (fmap neanderthal/sum (neanderthal-native/dge 2 2 [1 2 3 4]) [1.0 1.0] [0 0]))
 
@@ -54,7 +57,8 @@
     (let [mtrx (neanderthal-native/dge nrows ncols observed)
           one-v (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
           zero-v (neanderthal-native/dv ncols)
-          expected (for [row-total (neanderthal/mv! (neanderthal/trans mtrx) one-v zero-v)
+          transpose (neanderthal/trans mtrx)
+          expected (for [row-total (neanderthal/mv! transpose one-v zero-v)
                          column-total (neanderthal/mv! mtrx one-v zero-v)]
                      (/ (* row-total column-total)          ;TODO outer product§
                         (neanderthal/sum (neanderthal-native/dv observed))))] ;TODO in process of getting rid of for loop
@@ -62,14 +66,27 @@
                                           (fmap (fn ^double [^double x ^double y]
                                                   (/ (* (- x y)
                                                         (- x y)) y))
-                                                (neanderthal/trans mtrx) (neanderthal-native/dge nrows ncols expected)) one-v zero-v))))))
+                                                transpose
+                                                (neanderthal-native/dge nrows ncols expected))
+                                          one-v zero-v))))))
 
 
-(def row-total (neanderthal/mv! (neanderthal/trans mtrx) (neanderthal-native/dv [1 1]) (neanderthal-native/dv [0 0])))
-(def column-total (neanderthal/mv! mtrx (neanderthal-native/dv [1 1]) (neanderthal-native/dv [0 0])))
+(def row-total (neanderthal/mv! (neanderthal/trans mtrx)
+                                (neanderthal-native/dv [1 1])
+                                (neanderthal-native/dv [0 0])))
+(def column-total (neanderthal/mv! mtrx (neanderthal-native/dv [1 1])
+                                   (neanderthal-native/dv [0 0])))
 (def sum-obvs (neanderthal/sum (neanderthal-native/dv observed-vals)))
 
 (def rt [360 400])
 (def ct [70  690])
 
 
+
+(def rt-times-ct '(25200.0 248400.0 28000.0 276000.0))
+
+;rt =>  #RealBlockVector[double, n:2, stride:1](360.0 400.0)
+;ct =>  #RealBlockVector[double, n:2, stride:1](70.0 690.0)
+
+
+(def foo (neanderthal-native/dge 2 2 [60 300 10 390]))
