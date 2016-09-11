@@ -74,6 +74,7 @@
 (def row-total (neanderthal/mv! (neanderthal/trans mtrx)
                                 (neanderthal-native/dv [1 1])
                                 (neanderthal-native/dv [0 0])))
+
 (def column-total (neanderthal/mv! mtrx (neanderthal-native/dv [1 1])
                                    (neanderthal-native/dv [0 0])))
 (def sum-obvs (neanderthal/sum (neanderthal-native/dv observed-vals)))
@@ -90,3 +91,10 @@
 
 
 (def foo (neanderthal-native/dge 2 2 [60 300 10 390]))
+
+
+(neanderthal/rank
+  column-total
+  row-total)
+
+
