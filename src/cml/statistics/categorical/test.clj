@@ -1,59 +1,27 @@
 (ns cml.statistics.categorical.test
-  (:require [clojure.core.matrix :as matrix]
-            [clojure.core.reducers :as r]
-            [clojure.core.matrix.operators :as op]
-            [uncomplicate.neanderthal.native :as neanderthal-native]
+  (:require [uncomplicate.neanderthal.native :as neanderthal-native]
             [uncomplicate.neanderthal.core :as neanderthal])
   (:use [uncomplicate.fluokitten core jvm]))
-
-
-(def observed-vals [60 300 10 390])
-(def expected-vals '(33.1578947368421 36.8421052631579 326.8421052631579 363.1578947368421))
-
-;TODO swap out map for fmap and look at changing
-;TODO move the creation of a matrix outside of the function eg pull mtrx out
 
 (defprotocol Categorical
   (pearson-chi-square [s] "Conducts a Chi Square test on a categorical data set"))
 
+
+;TODO see if fmap has something to do with out of memory
 (defrecord Independance [observed nrows ncols]
   Categorical
   (pearson-chi-square [type]
     (let [mtrx (neanderthal-native/dge nrows ncols observed)
           one-v (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
           zero-v (neanderthal-native/dv ncols)
-          expected (for [row-total (map #(neanderthal/sum (neanderthal-native/dv %))
-                                        (neanderthal/rows mtrx))
-                         column-total (neanderthal/mv! (neanderthal/trans mtrx) one-v zero-v)]
-                     (/ (* row-total column-total)
-                        (neanderthal/sum (neanderthal-native/dv observed))))]
-      (assoc type :chi (neanderthal/sum (neanderthal/mv!
-                                          (fmap (fn ^double [^double x ^double y]
-                                                  (/ (* (- x y)
-                                                        (- x y)) y))
-                                                (neanderthal/trans mtrx)
-                                                (neanderthal-native/dge nrows ncols expected))
-                                          one-v zero-v))))))
-
-;(neanderthal/mv! (fmap neanderthal/sum (neanderthal-native/dge 2 2 [1 2 3 4]) [1.0 1.0] [0 0]))
-
-(defrecord -Independance [observed nrows ncols]
-  Categorical
-  (pearson-chi-square [type]
-    (let [mtrx (neanderthal-native/dge nrows ncols observed)
-          one-v (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
-          zero-v (neanderthal-native/dv ncols)
-          transpose (neanderthal/trans mtrx)
-          sum-obs (neanderthal/sum (neanderthal-native/dv observed-vals))
-          row-total (neanderthal/mv! transpose one-v zero-v)
-          column-total (neanderthal/mv! mtrx one-v zero-v)] ;TODO in process of getting rid of for loop
+          sum-obs (neanderthal/sum (neanderthal-native/dv observed))
+          transposed-mtrx (neanderthal/trans mtrx)]
       (assoc type :chi (neanderthal/sum (neanderthal/mv!
                                           (fmap! (fn ^double [^double x ^double y]
-                                                  (/ (* (- x y)
-                                                        (- x y)) y))
-                                                transpose
-                                                (fmap! (fn ^double [^double x] (/ x sum-obs))
-                                                       (neanderthal/rank
-                                                         row-total
-                                                         column-total)))
-                                          one-v zero-v))))))
+                                                   (/ (* (- x y)
+                                                         (- x y)) y)) transposed-mtrx
+                                                 (fmap! (fn ^double [^double x] (/ x sum-obs))
+                                                        (neanderthal/rank
+                                                          (neanderthal/mv! transposed-mtrx one-v zero-v)
+                                                          (neanderthal/mv! mtrx one-v (neanderthal-native/dv ncols))))) one-v zero-v))))))
+
