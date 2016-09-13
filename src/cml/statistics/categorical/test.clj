@@ -7,7 +7,9 @@
   (pearson-chi-square [s] "Conducts a Chi Square test on a categorical data set"))
 
 
-;TODO see if fmap has something to do with out of memory
+;TODO see if fmap! has something to do with out of memory and change to fmap if so
+;TODO increase GC heap space in leiningen
+
 (defrecord Independance [observed nrows ncols]
   Categorical
   (pearson-chi-square [type]
