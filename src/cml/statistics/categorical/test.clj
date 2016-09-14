@@ -2,6 +2,7 @@
   (:require [uncomplicate.neanderthal.native :as neanderthal-native]
             [uncomplicate.neanderthal.core :as neanderthal])
   (:use [uncomplicate.fluokitten core jvm]))
+(use 'criterium.core)
 
 (defprotocol Categorical
   (pearson-chi-square [s] "Conducts a Chi Square test on a categorical data set"))
@@ -18,12 +19,13 @@
           zero-v (neanderthal-native/dv ncols)
           sum-obs (neanderthal/sum (neanderthal-native/dv observed))
           transposed-mtrx (neanderthal/trans mtrx)]
-      (assoc type :chi (neanderthal/sum (neanderthal/mv!
-                                          (fmap! (fn ^double [^double x ^double y]
+      (assoc :chi (neanderthal/sum (neanderthal/mv!
+                                          (fmap! (^:once fn* ^double [^double x ^double y]
                                                    (/ (* (- x y)
                                                          (- x y)) y)) transposed-mtrx
-                                                 (fmap! (fn ^double [^double x] (/ x sum-obs))
+                                                 (fmap! (^:once fn* ^double [^double x] (/ x sum-obs))
                                                         (neanderthal/rank
                                                           (neanderthal/mv! transposed-mtrx one-v zero-v)
                                                           (neanderthal/mv! mtrx one-v (neanderthal-native/dv ncols))))) one-v zero-v))))))
 
+(neanderthal-native/dv (take 100000000 (range))) ;CAUSING OUT OF MEMORY SUBMIT PULL REQUEST
