@@ -9,6 +9,9 @@
             [cml.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]
             [cml.core.statistics.categorical.test :refer [chi-square-test]]))
 
+;TODO reformat project structure as per http://www.abs.gov.au/websitedbs/a3121120.nsf/home/statistical+language+-+what+are+variables
+;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
+
 
 (deftest one-sample-t-test-test
   (is (= (one-sample-ttest {:sample population-one :h-mean 400})

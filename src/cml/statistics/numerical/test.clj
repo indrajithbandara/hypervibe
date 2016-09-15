@@ -7,7 +7,8 @@
 ;TODO Have functions comply with dataframes
 
 (defprotocol Numerical
-  (t-test [tt] "Conducts a TTest on a numerical data set"))
+  (t-test [tt] "Conducts a TTest on a numerical data set")
+  (median-test [mt] "Conducts a median test on a numerical dataset"))
 
 (defrecord OneSample [sample h-mean]
   Numerical

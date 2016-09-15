@@ -5,6 +5,7 @@
   (:use [uncomplicate.fluokitten core jvm]))
 (use 'criterium.core)
 
+
 (defprotocol Categorical
   (pearson-chi-square [s] "Conducts a Chi Square test on a categorical data set"))
 
