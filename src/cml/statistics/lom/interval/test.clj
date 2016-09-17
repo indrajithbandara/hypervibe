@@ -26,6 +26,7 @@
                   :sample-standard-deviation sample-standard-deviation
                   :sample-size sample-size))))
 
+
 (defrecord EqualVariance [sample h-mean]
   Interval
   (ttest [type]
@@ -44,6 +45,7 @@
                   :population-means [population-mean-one population-mean-two]
                   :pooled-variances [pooled-variance-one pooled-variance-two]
                   :sample-sizes [sample-size-one sample-size-two]))))
+
 
 (defrecord Welch [sample]
   Interval

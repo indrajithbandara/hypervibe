@@ -17,6 +17,8 @@
 
 (defn ^double mean-1 [data] (/ (r/fold + data) (dec (count data))))
 
+(defn -mean-1 ^double [data] (pminus (pdiv (neanderthal/sum data) (neanderthal/ecount data)) 1))
+
 (defn ^doubles difference [[sample-one sample-two]] (map - sample-one sample-two))
 
 (defn -difference [vec-one vec-two] (vminus vec-one vec-two))
@@ -38,8 +40,4 @@
         (Math/sqrt sample-size))
      (Math/sqrt (- 1 (* correlation correlation)))))
 
-
-(def d1 (neanderthal-native/dv [1.0 2.0 3.0]))
-(def d2 (neanderthal-native/dv [4.0 5.0 6.0]))
-(def d3 (neanderthal-native/dv [1.0 2.0 3.0 4.0 5.0]))
 
