@@ -1,14 +1,26 @@
 (ns cml.utils.central-tendancy
-  (:use [criterium.core])
   (:require [cml.utils :refer [double-asum]]
-            [clojure.core.reducers :as r]))
+            [clojure.core.reducers :as r]
+            [uncomplicate.neanderthal.native :as neanderthal-native]
+            [uncomplicate.neanderthal.core :as neanderthal]
+            [cml.utils.primitive :refer [pdiv pminus ptimes pplus]]
+            [uncomplicate.commons.core :refer [with-release]]
+            [cml.utils.vector :refer [vminus]])
+  (:use [uncomplicate.fluokitten core jvm]))
 (use 'criterium.core)
+
+;TODO implement BLAS versions of functions for interval tests re implementation
+
+(defn -mean ^double [data] (pdiv (neanderthal/sum data) (neanderthal/ecount data)))
 
 (defn ^double mean [data] (/ (r/fold + data) (count data)))
 
 (defn ^double mean-1 [data] (/ (r/fold + data) (dec (count data))))
 
 (defn ^doubles difference [[sample-one sample-two]] (map - sample-one sample-two))
+
+(defn -difference [vec-one vec-two] (vminus vec-one vec-two))
+
 
 (defn permutations
   [x xs]                                                    ;TODO Put in respectable NS
@@ -26,4 +38,8 @@
         (Math/sqrt sample-size))
      (Math/sqrt (- 1 (* correlation correlation)))))
 
+
+(def d1 (neanderthal-native/dv [1.0 2.0 3.0]))
+(def d2 (neanderthal-native/dv [4.0 5.0 6.0]))
+(def d3 (neanderthal-native/dv [1.0 2.0 3.0 4.0 5.0]))
 

@@ -7,7 +7,9 @@
 
 ;TODO seperate out tests into differnt packages depending on the data types eg numerical/categorocal etc
 
-(defn one-sample-ttest [{:keys [sample h-mean]}]
+(defn one-sample-ttest
+  "Computes a students t-test for testing the null hypothesis that the population mean, is equal to a hypothesised mean"
+  [{:keys [sample h-mean]}]
   (ttest (OneSample. sample h-mean)))
 
 

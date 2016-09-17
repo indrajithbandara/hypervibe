@@ -1,8 +1,12 @@
 (ns cml.statistics.lom.interval.test
   (:require [cml.utils.tables :refer [t-table]]
             [cml.utils.central-tendancy :refer [mean difference]]
-            [cml.utils.variation :refer [standard-deviation variance]])
-  (:import [cml.utils.variation Sample Pooled]))
+            [cml.utils.variation :refer [standard-deviation variance]]
+            [uncomplicate.neanderthal.native :as neanderthal-native]
+            [uncomplicate.neanderthal.core :as neanderthal]
+            [uncomplicate.commons.core :refer [with-release]])
+  (:import [cml.utils.variation Sample Pooled])
+  (:use [uncomplicate.fluokitten core jvm]))
 
 (defprotocol Interval
   (ttest [this] "Conducts a ttest on a dataset that has an interval level of measurement"))

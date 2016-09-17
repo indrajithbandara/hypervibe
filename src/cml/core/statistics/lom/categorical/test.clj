@@ -5,8 +5,8 @@
 
 (defn chi-square-test
 
-  "Computes a Pearson chi square test that is applied to sets of categorical
-   data (has been counted and divided into categories) to evaluate how likely
+  "Computes a Pearson chi square test that is applied to a set of categorical
+   (has been counted and divided into categories) data to evaluate how likely
    it is that any observed difference between the sets arose by chance.
 
    Takes a map of the form:

@@ -16,8 +16,7 @@
                    one-v-rows (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
                    zero-v-cols (neanderthal-native/dv ncols)
                    transposed-mtrx (neanderthal/trans mtrx)]
-                  (assoc type :chi (neanderthal/sum
-                                     (neanderthal/mv!
+                  (assoc type :chi (neanderthal/sum (neanderthal/mv!
                                        (fmap! (^:once fn* ^double [^double x ^double y]
                                                 (/ (* (- x y)
                                                       (- x y)) y)) transposed-mtrx
@@ -28,4 +27,5 @@
                                                        (neanderthal/mv! mtrx (neanderthal/entry! (neanderthal-native/dv ncols) 1.0)
                                                                         (neanderthal-native/dv nrows)))))
                                        one-v-rows zero-v-cols))))))
+
 
