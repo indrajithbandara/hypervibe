@@ -1,18 +1,15 @@
-(ns cml.statistics.numerical.test
+(ns cml.statistics.lom.interval.test
   (:require [cml.utils.tables :refer [t-table]]
             [cml.utils.central-tendancy :refer [mean difference]]
             [cml.utils.variation :refer [standard-deviation variance]])
   (:import [cml.utils.variation Sample Pooled]))
 
-;TODO Have functions comply with dataframes
-
-(defprotocol Numerical
-  (t-test [tt] "Conducts a TTest on a numerical data set")
-  (median-test [mt] "Conducts a median test on a numerical dataset"))
+(defprotocol Interval
+  (ttest [this] "Conducts a ttest on a dataset that has an interval level of measurement"))
 
 (defrecord OneSample [sample h-mean]
-  Numerical
-  (t-test [type]
+  Interval
+  (ttest [type]
     (let [pcalcs (pvalues (mean sample) ;TODO remove (:standard-deviation.. ) call have fn return num not map. Do for all other util functins like this
                           (:standard-deviation (standard-deviation (Sample. (mean sample) sample)))
                           (count sample))
@@ -25,10 +22,9 @@
                   :sample-standard-deviation sample-standard-deviation
                   :sample-size sample-size))))
 
-
 (defrecord EqualVariance [sample h-mean]
-  Numerical
-  (t-test [type]
+  Interval
+  (ttest [type]
     (let [pcalcs (pvalues (map mean sample)
                           (map mean (partition 1 h-mean))
                           (map #(:variance (variance (Pooled. (mean %) % (- (count %) 1)))) sample)
@@ -45,10 +41,9 @@
                   :pooled-variances [pooled-variance-one pooled-variance-two]
                   :sample-sizes [sample-size-one sample-size-two]))))
 
-
 (defrecord Welch [sample]
-  Numerical
-  (t-test [type]
+  Interval
+  (ttest [type]
     (let [pcalcs (pvalues (map mean sample)
                           (map #(:variance (variance (Sample. (mean %) %))) sample)
                           (map count sample))
@@ -56,7 +51,7 @@
            [sample-size-one sample-size-two]] pcalcs]
       (assoc type :t-statistic (/ (- mean-one mean-two)
                                   (Math/sqrt (+ (/ sample-variance-one sample-size-one)
-                                      (/ sample-variance-two sample-size-two))))
+                                                (/ sample-variance-two sample-size-two))))
                   :dof (/ (* (+ (/ sample-variance-one sample-size-one)
                                 (/ sample-variance-two sample-size-two))
                              (+ (/ sample-variance-one sample-size-one)
@@ -71,10 +66,9 @@
                   :sample-variances [sample-variance-one sample-variance-two]
                   :sample-sizes [sample-size-one sample-size-two]))))
 
-
 (defrecord RepeatedMeasure [population h-mean]
-  Numerical
-  (t-test [type]
+  Interval
+  (ttest [type]
     (let [pcalcs (pvalues (mean (difference population))
                           (map mean (partition 1 h-mean))
                           (:standard-deviation (standard-deviation (Sample. (mean (difference population)) (difference population))))

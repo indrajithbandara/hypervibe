@@ -1,14 +1,12 @@
-(ns cml.statistics.categorical.test
+(ns cml.statistics.lom.categorical.test
   (:require [uncomplicate.neanderthal.native :as neanderthal-native]
             [uncomplicate.neanderthal.core :as neanderthal]
             [uncomplicate.commons.core :refer [with-release]])
   (:use [uncomplicate.fluokitten core jvm]))
-(use 'criterium.core)
 
-
-(defprotocol Categorical
-  (pearson-chi-square [s] "Conducts a Chi Square test on a categorical data set"))
-
+(defprotocol Categorical (pearson-chi-square [this]
+    "Conducts a pearson chi square test on a dataset that has an
+     categorical level of measurement"))
 
 (defrecord Independance [observed nrows ncols]
   Categorical
@@ -28,6 +26,5 @@
                                                        (neanderthal/mv! transposed-mtrx one-v-rows zero-v-cols)
                                                        (neanderthal/mv! mtrx (neanderthal/entry! (neanderthal-native/dv ncols) 1.0)
                                                                         (neanderthal-native/dv nrows)))))
-                                                      one-v-rows zero-v-cols))))))
-
+                                       one-v-rows zero-v-cols))))))
 
