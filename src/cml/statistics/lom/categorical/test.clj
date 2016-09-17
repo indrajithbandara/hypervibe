@@ -4,9 +4,10 @@
             [uncomplicate.commons.core :refer [with-release]])
   (:use [uncomplicate.fluokitten core jvm]))
 
-(defprotocol Categorical (pearson-chi-square [this]
-    "Conducts a pearson chi square test on a dataset that has an
-     categorical level of measurement"))
+(defprotocol Categorical
+  (pearson-chi-square [this]
+    "Conducts a pearson chi square test on a dataset
+     that has acategorical level of measurement"))
 
 (defrecord Independance [observed nrows ncols]
   Categorical
