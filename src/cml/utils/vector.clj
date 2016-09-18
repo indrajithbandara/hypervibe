@@ -4,7 +4,7 @@
 
 (defn vminus [vec-one vec-two]
   "Subtracts two vectors"
-  (neanderthal/axpy -1 vec-two vec-one))
+  (neanderthal/axpy -1 vec-one vec-two))
 
 (defn vplus [vec-one vec-two]
   "Adds two vectors"

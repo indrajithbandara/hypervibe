@@ -17,7 +17,7 @@
 
 (defn ^double mean-1 [data] (/ (r/fold + data) (dec (count data))))
 
-(defn -mean-1 ^double [data] (pminus (pdiv (neanderthal/sum data) (neanderthal/ecount data)) 1))
+(defn -mean-1 ^double [data]  (pdiv (neanderthal/sum data) (pminus (neanderthal/ecount data) 1)) )
 
 (defn ^doubles difference [[sample-one sample-two]] (map - sample-one sample-two))
 

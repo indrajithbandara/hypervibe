@@ -17,9 +17,9 @@
 
 
 (defn -standard-deviation [data-mean data]
-  (Math/sqrt (-mean-1 (neanderthal/dot                      ;TODO wrong
-                        (vminus (neanderthal/entry! data data-mean) data)
-                        (vminus (neanderthal/entry! data data-mean) data)))))
+  (with-release [data-means (neanderthal-native/dv (repeat (neanderthal/ecount data) data-mean))
+                 minus-data-means (vminus data-means (neanderthal-native/dv data))]
+                (Math/sqrt (-mean-1 (fmap ptimes minus-data-means minus-data-means)))))
 
 
 (defrecord Sample [sample-mean sample]
@@ -58,12 +58,4 @@
                 (/ (* size-1 (/ (reduce + (map #(* (- % pooled-mean) (- % pooled-mean)) pooled-data))
                                 (dec (count pooled-data)))) size-1))))
 
-;(mean [3 6 3 7 5 44 6 7]) => 10.125
 
-(def d1 (neanderthal-native/dv [1.0 2.0 3.0]))
-(def d2 (neanderthal-native/dv [4.0 5.0 6.0]))
-(def d3 (neanderthal-native/dv [1.0 2.0 3.0 4.0 5.0]))
-(def d4 (neanderthal-native/dv [3.0 6.0 3.0 7.0 5.0 44.0 6.0 7.0]))
-(def d99 (neanderthal-native/dv [3.0 6.0 3.0 7.0 5.0 44.0 6.0 7.0]))
-(def d5 (neanderthal/entry! d99 10.125))
-(def d6 (neanderthal-native/dv [9 5 3 5 66 77 8 7]))
