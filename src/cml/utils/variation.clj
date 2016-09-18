@@ -16,10 +16,10 @@
   (variance [v] "Variance"))
 
 
-(defn -standard-deviation [data-mean data]
+(defn -standard-deviation [data-mean data]                  ;TODO reimplement to slow.. get rid of (repeat ..)
   (with-release [data-means (neanderthal-native/dv (repeat (neanderthal/ecount data) data-mean))
                  minus-data-means (vminus data-means (neanderthal-native/dv data))]
-                (Math/sqrt (-mean-1 (fmap ptimes minus-data-means minus-data-means)))))
+                (Math/sqrt (-mean-1 (fmap! ptimes minus-data-means minus-data-means)))))
 
 
 (defrecord Sample [sample-mean sample]
