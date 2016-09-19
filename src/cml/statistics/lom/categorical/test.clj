@@ -9,6 +9,7 @@
     "Conducts a pearson chi square test on a dataset
      that has acategorical level of measurement"))
 
+;TODO use vminus
 (defrecord Independance [observed nrows ncols]
   Categorical
   (pearson-chi-square [type]

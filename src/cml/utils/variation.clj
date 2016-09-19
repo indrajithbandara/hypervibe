@@ -17,11 +17,14 @@
 
 
 (defn -standard-deviation [data mean]
-  (with-release [minus-data-means
-                 (vminus (neanderthal/entry!
-                           (neanderthal-native/dv data) mean)
-                         (neanderthal-native/dv data))]
+  (with-release [minus-data-means (vminus (neanderthal/entry! (neanderthal-native/dv data) mean)
+                                          (neanderthal-native/dv data))]
                 (Math/sqrt (-mean-1 (fmap! ptimes minus-data-means minus-data-means)))))
+
+(defn -sample-variance [data mean]
+  (/ (neanderthal/dot (vminus (neanderthal/entry! (neanderthal-native/dv data) mean)
+                              (neanderthal-native/dv data)) data)
+     (dec (neanderthal/ecount data))))
 
 
 (defrecord Sample [sample-mean sample]
@@ -35,7 +38,8 @@
 
   (variance [type]
     (assoc type :variance
-                (/ (reduce + (map #(* (- % sample-mean) (- % sample-mean)) sample))
+                (/ (reduce + (map #(* (- % sample-mean)
+                                      (- % sample-mean)) sample))
          (dec (count sample))))))
 
 
@@ -60,4 +64,20 @@
                 (/ (* size-1 (/ (reduce + (map #(* (- % pooled-mean) (- % pooled-mean)) pooled-data))
                                 (dec (count pooled-data)))) size-1))))
 
+(Math/sqrt
+  (/
+    (neanderthal/dot
+      (vminus
+        (neanderthal-native/dv [sm sm sm sm sm])
+        (neanderthal-native/dv [2 5 4 7 5]))
+      (neanderthal-native/dv [2 5 4 7 5]))
+    (neanderthal/ecount (neanderthal-native/dv [2 5 4 7 5]))))
 
+(/
+  (reduce +
+          (map #(* (- sm %)
+                   (- sm %))
+               [2 5 4 7 5]))
+  (dec (count [2 5 4 7 5])))
+
+(neanderthal/ecount (neanderthal-native/dv [2 5 4 7 5]))

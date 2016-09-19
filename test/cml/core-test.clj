@@ -121,4 +121,3 @@
 ;http://www.ats.ucla.edu/stat/stata/whatstat/whatstat.htm
 ;http://www.ats.ucla.edu/stat/mult_pkg/whatstat/nominal_ordinal_interval.htm
 
-
