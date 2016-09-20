@@ -10,6 +10,7 @@
      that has acategorical level of measurement"))
 
 ;TODO use vminus
+;TODO use rank!
 (defrecord Independance [observed nrows ncols]
   Categorical
   (pearson-chi-square [type]
