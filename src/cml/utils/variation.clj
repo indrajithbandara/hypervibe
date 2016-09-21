@@ -20,7 +20,7 @@
   (with-release [minus-data-means
                  (vminus (neanderthal/entry!
                            (neanderthal-native/dv data) mean)
-                   (neanderthal-native/dv data))]
+                          data)]
                 (Math/sqrt (-mean-1
                              (fmap! ptimes
                                     minus-data-means
@@ -31,7 +31,8 @@
   (/ (neanderthal/dot
        (vminus (neanderthal/entry!
                  (neanderthal-native/dv data) mean)
-               (neanderthal-native/dv data)) data)
+               data)
+       data)
      (dec (neanderthal/ecount data))))
 
 
@@ -39,7 +40,7 @@
   (with-release [minus-data-means
                  (vminus (neanderthal/entry!
                            (neanderthal-native/dv data) mean)
-                         (neanderthal-native/dv data))]
+                         data)]
                 (Math/sqrt (-mean
                              (fmap! ptimes
                                     minus-data-means
@@ -49,7 +50,8 @@
   (/ (neanderthal/dot
        (vminus (neanderthal/entry!
                  (neanderthal-native/dv data) mean)
-               (neanderthal-native/dv data)) data)
+               data)
+       data)
      (neanderthal/ecount data)))
 
 
