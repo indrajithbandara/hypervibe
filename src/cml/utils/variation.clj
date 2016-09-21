@@ -3,13 +3,11 @@
             [uncomplicate.neanderthal.native :as nn]
             [uncomplicate.neanderthal.core :as n]
             [cml.utils.primitive :refer [pdiv pminus ptimes pplus]]
-            [uncomplicate.commons.core :refer [with-release let-release]]
+            [uncomplicate.commons.core :refer [with-release]]
             [cml.utils.vector :refer [vminus]])
   (:use [uncomplicate.fluokitten core jvm]))
 
-;TODO remove protocol for plain functions
-;TODO implements as BLAS functions
-;TODO change return types to be the calculation not map
+;TODO move into single utils file
 
 (defprotocol Variation
   (standard-deviation [sd] "Standard deviation")

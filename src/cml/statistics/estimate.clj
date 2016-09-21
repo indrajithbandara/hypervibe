@@ -1,6 +1,6 @@
 (ns cml.statistics.estimate)
 
-;TODO Have functions comply with dataframes
+;TODO implement BLAS versions
 
 (defprotocol Estimate
   (confidence-interval [ci] "Confidence imterval"))

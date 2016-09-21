@@ -8,6 +8,8 @@
   (:import [cml.utils.variation Sample Pooled])
   (:use [uncomplicate.fluokitten core jvm]))
 
+;TODO implement BLAS versions
+
 (defprotocol Interval
   (ttest [this] "Conducts a ttest on a dataset that has an interval level of measurement"))
 

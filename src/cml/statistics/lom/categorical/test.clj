@@ -1,33 +1,32 @@
 (ns cml.statistics.lom.categorical.test
-  (:require [uncomplicate.neanderthal.native :as neanderthal-native]
-            [uncomplicate.neanderthal.core :as neanderthal]
-            [uncomplicate.commons.core :refer [with-release]])
+  (:require [uncomplicate.neanderthal.native :as nn]
+            [uncomplicate.neanderthal.core :as n]
+            [uncomplicate.commons.core :refer [with-release]]
+            [cml.utils.vector :refer [vminus]])
   (:use [uncomplicate.fluokitten core jvm]))
+(use 'criterium.core)
 
 (defprotocol Categorical
   (pearson-chi-square [this]
     "Conducts a pearson chi square test on a dataset
      that has acategorical level of measurement"))
 
-;TODO use vminus
-;TODO use rank!
 (defrecord Independance [observed nrows ncols]
   Categorical
   (pearson-chi-square [type]
-    (with-release [mtrx (neanderthal-native/dge nrows ncols observed)
-                   one-v-rows (neanderthal/entry! (neanderthal-native/dv nrows) 1.0)
-                   zero-v-cols (neanderthal-native/dv ncols)
-                   transposed-mtrx (neanderthal/trans mtrx)]
-                  (assoc type :chi (neanderthal/sum (neanderthal/mv!
-                                       (fmap! (^:once fn* ^double [^double x ^double y]
-                                                (/ (* (- x y)
-                                                      (- x y)) y)) transposed-mtrx
-                                              (fmap! (fn ^double [^double x]
-                                                       (/ x (neanderthal/sum (neanderthal-native/dv observed))))
-                                                     (neanderthal/rank
-                                                       (neanderthal/mv! transposed-mtrx one-v-rows zero-v-cols)
-                                                       (neanderthal/mv! mtrx (neanderthal/entry! (neanderthal-native/dv ncols) 1.0)
-                                                                        (neanderthal-native/dv nrows)))))
-                                       one-v-rows zero-v-cols))))))
-
-
+    (with-release
+      [mtrx (nn/dge nrows ncols observed)
+       vrows (n/entry! (nn/dv nrows) 1.0)
+       vcols (nn/dv ncols)
+       transposed (n/trans mtrx)]
+      (assoc type :chi
+        (n/sum (n/mv! (fmap!
+                        (^:once fn* ^double [^double x ^double y]
+                          (/ (* (- x y) (- x y)) y)) transposed
+                        (fmap! (fn ^double [^double x]
+                                 (/ x (n/sum (nn/dv observed))))
+                               (n/rank (n/mv! transposed vrows vcols)
+                                       (n/mv! mtrx (n/entry! (nn/dv ncols)
+                                                             1.0)
+                                              (nn/dv nrows)))))
+                      vrows vcols))))))

@@ -10,6 +10,7 @@
 (use 'criterium.core)
 
 ;TODO implement BLAS versions of functions for interval tests re implementation
+;TODO move into single utils file
 
 (defn -mean ^double [data] (pdiv (neanderthal/sum data) (neanderthal/ecount data)))
 
