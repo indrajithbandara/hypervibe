@@ -1,9 +1,9 @@
 (ns cml.utils.variation
   (:require [cml.utils.central-tendancy :refer [mean -mean mean-1 -mean-1]]
-            [uncomplicate.neanderthal.native :as neanderthal-native]
-            [uncomplicate.neanderthal.core :as neanderthal]
+            [uncomplicate.neanderthal.native :as nn]
+            [uncomplicate.neanderthal.core :as n]
             [cml.utils.primitive :refer [pdiv pminus ptimes pplus]]
-            [uncomplicate.commons.core :refer [with-release]]
+            [uncomplicate.commons.core :refer [with-release let-release]]
             [cml.utils.vector :refer [vminus]])
   (:use [uncomplicate.fluokitten core jvm]))
 
@@ -16,43 +16,31 @@
   (variance [v] "Variance"))
 
 
-(defn -smpl-stndrd-dev [data mean]
-  (with-release [minus-data-means
-                 (vminus (neanderthal/entry!
-                           (neanderthal-native/dv data) mean)
-                          data)]
-                (Math/sqrt (-mean-1
-                             (fmap! ptimes
-                                    minus-data-means
-                                    minus-data-means)))))
+(defn -smpl-std-dev [data mean]
+  "Computes the sample standard deviation"
+  (with-release [means (vminus (n/entry! (nn/dv data) mean) data)]
+                (Math/sqrt (-mean-1 (fmap! ptimes means means)))))
 
+(defn -pop-std-dev [data mean]
+  "Computes the population standard deviation"
+  (with-release [means (vminus (n/entry! (nn/dv data) mean) data)]
+                (Math/sqrt (-mean (fmap! ptimes means means)))))
 
 (defn -smpl-var [data mean]
-  (/ (neanderthal/dot
-       (vminus (neanderthal/entry!
-                 (neanderthal-native/dv data) mean)
-               data)
-       data)
-     (dec (neanderthal/ecount data))))
-
-
-(defn -pop-stndrd-dev [data mean]
-  (with-release [minus-data-means
-                 (vminus (neanderthal/entry!
-                           (neanderthal-native/dv data) mean)
-                         data)]
-                (Math/sqrt (-mean
-                             (fmap! ptimes
-                                    minus-data-means
-                                    minus-data-means)))))
+  "Computes the sample variance"
+  (/ (n/dot (vminus (n/entry! (nn/dv data) mean) data) data)
+     (dec (n/ecount data))))
 
 (defn -pop-var [data mean]
-  (/ (neanderthal/dot
-       (vminus (neanderthal/entry!
-                 (neanderthal-native/dv data) mean)
-               data)
-       data)
-     (neanderthal/ecount data)))
+  "Computes the population variance"
+  (/ (n/dot (vminus (n/entry! (nn/dv data) mean) data) data)
+     (n/ecount data)))
+
+(defn -pool-var [data mean]
+  "Computes the pooled variance"
+  (let-release [means  (vminus (n/entry! (nn/dv data) mean) data)]
+               (let [ec (dec (n/ecount data))]
+                 (/ (* ec (/ (n/dot means data) ec)) ec))))
 
 
 (defrecord Sample [sample-mean sample]
