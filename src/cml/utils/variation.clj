@@ -36,7 +36,7 @@
 
 (defn -pool-var [data mean]
   "Computes the pooled variance"
-  (let-release [means  (vminus (n/entry! (nn/dv data) mean) data)]
+  (with-release [means  (vminus (n/entry! (nn/dv data) mean) data)]
                (let [ec (dec (n/ecount data))]
                  (/ (* ec (/ (n/dot means data) ec)) ec))))
 

@@ -121,3 +121,7 @@
 ;http://www.ats.ucla.edu/stat/stata/whatstat/whatstat.htm
 ;http://www.ats.ucla.edu/stat/mult_pkg/whatstat/nominal_ordinal_interval.htm
 
+(def ostest (one-sample-ttest {:sample [1 2 3] :h-mean 4})) ;Polymorphic on the ttest interface
+(def evtest (equal-var-ttest {:sample [[1 2 3] [4 5 6]] :h-mean [0 0]}))
+;(ttest ostest)
+;(ttest evtest)

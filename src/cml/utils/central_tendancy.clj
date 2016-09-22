@@ -1,6 +1,5 @@
 (ns cml.utils.central-tendancy
-  (:require [cml.utils :refer [double-asum]]
-            [clojure.core.reducers :as r]
+  (:require [clojure.core.reducers :as r]
             [uncomplicate.neanderthal.native :as neanderthal-native]
             [uncomplicate.neanderthal.core :as neanderthal]
             [cml.utils.primitive :refer [pdiv pminus ptimes pplus]]

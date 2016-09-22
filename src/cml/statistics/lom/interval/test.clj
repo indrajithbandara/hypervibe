@@ -1,12 +1,14 @@
 (ns cml.statistics.lom.interval.test
   (:require [cml.utils.tables :refer [t-table]]
-            [cml.utils.central-tendancy :refer [mean difference]]
-            [cml.utils.variation :refer [standard-deviation variance]]
-            [uncomplicate.neanderthal.native :as neanderthal-native]
-            [uncomplicate.neanderthal.core :as neanderthal]
+            [cml.utils.central-tendancy :refer [mean -mean -difference difference]]
+            [cml.utils.variation :refer [standard-deviation variance -smpl-std-dev]]
+            [uncomplicate.neanderthal.native :as nn]
+            [uncomplicate.neanderthal.core :as n]
             [uncomplicate.commons.core :refer [with-release]])
   (:import [cml.utils.variation Sample Pooled])
   (:use [uncomplicate.fluokitten core jvm]))
+
+(use 'criterium.core)
 
 ;TODO implement BLAS versions
 
@@ -27,6 +29,25 @@
                   :sample-mean mean
                   :sample-standard-deviation sample-standard-deviation
                   :sample-size sample-size))))
+
+;takes a RealBlockVector and returns an un evaluated instance of OneSample (best performance)
+;takes a clojure sequence and returns an evaluated instance of OneSample worst performance
+;TODO have chi square have same effect
+(defrecord -OneSample [data h-mean]
+  Interval
+  (ttest [type]
+    (let [mtrx (nn/dv data)
+          smpl-mean (-mean mtrx)
+          smpl-size (n/ecount mtrx)
+          smpl-std-devi (-smpl-std-dev mtrx smpl-mean)]
+      (assoc type :t-statistic
+                  (/ (- smpl-mean h-mean)
+                     (/ smpl-std-devi
+                        (Math/sqrt smpl-size)))
+                  :dof (dec smpl-size)
+                  :sample-mean smpl-mean
+                  :sample-standard-deviation smpl-std-devi
+                  :sample-size smpl-std-devi))))
 
 
 (defrecord EqualVariance [sample h-mean]
