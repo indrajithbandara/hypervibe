@@ -1,6 +1,6 @@
 (ns cml.statistics.estimate)
 
-;TODO implement BLAS versions
+;TODO parallel versions as in interval api
 
 (defprotocol Estimate
   (confidence-interval [ci] "Confidence imterval"))

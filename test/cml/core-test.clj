@@ -11,7 +11,7 @@
 
 ;TODO reformat project structure as per http://www.abs.gov.au/websitedbs/a3121120.nsf/home/statistical+language+-+what+are+variables
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
-
+;TODO rename all cml to cs
 
 (deftest one-sample-t-test-test
   (is (= (one-sample-ttest {:sample population-one :h-mean 400})
@@ -91,12 +91,9 @@
          {:critical-value 1.8331, :dof 9, :alpha 0.05})))
 
 
-(deftest chi-square-test-test
-  (is (= (chi-square-test {:observed [60 300 10 390] :nrows 2 :ncols 2})
-         #cml.statistics.lom.categorical.test.Independance{:observed [60 300 10 390], :nrows 2, :ncols 2, :chi 45.47412008281575})))
+(def dataset "/Users/gregadebesin/Dropbox/Workspace/cs/resources/datasets/adult/adult.data")
 
-(def dataset "/Users/gra11/IdeaProjects/cml/resources/datasets/adult/adult.data")
-
+;TODO fix test
 (data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status
                             :job :family-status :race
