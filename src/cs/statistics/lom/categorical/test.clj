@@ -1,8 +1,8 @@
-(ns cml.statistics.lom.categorical.test
+(ns cs.statistics.lom.categorical.test
   (:require [uncomplicate.neanderthal.native :as nn]
             [uncomplicate.neanderthal.core :as n]
             [uncomplicate.commons.core :refer [with-release]]
-            [cml.utils.vector :refer [vminus]])
+            [cs.utils.vector :refer [vminus]])
   (:use [uncomplicate.fluokitten core jvm]))
 (use 'criterium.core)
 

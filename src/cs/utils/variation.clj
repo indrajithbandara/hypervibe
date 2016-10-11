@@ -1,10 +1,10 @@
-(ns cml.utils.variation
-  (:require [cml.utils.central-tendancy :refer [mean -mean mean-1 -mean-1]]
+(ns cs.utils.variation
+  (:require [cs.utils.central-tendancy :refer [mean -mean mean-1 -mean-1]]
             [uncomplicate.neanderthal.native :as nn]
             [uncomplicate.neanderthal.core :as n]
-            [cml.utils.primitive :refer [pdiv pminus ptimes pplus]]
+            [cs.utils.primitive :refer [pdiv pminus ptimes pplus]]
             [uncomplicate.commons.core :refer [with-release]]
-            [cml.utils.vector :refer [vminus]])
+            [cs.utils.vector :refer [vminus]])
   (:use [uncomplicate.fluokitten core jvm]))
 
 ;TODO move into single utils file

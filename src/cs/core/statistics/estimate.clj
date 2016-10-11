@@ -1,10 +1,10 @@
-(ns cml.core.statistics.estimate
-  (:require [cml.utils.variation :refer [standard-deviation variance]]
-            [cml.statistics.estimate :refer [confidence-interval]]
-            [cml.utils.central-tendancy :refer [mean]]
+(ns cs.core.statistics.estimate
+  (:require [cs.utils.variation :refer [standard-deviation variance]]
+            [cs.statistics.estimate :refer [confidence-interval]]
+            [cs.utils.central-tendancy :refer [mean]]
             )
-  (:import [cml.utils.variation Sample]
-           [cml.statistics.estimate OneSample TwoSample]))
+  (:import [cs.utils.variation Sample]
+           [cs.statistics.estimate OneSample TwoSample]))
 (use 'criterium.core)
 
 (defn one-sample-conf-inter [{:keys [sample critical-value]}]

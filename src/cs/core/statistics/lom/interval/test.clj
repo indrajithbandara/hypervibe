@@ -1,9 +1,9 @@
-(ns cml.core.statistics.lom.interval.test
-  (:require [cml.statistics.lom.interval.test :refer [ttest]]
-            [cml.statistics.lom.categorical.test :refer [pearson-chi-square]]
-            [cml.utils.variation :refer [standard-deviation variance]]
-            [cml.utils.central-tendancy :refer [mean difference]])
-  (:import [cml.statistics.lom.interval.test OneSample EqualVariance Welch RepeatedMeasure]))
+(ns cs.core.statistics.lom.interval.test
+  (:require [cs.statistics.lom.interval.test :refer [ttest]]
+            [cs.statistics.lom.categorical.test :refer [pearson-chi-square]]
+            [cs.utils.variation :refer [standard-deviation variance]]
+            [cs.utils.central-tendancy :refer [mean difference]])
+  (:import [cs.statistics.lom.interval.test OneSample EqualVariance Welch RepeatedMeasure]))
 
 ;TODO seperate out tests into differnt packages depending on the data types eg numerical/categorocal etc
 

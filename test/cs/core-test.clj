@@ -1,21 +1,21 @@
-(ns cml.core-test
+(ns cs.core-test
   (:require [clojure.test :refer :all]
-            [cml.utils.samples :refer :all]
-            [cml.dataset :refer [data-frame]]
-            [cml.extract :refer [file-lines]]
-            [cml.utils :refer [zip]]
-            [cml.core.statistics.estimate :refer [one-sample-conf-inter two-sample-conf-inter]]
-            [cml.core.statistics.lom.interval.test :refer [one-sample-ttest equal-var-ttest welch-ttest rep-measure-ttest]]
-            [cml.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]
-            [cml.core.statistics.lom.categorical.test :refer [chi-square-test]]))
+            [cs.utils.samples :refer :all]
+            [cs.dataset :refer [data-frame]]
+            [cs.extract :refer [file-lines]]
+            [cs.utils :refer [zip]]
+            [cs.core.statistics.estimate :refer [one-sample-conf-inter two-sample-conf-inter]]
+            [cs.core.statistics.lom.interval.test :refer [one-sample-ttest equal-var-ttest welch-ttest rep-measure-ttest]]
+            [cs.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]
+            [cs.core.statistics.lom.categorical.test :refer [chi-square-test]]))
 
 ;TODO reformat project structure as per http://www.abs.gov.au/websitedbs/a3121120.nsf/home/statistical+language+-+what+are+variables
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
-;TODO rename all cml to cs
+;TODO rename all cs to cs
 
 (deftest one-sample-t-test-test
   (is (= (one-sample-ttest {:sample population-one :h-mean 400})
-         #cml.statistics.lom.interval.test.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
+         #cs.statistics.lom.interval.test.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
                                                      :h-mean 400,
                                                      :t-statistic 8.700992601418207,
                                                      :dof 9,
@@ -26,7 +26,7 @@
 
 (deftest two-sample-t-test-equal-variance
   (is (= (equal-var-ttest {:sample [ballet-dancers football-players] :h-mean [0 0]})
-         #cml.statistics.lom.interval.test.EqualVariance{:sample [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+         #cs.statistics.lom.interval.test.EqualVariance{:sample [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                                [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                       :h-mean [0 0],
                                                       :t-statistic 1.094722972460392,
@@ -39,7 +39,7 @@
 
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (welch-ttest {:sample [ballet-dancers football-players]})
-         #cml.statistics.lom.interval.test.Welch{:sample [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+         #cs.statistics.lom.interval.test.Welch{:sample [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                        [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                  :t-statistic 1.0947229724603922,
                                                  :dof 17.993567997176537,
@@ -50,7 +50,7 @@
 
 (deftest two-sample-repeated-measure-test
   (is (= (rep-measure-ttest {:population [after before] :h-mean [0 0]})
-         #cml.statistics.lom.interval.test.RepeatedMeasure{:population [[200 210 210 170 220 180 190 190 220 210]
+         #cs.statistics.lom.interval.test.RepeatedMeasure{:population [[200 210 210 170 220 180 190 190 220 210]
                                                                      [220 240 225 180 210 190 195 200 210 240]],
                                                         :h-mean [0 0],
                                                         :t-statistic -2.5017235438103813,
@@ -63,7 +63,7 @@
 
 (deftest one-sample-conf-inter-test
   (is (= (one-sample-conf-inter {:sample population-one :critical-value 1.8331})
-         #cml.statistics.estimate.OneSample{:sample-mean               579.0,
+         #cs.statistics.estimate.OneSample{:sample-mean               579.0,
                                             :sample-standard-deviation 65.05553183413554,
                                             :sample-size               10,
                                             :critical-value            1.8331,
@@ -73,7 +73,7 @@
 
 (deftest two-sample-confidence-interval-test-test
   (is (= (two-sample-conf-inter {:sample [ballet-dancers football-players] :critical-value 2.1009})
-         #cml.statistics.estimate.TwoSample{:sample-mean     (87.94999999999999 85.19),
+         #cs.statistics.estimate.TwoSample{:sample-mean     (87.94999999999999 85.19),
                                             :sample-variance (32.382777777777775 31.181000000000015),
                                             :sample-size     (10 10),
                                             :critical-value  2.1009,
@@ -93,7 +93,7 @@
 
 (def dataset "/Users/gregadebesin/Dropbox/Workspace/cs/resources/datasets/adult/adult.data")
 
-;TODO fix test
+
 (data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status
                             :job :family-status :race

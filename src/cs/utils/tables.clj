@@ -1,4 +1,4 @@
-(ns cml.utils.tables)
+(ns cs.utils.tables)
 (use 'clojure.core.matrix)
 
 

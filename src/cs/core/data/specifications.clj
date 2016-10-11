@@ -1,4 +1,4 @@
-(ns cml.core.data.specifications)
+(ns cs.core.data.specifications)
 ;
 ;
 ;(s/def ::sample (s/and not-empty (s/coll-of number?)))

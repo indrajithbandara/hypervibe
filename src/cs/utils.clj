@@ -1,4 +1,4 @@
-(ns cml.utils)
+(ns cs.utils)
 
 
 (defn zip

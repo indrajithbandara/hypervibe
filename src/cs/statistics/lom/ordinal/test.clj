@@ -1,3 +1,3 @@
-(ns cml.statistics.lom.ordinal.test)
+(ns cs.statistics.lom.ordinal.test)
 
 (defprotocol Ordinal)

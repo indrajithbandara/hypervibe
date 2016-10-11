@@ -1,10 +1,10 @@
-(ns cml.utils.central-tendancy
+(ns cs.utils.central-tendancy
   (:require [clojure.core.reducers :as r]
             [uncomplicate.neanderthal.native :as neanderthal-native]
             [uncomplicate.neanderthal.core :as neanderthal]
-            [cml.utils.primitive :refer [pdiv pminus ptimes pplus]]
+            [cs.utils.primitive :refer [pdiv pminus ptimes pplus]]
             [uncomplicate.commons.core :refer [with-release]]
-            [cml.utils.vector :refer [vminus]])
+            [cs.utils.vector :refer [vminus]])
   (:use [uncomplicate.fluokitten core jvm]))
 (use 'criterium.core)
 

@@ -1,4 +1,4 @@
-(ns cml.statistics.estimate)
+(ns cs.statistics.estimate)
 
 ;TODO parallel versions as in interval api
 

@@ -1,1 +1,1 @@
-(ns cml.core.statistics.lom.ordinal.test)
+(ns cs.core.statistics.lom.ordinal.test)

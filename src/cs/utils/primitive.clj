@@ -1,4 +1,4 @@
-(ns cml.utils.primitive)
+(ns cs.utils.primitive)
 
 (defn pplus ^double [^double x ^double y]
   (+ x y))

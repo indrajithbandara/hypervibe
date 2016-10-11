@@ -1,4 +1,4 @@
-(ns cml.utils.vector
+(ns cs.utils.vector
   (:require [uncomplicate.neanderthal.native :as neanderthal-native]
             [uncomplicate.neanderthal.core :as neanderthal]))
 

@@ -1,11 +1,11 @@
-(ns cml.statistics.lom.interval.test
-  (:require [cml.utils.tables :refer [t-table]]
-            [cml.utils.central-tendancy :refer [mean -mean -difference difference]]
-            [cml.utils.variation :refer [standard-deviation variance -smpl-std-dev]]
+(ns cs.statistics.lom.interval.test
+  (:require [cs.utils.tables :refer [t-table]]
+            [cs.utils.central-tendancy :refer [mean -mean -difference difference]]
+            [cs.utils.variation :refer [standard-deviation variance -smpl-std-dev]]
             [uncomplicate.neanderthal.native :as nn]
             [uncomplicate.neanderthal.core :as n]
             [uncomplicate.commons.core :refer [with-release]])
-  (:import [cml.utils.variation Sample Pooled])
+  (:import [cs.utils.variation Sample Pooled])
   (:use [uncomplicate.fluokitten core jvm]))
 
 (use 'criterium.core)
