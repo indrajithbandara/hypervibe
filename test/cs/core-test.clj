@@ -6,8 +6,7 @@
             [cs.utils :refer [zip]]
             [cs.core.statistics.estimate :refer [one-sample-conf-inter two-sample-conf-inter]]
             [cs.core.statistics.lom.interval.test :refer [one-sample-ttest equal-var-ttest welch-ttest rep-measure-ttest]]
-            [cs.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]
-            [cs.core.statistics.lom.categorical.test :refer [chi-square-test]]))
+            [cs.core.statistics.critical-value :refer [one-tail-cv two-tail-cv]]))
 
 ;TODO reformat project structure as per http://www.abs.gov.au/websitedbs/a3121120.nsf/home/statistical+language+-+what+are+variables
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm

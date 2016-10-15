@@ -2,7 +2,7 @@
   (:require [cs.statistics.lom.categorical.test :refer [pearson-chi-square]])
   (:import [cs.statistics.lom.categorical.test Independance]))
 
-(defn chi-square-test
+#_(defn chi-square-test
 
   "Computes a Pearson chi square test that is applied to a set of categorical
    (has been counted and divided into categories) data to evaluate how likely

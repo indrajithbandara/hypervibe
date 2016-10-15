@@ -1,7 +1,7 @@
 (ns cs.statistics.lom.interval.test
   (:require [cs.utils.tables :refer [t-table]]
             [cs.utils.central-tendancy :refer [mean -mean -difference difference]]
-            [cs.utils.variation :refer [standard-deviation variance -smpl-std-dev]]
+            [cs.utils.variation :refer [standard-deviation variance smpl-std-dev pool-var]]
             [uncomplicate.neanderthal.native :as nn]
             [uncomplicate.neanderthal.core :as n]
             [uncomplicate.commons.core :refer [with-release]])
@@ -19,7 +19,7 @@
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (mean sample) ;TODO remove (:standard-deviation.. ) call have fn return num not map. Do for all other util functins like this
-                          (:standard-deviation (standard-deviation (Sample. (mean sample) sample)))
+                          (smpl-std-dev sample (mean sample))
                           (count sample))
           [mean sample-standard-deviation sample-size] pcalcs]
       (assoc type :t-statistic (/ (- mean h-mean)
@@ -36,7 +36,7 @@
   (ttest [type]
     (let [pcalcs (pvalues (map mean sample)
                           (map mean (partition 1 h-mean))
-                          (map #(:variance (variance (Pooled. (mean %) % (- (count %) 1)))) sample)
+                          (map #(pool-var % (mean %) (dec (count %))) sample)
                           (map count sample))
           [[mean-one mean-two] [population-mean-one population-mean-two]
            [pooled-variance-one pooled-variance-two] [sample-size-one sample-size-two]] pcalcs]

@@ -14,15 +14,14 @@
   (variance [v] "Variance"))
 
 
-(defn -smpl-std-dev [data mean]
+(defn smpl-std-dev [data mean]
   "Computes the sample standard deviation"
-  (with-release [means (vminus (n/entry! (nn/dv data) mean) data)]
-                (Math/sqrt (-mean-1 (fmap! ptimes means means)))))
+  (Math/sqrt (mean-1 (map #(* (- mean %)
+                              (- mean %)) data))))
 
-(defn -pop-std-dev [data mean]
+(defn pop-std-dev [data mean]
   "Computes the population standard deviation"
-  (with-release [means (vminus (n/entry! (nn/dv data) mean) data)]
-                (Math/sqrt (-mean (fmap! ptimes means means)))))
+  (Math/sqrt (mean (map #(* (- mean %) (- mean %)) data))))
 
 (defn -smpl-var [data mean]
   "Computes the sample variance"
@@ -34,11 +33,12 @@
   (/ (n/dot (vminus (n/entry! (nn/dv data) mean) data) data)
      (n/ecount data)))
 
-(defn -pool-var [data mean]
+(defn pool-var [data mean size-minus-one]
   "Computes the pooled variance"
-  (with-release [means  (vminus (n/entry! (nn/dv data) mean) data)]
-               (let [ec (dec (n/ecount data))]
-                 (/ (* ec (/ (n/dot means data) ec)) ec))))
+  (/ (* size-minus-one (/ (reduce + (map #(* (- % mean) (- % mean)) data))
+                          (dec (count data)))) size-minus-one))
+
+
 
 
 (defrecord Sample [sample-mean sample]
