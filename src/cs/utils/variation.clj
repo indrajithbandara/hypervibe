@@ -35,8 +35,9 @@
 
 (defn pool-var [data mean size-minus-one]
   "Computes the pooled variance"
-  (/ (* size-minus-one (/ (reduce + (map #(* (- % mean) (- % mean)) data))
-                          (dec (count data)))) size-minus-one))
+  (/ (* size-minus-one
+        (/ (reduce + (map #(* (- % mean) (- % mean)) data))
+           size-minus-one)) size-minus-one))
 
 
 
