@@ -40,8 +40,6 @@
            size-minus-one)) size-minus-one))
 
 
-
-
 (defrecord Sample [sample-mean sample]
   Variation
 
