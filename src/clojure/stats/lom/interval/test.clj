@@ -1,8 +1,7 @@
 (ns clojure.stats.lom.interval.test
   (:require [clojure.utils.tables :refer [t-table]]
-            [clojure.utils.central-tendancy :refer [mean -mean -difference difference]]
-            [clojure.utils.variation :refer [standard-deviation variance smpl-std-dev pool-var]])
-  (:import [clojure.utils.variation Sample Pooled]))
+            [clojure.utils.central-tendancy :refer [mean difference]]
+            [clojure.utils.variation :refer [standard-deviation variance smpl-std-dev smpl-var  pool-var]]))
 
 
 (defprotocol Interval
@@ -48,7 +47,7 @@
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (map mean sample)
-                          (map #(:variance (variance (Sample. (mean %) %))) sample)
+                          (map #(smpl-var % (mean %)) sample)
                           (map count sample))
           [[mean-one mean-two] [sample-variance-one sample-variance-two]
            [sample-size-one sample-size-two]] pcalcs]
@@ -74,7 +73,7 @@
   (ttest [type]
     (let [pcalcs (pvalues (mean (difference population))
                           (map mean (partition 1 h-mean))
-                          (:standard-deviation (standard-deviation (Sample. (mean (difference population)) (difference population))))
+                          (smpl-std-dev (mean (difference population)) (difference population))
                           (/ (+ (count (first population)) (count (second population))) 2))
           [difference-mean [population-mean-one population-mean-two] standard-deviation population-size] pcalcs]
       (assoc type :t-statistic (/ (- difference-mean
@@ -88,3 +87,4 @@
                   :difference-mean difference-mean))))
 
 
+;(:standard-deviation (standard-deviation (Sample. (mean (difference population)) (difference population))))

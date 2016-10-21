@@ -5,7 +5,7 @@
 (defprotocol Estimate
   (confidence-interval [ci] "Confidence imterval"))
 
-
+;TODO parallel version. Move computations in this namespace as in interval ns
 (defrecord OneSample [sample-mean sample-standard-deviation sample-size critical-value]
   Estimate
 
@@ -21,6 +21,7 @@
                       (Math/sqrt sample-size)))))))
 
 
+;TODO parallel version. Move computations in this namespace as in interval ns
 (defrecord TwoSample [sample-mean sample-variance sample-size critical-value]
   Estimate
 
