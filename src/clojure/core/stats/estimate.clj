@@ -7,9 +7,7 @@
 (use 'criterium.core)
 
 (defn one-sample-conf-inter [{:keys [sample critical-value]}]
-  (confidence-interval (OneSample. (mean sample)
-                                   (smpl-std-dev (mean sample) sample)
-                                   (count sample) critical-value)))
+  (confidence-interval (OneSample. sample critical-value)))
 
 ;(s/fdef one-sample-conf-inter
 ;        :args {:sample         (s/and not-empty (s/coll-of int?))

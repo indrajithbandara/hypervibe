@@ -47,7 +47,7 @@
                                                  :sample-sizes [10 10]})))
 
 
-;fix
+
 (deftest two-sample-repeated-measure-test
   (is (= (rep-measure-ttest {:population [after before] :h-mean [0 0]})
          #clojure.stats.lom.interval.test.RepeatedMeasure{:population [[200 210 210 170 220 180 190 190 220 210]
@@ -60,15 +60,16 @@
                                                         :population-size 10,
                                                         :difference-mean -11.0})))
 
-;fix
+
 (deftest one-sample-conf-inter-test
   (is (= (one-sample-conf-inter {:sample population-one :critical-value 1.8331})
-         #clojure.stats.estimate.OneSample{:sample-mean               579.0,
-                                            :sample-standard-deviation 65.05553183413554,
-                                            :sample-size               10,
-                                            :critical-value            1.8331,
-                                            :upper                     616.7112031961178,
-                                            :lower                     541.2887968038822})))
+         #clojure.stats.estimate.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
+                                           :critical-value 1.8331,
+                                           :sample-standard-deviation 65.05553183413554,
+                                           :sample-mean 579.0,
+                                           :sample-size 10,
+                                           :upper 616.7112031961178,
+                                           :lower 541.2887968038822})))
 
 
 (deftest two-sample-confidence-interval-test-test

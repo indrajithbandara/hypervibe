@@ -73,7 +73,7 @@
   (ttest [type]
     (let [pcalcs (pvalues (mean (difference population))
                           (map mean (partition 1 h-mean))
-                          (smpl-std-dev (mean (difference population)) (difference population))
+                          (smpl-std-dev (difference population) (mean (difference population)))
                           (/ (+ (count (first population)) (count (second population))) 2))
           [difference-mean [population-mean-one population-mean-two] standard-deviation population-size] pcalcs]
       (assoc type :t-statistic (/ (- difference-mean
