@@ -1,5 +1,5 @@
 (ns clojure.stats.estimate
-  (:require [clojure.utils.variation :refer [smpl-std-dev]]
+  (:require [clojure.utils.variation :refer [smpl-std-dev smpl-var]]
             [clojure.utils.central-tendancy :refer [mean]]))
 
 ;TODO parallel versions as in interval api
@@ -29,21 +29,23 @@
                                   (Math/sqrt sample-size))))))))
 
 
-;TODO parallel version. Move computations in this namespace as in interval ns
-(defrecord TwoSample [sample-mean sample-variance sample-size critical-value]
+(defrecord TwoSample [samples critical-value]
   Estimate
-
   (confidence-interval [type]
-    (let [[sample-mean-one sample-mean-two] sample-mean
-          [sample-variance-one sample-variance-two] sample-variance
-          [sample-size-one sample-size-two] sample-size]
-      (assoc type
-        :upper (+ (- sample-mean-one sample-mean-two)
-                  (* critical-value
-                     (Math/sqrt (+ (/ sample-variance-one sample-size-one)
-                                   (/ sample-variance-two sample-size-two)))))
-        :lower (- (- sample-mean-one sample-mean-two)
-                  (* critical-value
-                     (Math/sqrt (+ (/ sample-variance-one sample-size-one)
-                                   (/ sample-variance-two sample-size-two)))))))))
+    (let [pcalcs (pvalues (map mean samples)
+                          (map #(smpl-var % (mean %)) samples)
+                          (map count samples))
+          [[sample-mean-one sample-mean-two] [sample-variance-one sample-variance-two] [sample-size-one sample-size-two]] pcalcs]
+      (assoc type :sample-variances [sample-variance-one sample-variance-two]
+                  :sample-means [sample-mean-one sample-mean-two]
+                  :sample-sizes [sample-size-one sample-mean-two]
+                  :critical-value critical-value
+                  :upper (+ (- sample-mean-one sample-mean-two)
+                            (* critical-value
+                               (Math/sqrt (+ (/ sample-variance-one sample-size-one)
+                                             (/ sample-variance-two sample-size-two)))))
+                  :lower (- (- sample-mean-one sample-mean-two)
+                            (* critical-value
+                               (Math/sqrt (+ (/ sample-variance-one sample-size-one)
+                                             (/ sample-variance-two sample-size-two)))))))))
 

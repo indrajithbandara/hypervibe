@@ -10,7 +10,6 @@
 
 ;TODO reformat project structure as per http://www.abs.gov.au/websitedbs/a3121120.nsf/home/statistical+language+-+what+are+variables
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
-;TODO rename all cs to cs
 
 (deftest one-sample-t-test-test
   (is (= (one-sample-ttest {:sample population-one :h-mean 400})
@@ -24,21 +23,21 @@
 
 
 (deftest two-sample-t-test-equal-variance
-  (is (= (equal-var-ttest {:sample [ballet-dancers football-players] :h-mean [0 0]})
-         #clojure.stats.lom.interval.test.EqualVariance{:sample [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                                                               [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-                                                      :h-mean [0 0],
-                                                      :t-statistic 1.094722972460392,
-                                                      :dof 18,
-                                                      :sample-means [87.94999999999999 85.19],
-                                                      :population-means [0.0 0.0],
-                                                      :pooled-variances [32.382777777777775 31.181000000000015],
-                                                      :sample-sizes [10 10]})))
+  (is (= (equal-var-ttest {:samples [ballet-dancers football-players] :h-mean [0 0]})
+         #clojure.stats.lom.interval.test.EqualVariance{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+                                                                  [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                                        :h-mean [0 0],
+                                                        :t-statistic 1.094722972460392,
+                                                        :dof 18,
+                                                        :sample-means [87.94999999999999 85.19],
+                                                        :population-means [0.0 0.0],
+                                                        :pooled-variances [32.382777777777775 31.181000000000015],
+                                                        :sample-sizes [10 10]})))
 
 
 (deftest two-sample-t-test-unequal-variance-welch
-  (is (= (welch-ttest {:sample [ballet-dancers football-players]})
-         #clojure.stats.lom.interval.test.Welch{:sample [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+  (is (= (welch-ttest {:samples [ballet-dancers football-players]})
+         #clojure.stats.lom.interval.test.Welch{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                        [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                  :t-statistic 1.0947229724603922,
                                                  :dof 17.993567997176537,
@@ -51,7 +50,7 @@
 (deftest two-sample-repeated-measure-test
   (is (= (rep-measure-ttest {:population [after before] :h-mean [0 0]})
          #clojure.stats.lom.interval.test.RepeatedMeasure{:population [[200 210 210 170 220 180 190 190 220 210]
-                                                                     [220 240 225 180 210 190 195 200 210 240]],
+                                                                       [220 240 225 180 210 190 195 200 210 240]],
                                                         :h-mean [0 0],
                                                         :t-statistic -2.5017235438103813,
                                                         :dof 9,
@@ -74,12 +73,14 @@
 
 (deftest two-sample-confidence-interval-test-test
   (is (= (two-sample-conf-inter {:sample [ballet-dancers football-players] :critical-value 2.1009})
-         #clojure.stats.estimate.TwoSample{:sample-mean     (87.94999999999999 85.19),
-                                            :sample-variance (32.382777777777775 31.181000000000015),
-                                            :sample-size     (10 10),
-                                            :critical-value  2.1009,
-                                            :upper           8.05675922207777,
-                                            :lower           -2.536759222077789})))
+         #clojure.stats.estimate.TwoSample{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+                                                     [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                           :critical-value 2.1009,
+                                           :sample-variances [32.382777777777775 31.181000000000015],
+                                           :sample-means [87.94999999999999 85.19],
+                                           :sample-sizes [10 85.19],
+                                           :upper 8.05675922207777,
+                                           :lower -2.536759222077789})))
 
 
 (deftest two-tail-significance-test-test
@@ -120,6 +121,6 @@
 ;http://www.ats.ucla.edu/stat/mult_pkg/whatstat/nominal_ordinal_interval.htm
 
 (def ostest (one-sample-ttest {:sample [1 2 3] :h-mean 4})) ;Polymorphic on the ttest interface
-(def evtest (equal-var-ttest {:sample [[1 2 3] [4 5 6]] :h-mean [0 0]}))
+(def evtest (equal-var-ttest {:samples [[1 2 3] [4 5 6]] :h-mean [0 0]}))
 ;(ttest ostest)
 ;(ttest evtest)

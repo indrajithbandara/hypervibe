@@ -10,45 +10,45 @@
 (defrecord OneSample [sample h-mean]
   Interval
   (ttest [type]
-    (let [pcalcs (pvalues (mean sample) ;TODO remove (:standard-deviation.. ) call have fn return num not map. Do for all other util functins like this
+    (let [pcalcs (pvalues (mean sample)
                           (smpl-std-dev sample (mean sample))
                           (count sample))
-          [mean sample-standard-deviation sample-size] pcalcs]
-      (assoc type :t-statistic (/ (- mean h-mean)
+          [sample-mean sample-standard-deviation sample-size] pcalcs]
+      (assoc type :t-statistic (/ (- sample-mean h-mean)
                                   (/ sample-standard-deviation
                                      (Math/sqrt sample-size)))
                   :dof (dec sample-size)
-                  :sample-mean mean
+                  :sample-mean sample-mean
                   :sample-standard-deviation sample-standard-deviation
                   :sample-size sample-size))))
 
 
-(defrecord EqualVariance [sample h-mean]
+(defrecord EqualVariance [samples h-mean]
   Interval
   (ttest [type]
-    (let [pcalcs (pvalues (map mean sample)
+    (let [pcalcs (pvalues (map mean samples)
                           (map mean (partition 1 h-mean))
-                          (map #(pool-var % (mean %) (dec (count %))) sample)
-                          (map count sample))
-          [[mean-one mean-two] [population-mean-one population-mean-two]
+                          (map #(pool-var % (mean %) (dec (count %))) samples)
+                          (map count samples))
+          [[sample-mean-one sample-mean-two] [population-mean-one population-mean-two]
            [pooled-variance-one pooled-variance-two] [sample-size-one sample-size-two]] pcalcs]
-      (assoc type :t-statistic (/ (- (- mean-one mean-two)
+      (assoc type :t-statistic (/ (- (- sample-mean-one sample-mean-two)
                                      (- population-mean-one population-mean-two))
                                   (Math/sqrt (* (/ (+ pooled-variance-one pooled-variance-two) 2)
                                                 (+ (/ 1 sample-size-one) (/ 1 sample-size-two)))))
                   :dof (- (+ sample-size-one sample-size-two) 2)
-                  :sample-means [mean-one mean-two]
+                  :sample-means [sample-mean-one sample-mean-two]
                   :population-means [population-mean-one population-mean-two]
                   :pooled-variances [pooled-variance-one pooled-variance-two]
                   :sample-sizes [sample-size-one sample-size-two]))))
 
 
-(defrecord Welch [sample]
+(defrecord Welch [samples]
   Interval
   (ttest [type]
-    (let [pcalcs (pvalues (map mean sample)
-                          (map #(smpl-var % (mean %)) sample)
-                          (map count sample))
+    (let [pcalcs (pvalues (map mean samples)
+                          (map #(smpl-var % (mean %)) samples)
+                          (map count samples))
           [[mean-one mean-two] [sample-variance-one sample-variance-two]
            [sample-size-one sample-size-two]] pcalcs]
       (assoc type :t-statistic (/ (- mean-one mean-two)
@@ -68,6 +68,7 @@
                   :sample-variances [sample-variance-one sample-variance-two]
                   :sample-sizes [sample-size-one sample-size-two]))))
 
+
 (defrecord RepeatedMeasure [population h-mean]
   Interval
   (ttest [type]
@@ -86,5 +87,3 @@
                   :population-size population-size
                   :difference-mean difference-mean))))
 
-
-;(:standard-deviation (standard-deviation (Sample. (mean (difference population)) (difference population))))

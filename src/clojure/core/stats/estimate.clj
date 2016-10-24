@@ -16,9 +16,7 @@
 
 
 (defn two-sample-conf-inter [{:keys [sample critical-value]}]
-  (confidence-interval (TwoSample. (map mean sample)
-                                   (map #(smpl-var % (mean %)) sample)
-                                   (map count sample) critical-value)))
+  (confidence-interval (TwoSample. sample critical-value)))
 
 ;(s/fdef two-sample-conf-inter
 ;        :args {:sample         (or [sequential? sequential?] '(sequential? sequential?))

@@ -13,16 +13,15 @@
   (ttest (OneSample. sample h-mean)))
 
 
-(defn equal-var-ttest [{:keys [sample h-mean]}]
-  (ttest (EqualVariance. sample h-mean)))
+(defn equal-var-ttest [{:keys [samples h-mean]}]
+  (ttest (EqualVariance. samples h-mean)))
 
 
-(defn welch-ttest [{:keys [sample]}]
-  (ttest (Welch. sample)))
+(defn welch-ttest [{:keys [samples]}]
+  (ttest (Welch. samples)))
 
 
 (defn rep-measure-ttest [{:keys [population h-mean]}]
   (ttest (RepeatedMeasure. population h-mean)))
-
 
 
