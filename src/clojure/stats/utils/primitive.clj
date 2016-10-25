@@ -1,4 +1,4 @@
-(ns clojure.utils.primitive)
+(ns clojure.stats.utils.primitive)
 
 (defn pplus ^double [^double x ^double y]
   (+ x y))

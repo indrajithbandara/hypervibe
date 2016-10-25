@@ -1,7 +1,7 @@
 (ns clojure.stats.lom.interval.test
-  (:require [clojure.utils.tables :refer [t-table]]
-            [clojure.utils.central-tendancy :refer [mean difference]]
-            [clojure.utils.variation :refer [standard-deviation variance smpl-std-dev smpl-var  pool-var]]))
+  (:require [clojure.stats.utils.tables :refer [t-table]]
+            [clojure.stats.utils.central-tendancy :refer [mean difference]]
+            [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var pool-var]]))
 
 
 (defprotocol Interval

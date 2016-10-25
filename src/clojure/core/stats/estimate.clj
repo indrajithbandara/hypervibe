@@ -1,8 +1,7 @@
 (ns clojure.core.stats.estimate
-  (:require [clojure.utils.variation :refer [standard-deviation variance]]
-            [clojure.stats.estimate :refer [confidence-interval]]
-            [clojure.utils.central-tendancy :refer [mean]]
-            [clojure.utils.variation :refer [smpl-std-dev smpl-var]])
+  (:require [clojure.stats.estimate :refer [confidence-interval]]
+            [clojure.stats.utils.central-tendancy :refer [mean]]
+            [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var]])
   (:import [clojure.stats.estimate OneSample TwoSample]))
 (use 'criterium.core)
 

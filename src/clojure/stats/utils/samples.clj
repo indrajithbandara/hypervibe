@@ -1,4 +1,4 @@
-(ns clojure.utils.samples)
+(ns clojure.stats.utils.samples)
 
 (def observed-vals [60 300 10 390])
 (def expected-vals '(33.1578947368421 36.8421052631579 326.8421052631579 363.1578947368421))

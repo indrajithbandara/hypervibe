@@ -1,6 +1,6 @@
 (ns clojure.stats.estimate
-  (:require [clojure.utils.variation :refer [smpl-std-dev smpl-var]]
-            [clojure.utils.central-tendancy :refer [mean]]))
+  (:require [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var]]
+            [clojure.stats.utils.central-tendancy :refer [mean]]))
 
 ;TODO parallel versions as in interval api
 

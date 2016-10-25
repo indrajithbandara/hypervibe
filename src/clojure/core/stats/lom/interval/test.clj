@@ -1,8 +1,5 @@
 (ns clojure.core.stats.lom.interval.test
-  (:require [clojure.stats.lom.interval.test :refer [ttest]]
-            [clojure.stats.lom.categorical.test :refer [pearson-chi-square]]
-            [clojure.utils.variation :refer [standard-deviation variance]]
-            [clojure.utils.central-tendancy :refer [mean difference]])
+  (:require [clojure.stats.lom.interval.test :refer [ttest]])
   (:import [clojure.stats.lom.interval.test OneSample EqualVariance Welch RepeatedMeasure]))
 
 ;TODO seperate out tests into differnt packages depending on the data types eg numerical/categorocal etc

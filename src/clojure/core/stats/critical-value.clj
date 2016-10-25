@@ -1,5 +1,5 @@
 (ns clojure.core.stats.critical-value
-  (:require [clojure.utils.tables :refer [t-table]]))
+  (:require [clojure.stats.utils.tables :refer [t-table]]))
 (use 'clojure.core.matrix)
 
 

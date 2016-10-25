@@ -1,17 +1,5 @@
-(ns clojure.utils.variation
-  (:require [clojure.utils.central-tendancy :refer [mean -mean mean-1 -mean-1]]
-            [uncomplicate.neanderthal.native :as nn]
-            [uncomplicate.neanderthal.core :as n]
-            [clojure.utils.primitive :refer [pdiv pminus ptimes pplus]]
-            [uncomplicate.commons.core :refer [with-release]]
-            [clojure.utils.vector :refer [vminus]])
-  (:use [uncomplicate.fluokitten core jvm]))
-
-;TODO move into single utils file
-
-(defprotocol Variation
-  (standard-deviation [sd] "Standard deviation")
-  (variance [v] "Variance"))
+(ns clojure.stats.utils.variation
+  (:require [clojure.stats.utils.central-tendancy :refer [mean mean-1]]))
 
 
 (defn smpl-std-dev [data mean]

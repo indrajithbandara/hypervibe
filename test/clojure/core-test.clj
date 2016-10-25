@@ -1,6 +1,6 @@
 (ns clojure.core-test
   (:require [clojure.test :refer :all]
-            [clojure.utils.samples :refer :all]
+            [clojure.stats.utils.samples :refer :all]
             [clojure.dataset :refer [data-frame]]
             [clojure.extract :refer [file-lines]]
             [clojure.utils :refer [zip]]
