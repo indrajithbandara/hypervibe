@@ -5,7 +5,8 @@
 
 
 (defprotocol Interval
-  (ttest [this] "Conducts a ttest on a dataset that has an interval level of measurement"))
+  (ttest [this] "Conducts a ttest on a dataset. A t-test looks at the t-statistic, the t-distribution and
+                 degrees of freedom to determine the probability of difference between populations"))
 
 (defrecord OneSample [sample h-mean]
   Interval
@@ -86,4 +87,9 @@
                   :standard-deviation standard-deviation
                   :population-size population-size
                   :difference-mean difference-mean))))
+
+
+(defrecord OneSampleMedian []                               ;TODO consider moving all tests into one ns
+  Interval
+  (ttest [type]))
 

@@ -8,8 +8,8 @@
             [clojure.core.stats.lom.interval.test :refer [one-sample-ttest equal-var-ttest welch-ttest rep-measure-ttest]]
             [clojure.core.stats.critical-value :refer [one-tail-cv two-tail-cv]]))
 
-;TODO reformat project structure as per http://www.abs.gov.au/websitedbs/a3121120.nsf/home/statistical+language+-+what+are+variables
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
+;LOM = level of measurement
 
 (deftest one-sample-t-test-test
   (is (= (one-sample-ttest {:sample population-one :h-mean 400})
