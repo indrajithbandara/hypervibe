@@ -91,5 +91,6 @@
 
 (defrecord OneSampleMedian []                               ;TODO consider moving all tests into one ns
   Interval
-  (ttest [type]))
+  (ttest [type]
+    (println type)))
 

@@ -4,15 +4,15 @@
             [clojure.dataset :refer [data-frame]]
             [clojure.extract :refer [file-lines]]
             [clojure.utils :refer [zip]]
-            [clojure.core.stats.estimate :refer [one-sample-conf-inter two-sample-conf-inter]]
-            [clojure.core.stats.lom.interval.test :refer [one-sample-ttest equal-var-ttest welch-ttest rep-measure-ttest]]
+            [clojure.core.stats.estimate :refer [one-smpl-conf-inter two-smpl-conf-inter]]
+            [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
             [clojure.core.stats.critical-value :refer [one-tail-cv two-tail-cv]]))
 
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
 ;LOM = level of measurement
 
 (deftest one-sample-t-test-test
-  (is (= (one-sample-ttest {:sample population-one :h-mean 400})
+  (is (= (one-smpl-ttest {:sample population-one :h-mean 400})
          #clojure.stats.lom.interval.test.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
                                                      :h-mean 400,
                                                      :t-statistic 8.700992601418207,
@@ -48,7 +48,7 @@
 
 
 (deftest two-sample-repeated-measure-test
-  (is (= (rep-measure-ttest {:population [after before] :h-mean [0 0]})
+  (is (= (rep-msure-ttest {:population [after before] :h-mean [0 0]})
          #clojure.stats.lom.interval.test.RepeatedMeasure{:population [[200 210 210 170 220 180 190 190 220 210]
                                                                        [220 240 225 180 210 190 195 200 210 240]],
                                                         :h-mean [0 0],
@@ -61,7 +61,7 @@
 
 
 (deftest one-sample-conf-inter-test
-  (is (= (one-sample-conf-inter {:sample population-one :critical-value 1.8331})
+  (is (= (one-smpl-conf-inter {:sample population-one :critical-value 1.8331})
          #clojure.stats.estimate.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
                                            :critical-value 1.8331,
                                            :sample-standard-deviation 65.05553183413554,
@@ -72,7 +72,7 @@
 
 
 (deftest two-sample-confidence-interval-test-test
-  (is (= (two-sample-conf-inter {:sample [ballet-dancers football-players] :critical-value 2.1009})
+  (is (= (two-smpl-conf-inter {:sample [ballet-dancers football-players] :critical-value 2.1009})
          #clojure.stats.estimate.TwoSample{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                      [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                            :critical-value 2.1009,
@@ -120,7 +120,7 @@
 ;http://www.ats.ucla.edu/stat/stata/whatstat/whatstat.htm
 ;http://www.ats.ucla.edu/stat/mult_pkg/whatstat/nominal_ordinal_interval.htm
 
-(def ostest (one-sample-ttest {:sample [1 2 3] :h-mean 4})) ;Polymorphic on the ttest interface
+(def ostest (one-smpl-ttest {:sample [1 2 3] :h-mean 4})) ;Polymorphic on the ttest interface
 (def evtest (equal-var-ttest {:samples [[1 2 3] [4 5 6]] :h-mean [0 0]}))
 ;(ttest ostest)
 ;(ttest evtest)

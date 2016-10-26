@@ -6,7 +6,7 @@
     "Conducts a pearson chi square test on a dataset
      that has acategorical level of measurement"))
 
-;TODO re implement have BLAS functionality in functions only to stop complexity for minimal perf gain
+;TODO implement next
 (defrecord Independance [data nrows ncols]
   Categorical
   (pearson-chi-square [type]))

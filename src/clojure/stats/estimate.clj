@@ -5,11 +5,11 @@
 ;TODO parallel versions as in interval api
 
 (defprotocol Estimate
-  (confidence-interval [ci] "Confidence imterval"))
+  (conf-int [ci] "Confidence imterval"))
 
 (defrecord OneSample [sample critical-value]
   Estimate
-  (confidence-interval [type]
+  (conf-int [type]
     (let [pcalcs (pvalues (mean sample)
                           (smpl-std-dev sample (mean sample))
                           (count sample)
@@ -31,7 +31,7 @@
 
 (defrecord TwoSample [samples critical-value]
   Estimate
-  (confidence-interval [type]
+  (conf-int [type]
     (let [pcalcs (pvalues (map mean samples)
                           (map #(smpl-var % (mean %)) samples)
                           (map count samples))

@@ -4,7 +4,7 @@
 
 ;TODO seperate out tests into differnt packages depending on the data types eg numerical/categorocal etc
 
-(defn one-sample-ttest
+(defn one-smpl-ttest
 
   "Computes a students t-test for testing the null hypothesis that the population mean, is equal to a hypothesised mean. The
    students one sample t-test requires a sample that is normally distributed"
@@ -21,7 +21,8 @@
   (ttest (Welch. samples)))
 
 ;TODO add extensive docs, specs
-(defn rep-measure-ttest [{:keys [population h-mean]}]
+(defn rep-msure-ttest [{:keys [population h-mean]}]
   (ttest (RepeatedMeasure. population h-mean)))
 
+(defn one-smpl-mdian [])
 

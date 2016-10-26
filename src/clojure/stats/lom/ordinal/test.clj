@@ -6,4 +6,5 @@
 
 (defrecord OneSampleMedian []
   Ordinal
-  (ttest [type]))
+  (ttest [type]
+    (println type)))
