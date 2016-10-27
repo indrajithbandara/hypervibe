@@ -7,6 +7,5 @@
                  [criterium "0.4.4"]
                  [com.google.guava/guava "19.0"]
                  [net.mikera/core.matrix "0.51.0"]
-                 [uncomplicate/neanderthal "0.7.0"]
                  [uncomplicate/fluokitten "0.5.0"]]
   :repl-options {:init (set! *print-length* 100)})
