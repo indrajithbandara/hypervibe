@@ -6,12 +6,13 @@
             [clojure.utils :refer [zip]]
             [clojure.core.stats.estimate :refer [one-smpl-conf-inter two-smpl-conf-inter]]
             [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
-            [clojure.core.stats.critical-value :refer [one-tail-cv two-tail-cv]]))
+            [clojure.stats.distribution.t.critical-value :refer [one-tail two-tail]]))
 
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
 ;LOM = level of measurement
 ;TODO create protocol named Conduct which composes steps of a test and takes an alpha value as input returning a test result. Have protocol work on all tests
-
+;If alpha equals 0.05, then your confidence level is 0.95. If you increase alpha, you both increase the probability of incorrectly rejecting the null hypothesis and also decrease your confidence level.
+;A two-tailed test will test both if the mean is significantly greater than x and if the mean significantly less than x
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:sample population-one :h-mean 400})
          #clojure.stats.lom.interval.test.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
@@ -29,6 +30,7 @@
          #clojure.stats.lom.interval.test.EqualVariance{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                                   [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                         :h-mean [0 0],
+                                                        :alpha 0.05,
                                                         :t-statistic 1.094722972460392,
                                                         :dof 18,
                                                         :sample-means [87.94999999999999 85.19],
@@ -43,6 +45,7 @@
                                                        [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                  :t-statistic 1.0947229724603922,
                                                  :dof 17.993567997176537,
+                                                 :alpha 0.05
                                                  :sample-means [87.94999999999999 85.19],
                                                  :sample-variances [32.382777777777775 31.181000000000015],
                                                  :sample-sizes [10 10]})))
@@ -56,6 +59,7 @@
                                                         :h-mean [0 0],
                                                         :t-statistic -2.5017235438103813,
                                                         :dof 9,
+                                                        :alpha 0.05
                                                         :population-means [0.0 0.0],
                                                         :standard-deviation 13.90443574307614,
                                                         :population-size 10,
@@ -86,12 +90,12 @@
 
 
 (deftest two-tail-significance-test-test
-  (is (= (two-tail-cv {:dof 9 :alpha 0.05})
+  (is (= (two-tail {:dof 9 :alpha 0.05})
          {:critical-value 2.2621, :dof 9, :alpha 0.05})))
 
 
 (deftest one-tail-significance-test-test
-  (is (= (one-tail-cv {:dof 9 :alpha 0.05})
+  (is (= (one-tail {:dof 9 :alpha 0.05})
          {:critical-value 1.8331, :dof 9, :alpha 0.05})))
 
 

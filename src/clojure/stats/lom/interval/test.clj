@@ -1,6 +1,5 @@
 (ns clojure.stats.lom.interval.test
-  (:require [clojure.stats.utils.tables :refer [t-table]]
-            [clojure.stats.utils.central-tendancy :refer [mean difference]]
+  (:require [clojure.stats.utils.central-tendancy :refer [mean difference]]
             [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var pool-var]]))
 
 
@@ -25,7 +24,7 @@
                   :sample-size sample-size))))
 
 
-(defrecord EqualVariance [samples h-mean]
+(defrecord EqualVariance [samples h-mean alpha]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (map mean samples)
@@ -39,13 +38,14 @@
                                   (Math/sqrt (* (/ (+ pooled-variance-one pooled-variance-two) 2)
                                                 (+ (/ 1 sample-size-one) (/ 1 sample-size-two)))))
                   :dof (- (+ sample-size-one sample-size-two) 2)
+                  :alpha alpha
                   :sample-means [sample-mean-one sample-mean-two]
                   :population-means [population-mean-one population-mean-two]
                   :pooled-variances [pooled-variance-one pooled-variance-two]
                   :sample-sizes [sample-size-one sample-size-two]))))
 
 
-(defrecord Welch [samples]
+(defrecord Welch [samples alpha]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (map mean samples)
@@ -66,12 +66,13 @@
                              (/ (* (/ sample-variance-two sample-size-two)
                                    (/ sample-variance-two sample-size-two))
                                 (- sample-size-two 1))))
+                  :alpha alpha
                   :sample-means [mean-one mean-two]
                   :sample-variances [sample-variance-one sample-variance-two]
                   :sample-sizes [sample-size-one sample-size-two]))))
 
 
-(defrecord RepeatedMeasure [population h-mean]
+(defrecord RepeatedMeasure [population h-mean alpha]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (mean (difference population))
@@ -84,6 +85,7 @@
                                   (/ standard-deviation
                                      (Math/sqrt population-size)))
                   :dof (- population-size 1)
+                  :alpha alpha
                   :population-means [population-mean-one population-mean-two]
                   :standard-deviation standard-deviation
                   :population-size population-size
