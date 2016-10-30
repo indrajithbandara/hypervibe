@@ -8,7 +8,7 @@
   (ttest [this] "Conducts a ttest on a dataset. A t-test looks at the t-statistic, the t-distribution and
                  degrees of freedom to determine the probability of difference between populations"))
 
-(defrecord OneSample [sample h-mean]
+(defrecord OneSample [sample h-mean alpha]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (mean sample)
@@ -19,6 +19,7 @@
                                   (/ sample-standard-deviation
                                      (Math/sqrt sample-size)))
                   :dof (dec sample-size)
+                  :alpha alpha
                   :sample-mean sample-mean
                   :sample-standard-deviation sample-standard-deviation
                   :sample-size sample-size))))

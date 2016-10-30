@@ -9,8 +9,8 @@
   "Computes a students t-test for testing the null hypothesis that the population mean, is equal to a hypothesised mean. The
    students one sample t-test requires a sample that is normally distributed"
 
-  [{:keys [sample h-mean]}]
-  (ttest (OneSample. sample h-mean)))
+  [{sample :sample h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
+  (ttest (OneSample. sample h-mean alpha)))
 
 ;TODO add extensive docs, specs
 (defn equal-var-ttest [{:keys [samples h-mean]}]
@@ -23,6 +23,3 @@
 ;TODO add extensive docs, specs
 (defn rep-msure-ttest [{:keys [population h-mean]}]
   (ttest (RepeatedMeasure. population h-mean)))
-
-(defn one-smpl-mdian [])
-

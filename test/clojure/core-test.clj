@@ -10,11 +10,13 @@
 
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
 ;LOM = level of measurement
+;TODO create protocol named Conduct which composes steps of a test and takes an alpha value as input returning a test result. Have protocol work on all tests
 
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:sample population-one :h-mean 400})
          #clojure.stats.lom.interval.test.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
                                                      :h-mean 400,
+                                                     :alpha 0.05
                                                      :t-statistic 8.700992601418207,
                                                      :dof 9,
                                                      :sample-mean 579.0,

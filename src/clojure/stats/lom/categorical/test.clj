@@ -3,14 +3,22 @@
 
 
 (defprotocol Categorical
-  (pearson-chi-square [this]
+  (chi-square [this]
     "Conducts a pearson chi square test on a dataset
      that has acategorical level of measurement"))
 
 ;TODO implement next
 (defrecord Independance [data nrows ncols]
   Categorical
-  (pearson-chi-square [type]))
+  (chi-square [type]))
+
+(defrecord Goodness []
+  Categorical
+  (chi-square [type]))
+
+(defrecord Homogeneity []
+  Categorical
+  (chi-square [type]))
 
 
 
