@@ -6,7 +6,7 @@
             [clojure.utils :refer [zip]]
             [clojure.core.stats.estimate :refer [one-smpl-conf-inter two-smpl-conf-inter]]
             [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
-            [clojure.stats.distribution.t.critical-value :refer [one-tail two-tail]]))
+            [clojure.stats.distribution.t.critical-value :refer [critical-value]]))
 
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
 ;LOM = level of measurement
@@ -14,15 +14,17 @@
 ;If alpha equals 0.05, then your confidence level is 0.95. If you increase alpha, you both increase the probability of incorrectly rejecting the null hypothesis and also decrease your confidence level.
 ;A two-tailed test will test both if the mean is significantly greater than x and if the mean significantly less than x
 (deftest one-sample-t-test-test
-  (is (= (one-smpl-ttest {:sample population-one :h-mean 400})
+  (is (= (one-smpl-ttest {:sample population-one :h-mean 400 :tail :one})
          #clojure.stats.lom.interval.test.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
-                                                     :h-mean 400,
-                                                     :alpha 0.05
-                                                     :t-statistic 8.700992601418207,
-                                                     :dof 9,
-                                                     :sample-mean 579.0,
-                                                     :sample-standard-deviation 65.05553183413554,
-                                                     :sample-size 10})))
+                                                    :h-mean 400,
+                                                    :alpha 0.05,
+                                                    :tail :one,
+                                                    :t-statistic 8.700992601418207,
+                                                    :dof 9,
+                                                    :critical-value 1.8331,
+                                                    :sample-mean 579.0,
+                                                    :sample-standard-deviation 65.05553183413554,
+                                                    :sample-size 10})))
 
 
 (deftest two-sample-t-test-equal-variance
@@ -90,13 +92,13 @@
 
 
 (deftest two-tail-significance-test-test
-  (is (= (two-tail {:dof 9 :alpha 0.05})
-         {:critical-value 2.2621, :dof 9, :alpha 0.05})))
+  (is (= (critical-value {:dof 9 :alpha 0.05 :tail :one})
+         1.8331)))
 
 
 (deftest one-tail-significance-test-test
-  (is (= (one-tail {:dof 9 :alpha 0.05})
-         {:critical-value 1.8331, :dof 9, :alpha 0.05})))
+  (is (= (critical-value {:dof 9 :alpha 0.05 :tail :two})
+         2.2621)))
 
 
 (def dataset "/Users/gregadebesin/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")
@@ -126,7 +128,7 @@
 ;http://www.ats.ucla.edu/stat/stata/whatstat/whatstat.htm
 ;http://www.ats.ucla.edu/stat/mult_pkg/whatstat/nominal_ordinal_interval.htm
 
-(def ostest (one-smpl-ttest {:sample [1 2 3] :h-mean 4})) ;Polymorphic on the ttest interface
+(def ostest (one-smpl-ttest {:sample [1 2 3] :h-mean 4 :tail :one})) ;Polymorphic on the ttest interface
 (def evtest (equal-var-ttest {:samples [[1 2 3] [4 5 6]] :h-mean [0 0]}))
 ;(ttest ostest)
 ;(ttest evtest)

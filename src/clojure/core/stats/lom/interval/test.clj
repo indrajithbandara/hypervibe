@@ -9,8 +9,8 @@
   "Computes a students t-test for testing the null hypothesis that the population mean, is equal to a hypothesised mean. The
    students one sample t-test requires a sample that is normally distributed"
 
-  [{sample :sample h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
-  (ttest (OneSample. sample h-mean alpha)))
+  [{sample :sample h-mean :h-mean alpha :alpha :or {alpha 0.05} tail :tail}]
+  (ttest (OneSample. sample h-mean alpha tail)))
 
 ;TODO add extensive docs, specs
 (defn equal-var-ttest [{samples :samples h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
