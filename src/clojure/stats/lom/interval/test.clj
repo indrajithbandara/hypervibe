@@ -26,7 +26,7 @@
                   :sample-size sample-size))))
 
 
-(defrecord EqualVariance [samples h-mean alpha]
+(defrecord EqualVariance [samples h-mean alpha tail]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (map mean samples)
@@ -41,6 +41,7 @@
                                                 (+ (/ 1 sample-size-one) (/ 1 sample-size-two)))))
                   :dof (- (+ sample-size-one sample-size-two) 2)
                   :alpha alpha
+                  :critical-value (critical-value {:tail tail :dof (- (+ sample-size-one sample-size-two) 2) :alpha alpha})
                   :sample-means [sample-mean-one sample-mean-two]
                   :population-means [population-mean-one population-mean-two]
                   :pooled-variances [pooled-variance-one pooled-variance-two]
@@ -56,7 +57,7 @@
           [[mean-one mean-two] [sample-variance-one sample-variance-two]
            [sample-size-one sample-size-two]] pcalcs]
       (assoc type :t-statistic (/ (- mean-one mean-two)
-                                  (Math/sqrt (+ (/ sample-variance-one sample-size-one)
+                                  (Math/sqrt (+ (/ sample-variance-one sample-size-one) ;TODO research how the critical value is derived from a welch test's dof
                                                 (/ sample-variance-two sample-size-two))))
                   :dof (/ (* (+ (/ sample-variance-one sample-size-one)
                                 (/ sample-variance-two sample-size-two))
@@ -74,7 +75,7 @@
                   :sample-sizes [sample-size-one sample-size-two]))))
 
 
-(defrecord RepeatedMeasure [population h-mean alpha]
+(defrecord RepeatedMeasure [population h-mean alpha tail]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (mean (difference population))
@@ -88,6 +89,7 @@
                                      (Math/sqrt population-size)))
                   :dof (- population-size 1)
                   :alpha alpha
+                  :critical-value (critical-value {:tail tail :dof (dec population-size) :alpha alpha}) ;TODO check population size is correct
                   :population-means [population-mean-one population-mean-two]
                   :standard-deviation standard-deviation
                   :population-size population-size
