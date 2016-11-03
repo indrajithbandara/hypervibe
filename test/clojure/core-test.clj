@@ -8,11 +8,17 @@
             [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
             [clojure.stats.distribution.t.critical-value :refer [critical-value]]))
 
+
+;TODO generate t distribution numbers in r using qt(c(.05), df=1:1000)
+;TODO merge one tail and two tail into one big table =>  {0.05 0 0.025 1 0.01 2 0.005 3 0.0025 4 0.001 5 0.0005 6 0.1 7 0.05 8 0.02 9 0.01 10 0.005 11 0.002 12 0.001 13}
+;TODO the above will solve simplify critical value fn
+;TODO using math.round will solve problem of dof for welch ttest
+;TODO generate chi square distribution using R
+;TODO implement Z scores using R
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
-;LOM = level of measurement
 ;TODO create protocol named Conduct which compares the absolute value of the t statistic with the critical value ang outputs the test result
-;If alpha equals 0.05, then your confidence level is 0.95. If you increase alpha, you both increase the probability of incorrectly rejecting the null hypothesis and also decrease your confidence level.
-;A two-tailed test will test both if the mean is significantly greater than x and if the mean significantly less than x
+;TODO reference here for different distrubutions http://www.itl.nist.gov/div898/handbook/eda/section3/eda367.htm
+
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:sample population-one :h-mean 400 :tail :one})
          #clojure.stats.lom.interval.test.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
@@ -126,9 +132,13 @@
                                  #(clojure.string/replace % #" " ""))
              :return       []})
 
+;NOTES
 ;http://www.ats.ucla.edu/stat/mult_pkg/whatstat/choosestat.html
 ;http://www.ats.ucla.edu/stat/stata/whatstat/whatstat.htm
 ;http://www.ats.ucla.edu/stat/mult_pkg/whatstat/nominal_ordinal_interval.htm
+;If alpha equals 0.05, then your confidence level is 0.95. If you increase alpha, you both increase the probability of incorrectly rejecting the null hypothesis and also decrease your confidence level.
+;A two-tailed test will test both if the mean is significantly greater than x and if the mean significantly less than x
+;LOM = level of measurement
 
 #_(def ostest (one-smpl-ttest {:sample [1 2 3] :h-mean 4 :tail :one})) ;Polymorphic on the ttest interface
 #_(def evtest (equal-var-ttest {:samples [[1 2 3] [4 5 6]] :h-mean [0 0] :tail :one}))

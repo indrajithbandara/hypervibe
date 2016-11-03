@@ -2,7 +2,6 @@
   (:require [clojure.stats.distribution.t.table :refer [t one-tail-alpha-value two-tail-alpha-value]]))
 (use 'clojure.core.matrix)
 
-; http://www.itl.nist.gov/div898/handbook/eda/section3/eda367.htm
 
 (defmulti critical-value :tail)
 
