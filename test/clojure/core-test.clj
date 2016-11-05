@@ -9,9 +9,8 @@
             [clojure.stats.distribution.t.critical-value :refer [critical-value]]))
 
 
-;TODO generate t distribution numbers in r using qt(c(.05), df=1:1000)
-;TODO merge one tail and two tail into one big table =>  {0.05 0 0.025 1 0.01 2 0.005 3 0.0025 4 0.001 5 0.0005 6 0.1 7 0.05 8 0.02 9 0.01 10 0.005 11 0.002 12 0.001 13}
-;TODO the above will solve simplify critical value fn
+;TODO move all tests to new t table
+;TODO start documentation!
 ;TODO using math.round will solve problem of dof for welch ttest
 ;TODO generate chi square distribution using R
 ;TODO implement Z scores using R
@@ -20,14 +19,13 @@
 ;TODO reference here for different distrubutions http://www.itl.nist.gov/div898/handbook/eda/section3/eda367.htm
 
 (deftest one-sample-t-test-test
-  (is (= (one-smpl-ttest {:sample population-one :h-mean 400 :tail :one})
+  (is (= (one-smpl-ttest {:sample population-one :h-mean 400})
          #clojure.stats.lom.interval.test.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
                                                     :h-mean 400,
                                                     :alpha 0.05,
-                                                    :tail :one,
                                                     :t-statistic 8.700992601418207,
                                                     :dof 9,
-                                                    :critical-value 1.8331,
+                                                    :critical-value 1.83311293265624,
                                                     :sample-mean 579.0,
                                                     :sample-standard-deviation 65.05553183413554,
                                                     :sample-size 10})))

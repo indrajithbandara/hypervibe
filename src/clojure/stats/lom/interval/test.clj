@@ -1,14 +1,15 @@
 (ns clojure.stats.lom.interval.test
   (:require [clojure.stats.utils.central-tendancy :refer [mean difference]]
             [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var pool-var]]
-            [clojure.stats.distribution.t.critical-value :refer [critical-value]]))
-
+            [clojure.stats.distribution.t.critical-value :refer [critical-value]]
+            [clojure.stats.distribution.t.table :refer [percentile-lkup t-dist]]))
+(use 'clojure.core.matrix)
 
 (defprotocol Interval
   (ttest [this] "Conducts a ttest on a dataset. A t-test looks at the t-statistic, the t-distribution and
                  degrees of freedom to determine the probability of difference between populations"))
 
-(defrecord OneSample [sample h-mean alpha tail]
+(defrecord OneSample [sample h-mean alpha]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (mean sample)
@@ -20,7 +21,7 @@
                                      (Math/sqrt sample-size)))
                   :dof (dec sample-size)
                   :alpha alpha
-                  :critical-value (critical-value {:tail tail :dof (dec sample-size) :alpha alpha})
+                  :critical-value (mget t-dist (- sample-size 2) ((percentile-lkup) alpha))
                   :sample-mean sample-mean
                   :sample-standard-deviation sample-standard-deviation
                   :sample-size sample-size))))
