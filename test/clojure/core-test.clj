@@ -5,11 +5,9 @@
             [clojure.extract :refer [file-lines]]
             [clojure.utils :refer [zip]]
             [clojure.core.stats.estimate :refer [one-smpl-conf-inter two-smpl-conf-inter]]
-            [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
-            [clojure.stats.distribution.t.critical-value :refer [critical-value]]))
+            [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]))
 
-
-;TODO move all tests to new t table
+;TODO change all keys to abbreviated versions
 ;TODO start documentation!
 ;TODO using math.round will solve problem of dof for welch ttest
 ;TODO generate chi square distribution using R
@@ -19,16 +17,16 @@
 ;TODO reference here for different distrubutions http://www.itl.nist.gov/div898/handbook/eda/section3/eda367.htm
 
 (deftest one-sample-t-test-test
-  (is (= (one-smpl-ttest {:sample population-one :h-mean 400})
-         #clojure.stats.lom.interval.test.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
+  (is (= (one-smpl-ttest {:smpl population-one :h-mean 400})
+         #clojure.stats.lom.interval.test.OneSample{:smpl [490 500 530 550 580 590 600 600 650 700],
                                                     :h-mean 400,
                                                     :alpha 0.05,
-                                                    :t-statistic 8.700992601418207,
+                                                    :t-stat 8.700992601418207,
                                                     :dof 9,
-                                                    :critical-value 1.83311293265624,
-                                                    :sample-mean 579.0,
-                                                    :sample-standard-deviation 65.05553183413554,
-                                                    :sample-size 10})))
+                                                    :crtcl-val 1.83311293265624,
+                                                    :smpl-mean 579.0,
+                                                    :smpl-std-dev 65.05553183413554,
+                                                    :smpl-size 10})))
 
 
 (deftest two-sample-t-test-equal-variance
@@ -96,14 +94,6 @@
                                            :sample-sizes [10 85.19],
                                            :upper 8.05675922207777,
                                            :lower -2.536759222077789})))
-
-
-(deftest two-tail-significance-test-test
-  (is (= (critical-value {:dof 9 :alpha 0.05 :tail :one}) 1.8331)))
-
-
-(deftest one-tail-significance-test-test
-  (is (= (critical-value {:dof 9 :alpha 0.05 :tail :two}) 2.2621)))
 
 
 (def dataset "/Users/gregadebesin/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")
