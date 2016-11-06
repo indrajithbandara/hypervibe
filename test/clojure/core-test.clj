@@ -32,15 +32,14 @@
 
 
 (deftest two-sample-t-test-equal-variance
-  (is (= (equal-var-ttest {:samples [ballet-dancers football-players] :h-mean [0 0] :tail :one})
+  (is (= (equal-var-ttest {:samples [ballet-dancers football-players] :h-mean [0 0]})
          #clojure.stats.lom.interval.test.EqualVariance{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                                   [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                         :h-mean [0 0],
                                                         :alpha 0.05,
-                                                        :tail :one,
                                                         :t-statistic 1.094722972460392,
                                                         :dof 18,
-                                                        :critical-value 1.7341,
+                                                        :critical-value 1.73406360661754,
                                                         :sample-means [87.94999999999999 85.19],
                                                         :population-means [0.0 0.0],
                                                         :pooled-variances [32.382777777777775 31.181000000000015],
@@ -50,13 +49,14 @@
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (welch-ttest {:samples [ballet-dancers football-players]})
          #clojure.stats.lom.interval.test.Welch{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                                                       [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-                                                 :t-statistic 1.0947229724603922,
-                                                 :dof 17.993567997176537,
-                                                 :alpha 0.05
-                                                 :sample-means [87.94999999999999 85.19],
-                                                 :sample-variances [32.382777777777775 31.181000000000015],
-                                                 :sample-sizes [10 10]})))
+                                                          [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                                :alpha 0.05,
+                                                :t-statistic 1.0947229724603922,
+                                                :dof 17.993567997176537,
+                                                :critical-value 1.73406360661754,
+                                                :sample-means [87.94999999999999 85.19],
+                                                :sample-variances [32.382777777777775 31.181000000000015],
+                                                :sample-sizes [10 10]})))
 
 
 
@@ -66,10 +66,9 @@
                                                                        [220 240 225 180 210 190 195 200 210 240]],
                                                           :h-mean [0 0],
                                                           :alpha 0.05,
-                                                          :tail :one,
                                                           :t-statistic -2.5017235438103813,
                                                           :dof 9,
-                                                          :critical-value 1.8331,
+                                                          :critical-value 1.83311293265624,
                                                           :population-means [0.0 0.0],
                                                           :standard-deviation 13.90443574307614,
                                                           :population-size 10,

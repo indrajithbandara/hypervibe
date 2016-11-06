@@ -2,7 +2,7 @@
   (:require [clojure.stats.utils.central-tendancy :refer [mean difference]]
             [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var pool-var]]
             [clojure.stats.distribution.t.critical-value :refer [critical-value]]
-            [clojure.stats.distribution.t.table :refer [percentile-lkup t-dist]]))
+            [clojure.stats.distribution.t.table :refer [t-dist crtcl-val]]))
 (use 'clojure.core.matrix)
 
 (defprotocol Interval
@@ -21,13 +21,13 @@
                                      (Math/sqrt sample-size)))
                   :dof (dec sample-size)
                   :alpha alpha
-                  :critical-value (mget t-dist (- sample-size 2) ((percentile-lkup) alpha))
+                  :critical-value (crtcl-val t-dist (dec sample-size) alpha)
                   :sample-mean sample-mean
                   :sample-standard-deviation sample-standard-deviation
                   :sample-size sample-size))))
 
 
-(defrecord EqualVariance [samples h-mean alpha tail]
+(defrecord EqualVariance [samples h-mean alpha]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (map mean samples)
@@ -42,7 +42,7 @@
                                                 (+ (/ 1 sample-size-one) (/ 1 sample-size-two)))))
                   :dof (- (+ sample-size-one sample-size-two) 2)
                   :alpha alpha
-                  :critical-value (critical-value {:tail tail :dof (- (+ sample-size-one sample-size-two) 2) :alpha alpha})
+                  :critical-value (crtcl-val t-dist (- (+ sample-size-one sample-size-two) 2) alpha)
                   :sample-means [sample-mean-one sample-mean-two]
                   :population-means [population-mean-one population-mean-two]
                   :pooled-variances [pooled-variance-one pooled-variance-two]
@@ -58,7 +58,7 @@
           [[mean-one mean-two] [sample-variance-one sample-variance-two]
            [sample-size-one sample-size-two]] pcalcs]
       (assoc type :t-statistic (/ (- mean-one mean-two)
-                                  (Math/sqrt (+ (/ sample-variance-one sample-size-one) ;TODO research how the critical value is derived from a welch test's dof
+                                  (Math/sqrt (+ (/ sample-variance-one sample-size-one)
                                                 (/ sample-variance-two sample-size-two))))
                   :dof (/ (* (+ (/ sample-variance-one sample-size-one)
                                 (/ sample-variance-two sample-size-two))
@@ -71,12 +71,24 @@
                                    (/ sample-variance-two sample-size-two))
                                 (- sample-size-two 1))))
                   :alpha alpha
+                  :critical-value (crtcl-val
+                                    t-dist (Math/round
+                                             (/ (* (+ (/ sample-variance-one sample-size-one)
+                                                      (/ sample-variance-two sample-size-two))
+                                                   (+ (/ sample-variance-one sample-size-one)
+                                                      (/ sample-variance-two sample-size-two)))
+                                                (+ (/ (* (/ sample-variance-one sample-size-one)
+                                                         (/ sample-variance-one sample-size-one))
+                                                      (- sample-size-one 1))
+                                                   (/ (* (/ sample-variance-two sample-size-two)
+                                                         (/ sample-variance-two sample-size-two))
+                                                      (- sample-size-two 1))))) alpha)
                   :sample-means [mean-one mean-two]
                   :sample-variances [sample-variance-one sample-variance-two]
                   :sample-sizes [sample-size-one sample-size-two]))))
 
 
-(defrecord RepeatedMeasure [population h-mean alpha tail]
+(defrecord RepeatedMeasure [population h-mean alpha]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (mean (difference population))
@@ -88,9 +100,9 @@
                                      (- population-mean-one population-mean-two))
                                   (/ standard-deviation
                                      (Math/sqrt population-size)))
-                  :dof (- population-size 1)
+                  :dof (dec population-size)
                   :alpha alpha
-                  :critical-value (critical-value {:tail tail :dof (dec population-size) :alpha alpha}) ;TODO check population size is correct
+                  :critical-value (crtcl-val t-dist (dec population-size) alpha) ;TODO check population size is correct
                   :population-means [population-mean-one population-mean-two]
                   :standard-deviation standard-deviation
                   :population-size population-size

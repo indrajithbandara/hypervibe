@@ -11,4 +11,3 @@
 (defmethod critical-value :two [tail]
   (mget t (dec (:dof tail)) ((two-tail-alpha-value) (:alpha tail))))
 
-
