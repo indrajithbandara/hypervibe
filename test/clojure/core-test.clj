@@ -7,7 +7,7 @@
             [clojure.core.stats.estimate :refer [one-smpl-conf-inter two-smpl-conf-inter]]
             [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]))
 
-;TODO change all keys to abbreviated versions
+;TODO change variables to same as abbreviated names
 ;TODO start documentation!
 ;TODO using math.round will solve problem of dof for welch ttest
 ;TODO generate chi square distribution using R
@@ -30,68 +30,64 @@
 
 
 (deftest two-sample-t-test-equal-variance
-  (is (= (equal-var-ttest {:samples [ballet-dancers football-players] :h-mean [0 0]})
-         #clojure.stats.lom.interval.test.EqualVariance{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                                                                  [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+  (is (= (equal-var-ttest {:smpls [ballet-dancers football-players] :h-mean [0 0]})
+         #clojure.stats.lom.interval.test.EqualVariance{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                         :h-mean [0 0],
                                                         :alpha 0.05,
-                                                        :t-statistic 1.094722972460392,
+                                                        :t-stat 1.094722972460392,
                                                         :dof 18,
-                                                        :critical-value 1.73406360661754,
-                                                        :sample-means [87.94999999999999 85.19],
-                                                        :population-means [0.0 0.0],
-                                                        :pooled-variances [32.382777777777775 31.181000000000015],
-                                                        :sample-sizes [10 10]})))
+                                                        :crtcl-val 1.73406360661754,
+                                                        :smpl-means [87.94999999999999 85.19],
+                                                        :pop-means [0.0 0.0],
+                                                        :pool-vars [32.382777777777775 31.181000000000015],
+                                                        :smpl-sizes [10 10]})))
 
 
 (deftest two-sample-t-test-unequal-variance-welch
-  (is (= (welch-ttest {:samples [ballet-dancers football-players]})
-         #clojure.stats.lom.interval.test.Welch{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                                                          [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+  (is (= (welch-ttest {:smpls [ballet-dancers football-players]})
+         #clojure.stats.lom.interval.test.Welch{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                 :alpha 0.05,
-                                                :t-statistic 1.0947229724603922,
+                                                :t-stat 1.0947229724603922,
                                                 :dof 17.993567997176537,
-                                                :critical-value 1.73406360661754,
-                                                :sample-means [87.94999999999999 85.19],
-                                                :sample-variances [32.382777777777775 31.181000000000015],
-                                                :sample-sizes [10 10]})))
+                                                :crtcl-val 1.73406360661754,
+                                                :smpl-means [87.94999999999999 85.19],
+                                                :smpl-vars [32.382777777777775 31.181000000000015],
+                                                :smpl-sizes [10 10]})))
 
 
 
 (deftest two-sample-repeated-measure-test
-  (is (= (rep-msure-ttest {:population [after before] :h-mean [0 0] :tail :one})
-         #clojure.stats.lom.interval.test.RepeatedMeasure{:population [[200 210 210 170 220 180 190 190 220 210]
-                                                                       [220 240 225 180 210 190 195 200 210 240]],
+  (is (= (rep-msure-ttest {:pops [after before] :h-mean [0 0]})
+         #clojure.stats.lom.interval.test.RepeatedMeasure{:pops [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
                                                           :h-mean [0 0],
                                                           :alpha 0.05,
-                                                          :t-statistic -2.5017235438103813,
+                                                          :t-stat -2.5017235438103813,
                                                           :dof 9,
-                                                          :critical-value 1.83311293265624,
-                                                          :population-means [0.0 0.0],
-                                                          :standard-deviation 13.90443574307614,
-                                                          :population-size 10,
-                                                          :difference-mean -11.0})))
+                                                          :crtcl-val 1.83311293265624,
+                                                          :pop-means [0.0 0.0],
+                                                          :std-dev 13.90443574307614,
+                                                          :pop-size 10,
+                                                          :diff-mean -11.0})))
 
 
 (deftest one-sample-conf-inter-test
-  (is (= (one-smpl-conf-inter {:sample population-one :critical-value 1.8331})
-         #clojure.stats.estimate.OneSample{:sample [490 500 530 550 580 590 600 600 650 700],
-                                           :critical-value 1.8331,
-                                           :sample-standard-deviation 65.05553183413554,
-                                           :sample-mean 579.0,
-                                           :sample-size 10,
+  (is (= (one-smpl-conf-inter {:smpl population-one :crtcl-val 1.8331})
+         #clojure.stats.estimate.OneSample{:smpl [490 500 530 550 580 590 600 600 650 700],
+                                           :crtcl-val 1.8331,
+                                           :smpl-std-dev 65.05553183413554,
+                                           :smpl-mean 579.0,
+                                           :smpl-size 10,
                                            :upper 616.7112031961178,
                                            :lower 541.2887968038822})))
 
 
 (deftest two-sample-confidence-interval-test-test
-  (is (= (two-smpl-conf-inter {:sample [ballet-dancers football-players] :critical-value 2.1009})
-         #clojure.stats.estimate.TwoSample{:samples [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                                                     [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-                                           :critical-value 2.1009,
-                                           :sample-variances [32.382777777777775 31.181000000000015],
-                                           :sample-means [87.94999999999999 85.19],
-                                           :sample-sizes [10 85.19],
+  (is (= (two-smpl-conf-inter {:smpls [ballet-dancers football-players] :crtcl-val 2.1009})
+         #clojure.stats.estimate.TwoSample{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                           :crtcl-val 2.1009,
+                                           :smpl-vars [32.382777777777775 31.181000000000015],
+                                           :smpl-means [87.94999999999999 85.19],
+                                           :smpl-sizes [10 85.19],
                                            :upper 8.05675922207777,
                                            :lower -2.536759222077789})))
 

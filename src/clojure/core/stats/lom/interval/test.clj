@@ -48,15 +48,15 @@
   (ttest (OneSample. sample h-mean alpha)))
 
 ;TODO add extensive docs, specs
-(defn equal-var-ttest [{samples :samples h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
-  (ttest (EqualVariance. samples h-mean alpha)))
+(defn equal-var-ttest [{smpls :smpls h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
+  (ttest (EqualVariance. smpls h-mean alpha)))
 
 ;TODO add extensive docs, specs
-(defn welch-ttest [{samples :samples alpha :alpha :or {alpha 0.05}}]
-  (ttest (Welch. samples alpha)))
+(defn welch-ttest [{smpls :smpls alpha :alpha :or {alpha 0.05}}]
+  (ttest (Welch. smpls alpha)))
 
 ;TODO add extensive docs, specs
-(defn rep-msure-ttest [{population :population h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
-  (ttest (RepeatedMeasure. population h-mean alpha)))
+(defn rep-msure-ttest [{pops :pops h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
+  (ttest (RepeatedMeasure. pops h-mean alpha)))
 
 

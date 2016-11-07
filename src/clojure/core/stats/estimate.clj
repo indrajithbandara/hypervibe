@@ -5,8 +5,8 @@
   (:import [clojure.stats.estimate OneSample TwoSample]))
 (use 'criterium.core)
 
-(defn one-smpl-conf-inter [{:keys [sample critical-value]}]
-  (conf-int (OneSample. sample critical-value)))
+(defn one-smpl-conf-inter [{:keys [smpl crtcl-val]}]
+  (conf-int (OneSample. smpl crtcl-val)))
 
 ;(s/fdef one-sample-conf-inter
 ;        :args {:sample         (s/and not-empty (s/coll-of int?))
@@ -14,8 +14,8 @@
 ;        :ret map?)
 
 
-(defn two-smpl-conf-inter [{:keys [sample critical-value]}]
-  (conf-int (TwoSample. sample critical-value)))
+(defn two-smpl-conf-inter [{:keys [smpls crtcl-val]}]
+  (conf-int (TwoSample. smpls crtcl-val)))
 
 ;(s/fdef two-sample-conf-inter
 ;        :args {:sample         (or [sequential? sequential?] '(sequential? sequential?))
