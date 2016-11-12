@@ -14,17 +14,17 @@
     (let [pcalcs (pvalues (mean smpl)
                           (smpl-std-dev smpl (mean smpl))
                           (count smpl))
-          [sample-mean sample-standard-deviation sample-size] pcalcs
-          dof (dec sample-size)]
-      (assoc type :t-stat (/ (- sample-mean h-mean)
-                             (/ sample-standard-deviation
-                                (Math/sqrt sample-size)))
+          [smpl-mean smpl-std-dev smpl-size] pcalcs
+          dof (dec smpl-size)]
+      (assoc type :t-stat (/ (- smpl-mean h-mean)
+                             (/ smpl-std-dev
+                                (Math/sqrt smpl-size)))
                   :dof dof
                   :alpha alpha
                   :crtcl-val (crtcl-val t-dist dof alpha)
-                  :smpl-mean sample-mean
-                  :smpl-std-dev sample-standard-deviation
-                  :smpl-size sample-size))))
+                  :smpl-mean smpl-mean
+                  :smpl-std-dev smpl-std-dev
+                  :smpl-size smpl-size))))
 
 
 (defrecord EqualVariance [smpls h-mean alpha]
@@ -34,20 +34,20 @@
                           (map mean (partition 1 h-mean))
                           (map #(pool-var % (mean %) (dec (count %))) smpls)
                           (map count smpls))
-          [[sample-mean-one sample-mean-two] [population-mean-one population-mean-two]
-           [pooled-variance-one pooled-variance-two] [sample-size-one sample-size-two]] pcalcs
-          dof (- (+ sample-size-one sample-size-two) 2)]
-      (assoc type :t-stat (/ (- (- sample-mean-one sample-mean-two)
-                                (- population-mean-one population-mean-two))
-                             (Math/sqrt (* (/ (+ pooled-variance-one pooled-variance-two) 2)
-                                           (+ (/ 1 sample-size-one) (/ 1 sample-size-two)))))
+          [[smpl-mean-one smpl-mean-two] [pop-mean-one pop-mean-two]
+           [pool-var-one pool-var-two] [smpl-size-one smpl-size-two]] pcalcs
+          dof (- (+ smpl-size-one smpl-size-two) 2)]
+      (assoc type :t-stat (/ (- (- smpl-mean-one smpl-mean-two)
+                                (- pop-mean-one pop-mean-two))
+                             (Math/sqrt (* (/ (+ pool-var-one pool-var-two) 2)
+                                           (+ (/ 1 smpl-size-one) (/ 1 smpl-size-two)))))
                   :dof dof
                   :alpha alpha
                   :crtcl-val (crtcl-val t-dist dof alpha)
-                  :smpl-means [sample-mean-one sample-mean-two]
-                  :pop-means [population-mean-one population-mean-two]
-                  :pool-vars [pooled-variance-one pooled-variance-two]
-                  :smpl-sizes [sample-size-one sample-size-two]))))
+                  :smpl-means [smpl-mean-one smpl-mean-two]
+                  :pop-means [pop-mean-one pop-mean-two]
+                  :pool-vars [pool-var-one pool-var-two]
+                  :smpl-sizes [smpl-size-one smpl-size-two]))))
 
 
 (defrecord Welch [smpls alpha]                            ;TODO test in SPSS
@@ -56,27 +56,27 @@
     (let [pcalcs (pvalues (map mean smpls)
                           (map #(smpl-var % (mean %)) smpls)
                           (map count smpls))
-          [[mean-one mean-two] [sample-variance-one sample-variance-two]
-           [sample-size-one sample-size-two]] pcalcs
-          dof (/ (* (+ (/ sample-variance-one sample-size-one)
-                       (/ sample-variance-two sample-size-two))
-                    (+ (/ sample-variance-one sample-size-one)
-                       (/ sample-variance-two sample-size-two)))
-                 (+ (/ (* (/ sample-variance-one sample-size-one)
-                          (/ sample-variance-one sample-size-one))
-                       (- sample-size-one 1))
-                    (/ (* (/ sample-variance-two sample-size-two)
-                          (/ sample-variance-two sample-size-two))
-                       (- sample-size-two 1))))]
+          [[mean-one mean-two] [smpl-var-one smpl-var-two]
+           [smpl-size-one smpl-size-two]] pcalcs
+          dof (/ (* (+ (/ smpl-var-one smpl-size-one)
+                       (/ smpl-var-two smpl-size-two))
+                    (+ (/ smpl-var-one smpl-size-one)
+                       (/ smpl-var-two smpl-size-two)))
+                 (+ (/ (* (/ smpl-var-one smpl-size-one)
+                          (/ smpl-var-one smpl-size-one))
+                       (- smpl-size-one 1))
+                    (/ (* (/ smpl-var-two smpl-size-two)
+                          (/ smpl-var-two smpl-size-two))
+                       (- smpl-size-two 1))))]
       (assoc type :t-stat (/ (- mean-one mean-two)
-                                  (Math/sqrt (+ (/ sample-variance-one sample-size-one)
-                                                (/ sample-variance-two sample-size-two))))
+                                  (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
+                                                (/ smpl-var-two smpl-size-two))))
                   :dof dof
                   :alpha alpha
                   :crtcl-val (crtcl-val t-dist (Math/round dof) alpha)
                   :smpl-means [mean-one mean-two]
-                  :smpl-vars [sample-variance-one sample-variance-two]
-                  :smpl-sizes [sample-size-one sample-size-two]))))
+                  :smpl-vars [smpl-var-one smpl-var-two]
+                  :smpl-sizes [smpl-size-one smpl-size-two]))))
 
 
 (defrecord RepeatedMeasure [pops h-mean alpha] ;TODO check population size is correct
@@ -86,19 +86,19 @@
                           (map mean (partition 1 h-mean))
                           (smpl-std-dev (difference pops) (mean (difference pops)))
                           (/ (+ (count (first pops)) (count (second pops))) 2))
-          [difference-mean [population-mean-one population-mean-two] standard-deviation population-size] pcalcs
-          dof (dec population-size)]
-      (assoc type :t-stat (/ (- difference-mean
-                                (- population-mean-one population-mean-two))
-                             (/ standard-deviation
-                                (Math/sqrt population-size)))
+          [diff-mean [pop-mean-one pop-mean-two] std-dev pop-size] pcalcs
+          dof (dec pop-size)]
+      (assoc type :t-stat (/ (- diff-mean
+                                (- pop-mean-one pop-mean-two))
+                             (/ std-dev
+                                (Math/sqrt pop-size)))
                   :dof dof
                   :alpha alpha
                   :crtcl-val (crtcl-val t-dist dof alpha)
-                  :pop-means [population-mean-one population-mean-two]
-                  :std-dev standard-deviation
-                  :pop-size population-size
-                  :diff-mean difference-mean))))
+                  :pop-means [pop-mean-one pop-mean-two]
+                  :std-dev std-dev
+                  :pop-size pop-size
+                  :diff-mean diff-mean))))
 
 
 (defrecord OneSampleMedian []
