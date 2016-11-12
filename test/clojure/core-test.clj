@@ -30,9 +30,9 @@
 
 
 (deftest two-sample-t-test-equal-variance
-  (is (= (equal-var-ttest {:smpls [ballet-dancers football-players] :h-mean [0 0]})
+  (is (= (equal-var-ttest {:smpls [ballet-dancers football-players] :h-means [0 0]})
          #clojure.stats.lom.interval.test.EqualVariance{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-                                                        :h-mean [0 0],
+                                                        :h-means [0 0],
                                                         :alpha 0.05,
                                                         :t-stat 1.094722972460392,
                                                         :dof 18,

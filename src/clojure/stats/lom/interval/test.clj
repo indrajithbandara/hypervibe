@@ -27,11 +27,11 @@
                   :smpl-size smpl-size))))
 
 
-(defrecord EqualVariance [smpls h-mean alpha]
+(defrecord EqualVariance [smpls h-means alpha]
   Interval
   (ttest [type]
     (let [pcalcs (pvalues (map mean smpls)
-                          (map mean (partition 1 h-mean))
+                          (map mean (partition 1 h-means))
                           (map #(pool-var % (mean %) (dec (count %))) smpls)
                           (map count smpls))
           [[smpl-mean-one smpl-mean-two] [pop-mean-one pop-mean-two]
