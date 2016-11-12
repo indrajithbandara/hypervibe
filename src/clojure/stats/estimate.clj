@@ -13,19 +13,19 @@
                           (smpl-std-dev smpl (mean smpl))
                           (count smpl)
                           crtcl-val)
-          [sample-mean sample-standard-deviation sample-size critical-value] pcalcs]
-      (assoc type :smpl-std-dev sample-standard-deviation
-                  :smpl-mean sample-mean
-                  :smpl-size sample-size
-                  :crtcl-val critical-value
-                  :upper (+ sample-mean
-                            (* critical-value
-                               (/ sample-standard-deviation
-                                  (Math/sqrt sample-size))))
-                  :lower (- sample-mean
-                            (* critical-value
-                               (/ sample-standard-deviation
-                                  (Math/sqrt sample-size))))))))
+          [smpl-mean smpl-std-dev smpl-size crtcl-val] pcalcs]
+      (assoc type :smpl-std-dev smpl-std-dev
+                  :smpl-mean smpl-mean
+                  :smpl-size smpl-size
+                  :crtcl-val crtcl-val
+                  :upper (+ smpl-mean
+                            (* crtcl-val
+                               (/ smpl-std-dev
+                                  (Math/sqrt smpl-size))))
+                  :lower (- smpl-mean
+                            (* crtcl-val
+                               (/ smpl-std-dev
+                                  (Math/sqrt smpl-size))))))))
 
 
 (defrecord TwoSample [smpls crtcl-val]
@@ -34,17 +34,17 @@
     (let [pcalcs (pvalues (map mean smpls)
                           (map #(smpl-var % (mean %)) smpls)
                           (map count smpls))
-          [[sample-mean-one sample-mean-two] [sample-variance-one sample-variance-two] [sample-size-one sample-size-two]] pcalcs]
-      (assoc type :smpl-vars [sample-variance-one sample-variance-two]
-                  :smpl-means [sample-mean-one sample-mean-two]
-                  :smpl-sizes [sample-size-one sample-mean-two]
+          [[smpl-mean-one smpl-mean-two] [smpl-var-one smpl-var-two] [smpl-size-one smpl-size-two]] pcalcs]
+      (assoc type :smpl-vars [smpl-var-one smpl-var-two]
+                  :smpl-means [smpl-mean-one smpl-mean-two]
+                  :smpl-sizes [smpl-size-one smpl-mean-two]
                   :crtcl-val crtcl-val
-                  :upper (+ (- sample-mean-one sample-mean-two)
+                  :upper (+ (- smpl-mean-one smpl-mean-two)
                             (* crtcl-val
-                               (Math/sqrt (+ (/ sample-variance-one sample-size-one)
-                                             (/ sample-variance-two sample-size-two)))))
-                  :lower (- (- sample-mean-one sample-mean-two)
+                               (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
+                                             (/ smpl-var-two smpl-size-two)))))
+                  :lower (- (- smpl-mean-one smpl-mean-two)
                             (* crtcl-val
-                               (Math/sqrt (+ (/ sample-variance-one sample-size-one)
-                                             (/ sample-variance-two sample-size-two)))))))))
+                               (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
+                                             (/ smpl-var-two smpl-size-two)))))))))
 
