@@ -79,25 +79,25 @@
                   :smpl-sizes [smpl-size-one smpl-size-two]))))
 
 
-(defrecord RepeatedMeasure [pops h-means alpha] ;TODO check population size is correct
+(defrecord RepeatedMeasure [smpls h-means alpha]
   Interval
   (ttest [type]
-    (let [pcalcs (pvalues (mean (difference pops))
+    (let [pcalcs (pvalues (mean (difference smpls))
                           (map mean (partition 1 h-means))
-                          (smpl-std-dev (difference pops) (mean (difference pops)))
-                          (/ (+ (count (first pops)) (count (second pops))) 2))
-          [diff-mean [pop-mean-one pop-mean-two] std-dev pop-size] pcalcs
-          dof (dec pop-size)]
+                          (smpl-std-dev (difference smpls) (mean (difference smpls)))
+                          (/ (+ (count (first smpls)) (count (second smpls))) 2))
+          [diff-mean [pop-mean-one pop-mean-two] std-dev smpl-size] pcalcs
+          dof (dec smpl-size)]
       (assoc type :t-stat (/ (- diff-mean
                                 (- pop-mean-one pop-mean-two))
                              (/ std-dev
-                                (Math/sqrt pop-size)))
+                                (Math/sqrt smpl-size)))
                   :dof dof
                   :alpha alpha
                   :crtcl-val (crtcl-val t-dist dof alpha)
                   :pop-means [pop-mean-one pop-mean-two]
                   :std-dev std-dev
-                  :pop-size pop-size
+                  :smpl-size smpl-size
                   :diff-mean diff-mean))))
 
 

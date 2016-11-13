@@ -58,8 +58,8 @@
 
 
 (deftest two-sample-repeated-measure-test
-  (is (= (rep-msure-ttest {:pops [after before]})
-         #clojure.stats.lom.interval.test.RepeatedMeasure{:pops [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
+  (is (= (rep-msure-ttest {:smpls [after before]})
+         #clojure.stats.lom.interval.test.RepeatedMeasure{:smpls [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
                                                           :h-means [0 0],
                                                           :alpha 0.05,
                                                           :t-stat -2.5017235438103813,
@@ -67,7 +67,7 @@
                                                           :crtcl-val 1.83311293265624,
                                                           :pop-means [0.0 0.0],
                                                           :std-dev 13.90443574307614,
-                                                          :pop-size 10,
+                                                          :smpl-size 10,
                                                           :diff-mean -11.0})))
 
 
