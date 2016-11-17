@@ -7,8 +7,7 @@
             [clojure.core.stats.estimate :refer [one-smpl-conf-inter two-smpl-conf-inter]]
             [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]))
 
-;TODO change variables to same as abbreviated names
-;TODO start documentation!
+;TODO add dev code into single file
 ;TODO create function that outputs test result
 ;TODO using math.round will solve problem of dof for welch ttest
 ;TODO generate chi square distribution using R
