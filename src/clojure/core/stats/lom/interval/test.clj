@@ -20,6 +20,7 @@
 
    - Variables are measured at interval level
    - Datasets are independent
+   - Random sample
    - No significant outliers
    - Variables are normally distributed | approximately normally distributed
 
@@ -76,17 +77,19 @@
 
   "OVERVIEW:
 
-   Two (independent) sample equal variance t-test is a hypothesis test, in which the test statistic follows
-   a Student's t-distribution under the null hypothesis. It can be used to determine if two sets of data
-   are significantly different from each other. The purpose of this test is to determine whether the
-   means of the populations from which the samples were drawn are the same
+   Two sample equal variance t-test is a hypothesis test, in which the test statistic follows a Student's
+   t-distribution under the null hypothesis. It can be used to determine if two sets of data are
+   significantly different from each other. The purpose of this test is to determine whether
+   the means of the populations from which the samples were drawn are the same
 
-   The t-test for independent samples, also known as the two-sample t-test, compares the means of two samples
+   The two sample equal variance ttest compares the means of two samples in order to test
+   whether the associated population means are significantly different
 
    ASSUMPTION:
 
    - Variables are measured at interval level
    - Datasets are independent
+   - Random sample
    - No significant outliers
    - Variables are normally distributed | approximately normally distributed
    - Homogeneity of variance
@@ -132,12 +135,13 @@
     - Alpha value defaults to 0.05 unless explicitly defined
 
     - Often the null hypothesis for an independent samples t-test is that the difference between the population means
-      is 0. Both population means default to 0 unless explicitly defined
+      is 0
 
-    SCENARIO:
+    - Both population means default to 0 unless explicitly defined
 
-     You want to understand whether first year graduate salaries differ based on gender. One sample would be
-     male graduate salaries and the other samnple would be female graduate salaries"
+   SCENARIO:
+
+    You want to understand whether first year graduate salaries differ based on gender"
 
   [{smpls :smpls h-means :h-means alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
   (interval (EqualVariance. smpls h-means alpha)))
@@ -145,11 +149,24 @@
 
 (defn welch-ttest
 
-  "Two sample unequal variance t-test (welch) is a hypothesis test, in which the test
-   statistic follows a Student's t-distribution under the null hypothesis. It can be
-   used to determine if two sets of data are significantly different from each
-   other. Two sample unequal variance t-test assumes that the two populations
-   have normal distributions and unequal variances
+  "Welch's two sample unequal variance t-test is a hypothesis test, in which the test
+   statistic follows a Student's t-distribution under the null hypothesis. It can
+   be used to determine if two sets of data are significantly different from
+   each other. The purpose of this test is to determine whether the means
+   of the populations from which the samples were drawn are the same
+
+   Welch's two sample unequal variance ttest compares the means of two samples in
+   order to test whether the associated population means are significantly
+   different
+
+   ASSUMPTION:
+
+   - Variables are measured at interval level
+   - Datasets are independent
+   - Random sample
+   - No significant outliers
+   - Variables are normally distributed | approximately normally distributed
+   - Nonhomogeneity of variance
 
    INPUT:
 
@@ -189,7 +206,7 @@
 
     SCENARIO:
 
-    ..."
+    Compare the heights in inches of two groups of individuals"
 
   [{smpls :smpls alpha :alpha :or {alpha 0.05}}]
   (interval (Welch. smpls alpha)))
@@ -197,7 +214,10 @@
 
 (defn rep-msure-ttest
 
-  ""
+  "Two repeated measure t-test is a hypothesis test, in which the test statistic follows a
+   Student's t-distribution under the null hypothesis. The repeated measure t-test
+   compares the means of two related groups to determine whether there is a
+   statistically significant difference between these means"
 
   [{smpls :smpls h-means :h-mean alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
   (interval (RepeatedMeasure. smpls h-means alpha)))

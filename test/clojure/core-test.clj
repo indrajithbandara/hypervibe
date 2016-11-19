@@ -15,7 +15,7 @@
 ;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
 ;TODO create protocol named Conduct which compares the absolute value of the t statistic with the critical value ang outputs the test result
 ;TODO reference here for different distrubutions http://www.itl.nist.gov/div898/handbook/eda/section3/eda367.htm
-
+;TODO Levene's Test for Equality of Variances
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:smpl population-one :h-mean 400})
          #clojure.stats.lom.test.OneSample{:smpl [490 500 530 550 580 590 600 600 650 700],
@@ -92,7 +92,7 @@
                                            :lower -2.536759222077789})))
 
 
-(def dataset "/Users/gregadebesin/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")
+(def dataset "/Users/adebesing/Workspace/clojure-stats/resources/datasets/adult/adult.data")
 
 
 (data-frame {:column-names [:age :department :salary
