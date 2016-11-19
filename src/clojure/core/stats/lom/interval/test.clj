@@ -1,6 +1,6 @@
 (ns clojure.core.stats.lom.interval.test
-  (:require [clojure.stats.lom.interval.test :refer [ttest]])
-  (:import [clojure.stats.lom.interval.test OneSample EqualVariance Welch RepeatedMeasure]))
+  (:require [clojure.stats.lom.test :refer [interval]])
+  (:import [clojure.stats.lom.test OneSample EqualVariance Welch RepeatedMeasure]))
 (use 'criterium.core)
 
 (defn one-smpl-ttest
@@ -69,7 +69,7 @@
     the national average score"
 
   [{sample :smpl h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
-  (ttest (OneSample. sample h-mean alpha)))
+  (interval (OneSample. sample h-mean alpha)))
 
 
 (defn equal-var-ttest
@@ -140,7 +140,7 @@
      male graduate salaries and the other samnple would be female graduate salaries"
 
   [{smpls :smpls h-means :h-means alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
-  (ttest (EqualVariance. smpls h-means alpha)))
+  (interval (EqualVariance. smpls h-means alpha)))
 
 
 (defn welch-ttest
@@ -192,7 +192,7 @@
     ..."
 
   [{smpls :smpls alpha :alpha :or {alpha 0.05}}]
-  (ttest (Welch. smpls alpha)))
+  (interval (Welch. smpls alpha)))
 
 
 (defn rep-msure-ttest
@@ -200,6 +200,6 @@
   ""
 
   [{smpls :smpls h-means :h-mean alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
-  (ttest (RepeatedMeasure. smpls h-means alpha)))
+  (interval (RepeatedMeasure. smpls h-means alpha)))
 
 

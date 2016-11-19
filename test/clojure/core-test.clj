@@ -18,7 +18,7 @@
 
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:smpl population-one :h-mean 400})
-         #clojure.stats.lom.interval.test.OneSample{:smpl [490 500 530 550 580 590 600 600 650 700],
+         #clojure.stats.lom.test.OneSample{:smpl [490 500 530 550 580 590 600 600 650 700],
                                                     :h-mean 400,
                                                     :alpha 0.05,
                                                     :t-stat 8.700992601418207,
@@ -31,7 +31,7 @@
 
 (deftest two-sample-t-test-equal-variance
   (is (= (equal-var-ttest {:smpls [ballet-dancers football-players]})
-         #clojure.stats.lom.interval.test.EqualVariance{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+         #clojure.stats.lom.test.EqualVariance{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                         :h-means [0 0],
                                                         :alpha 0.05,
                                                         :t-stat 1.094722972460392,
@@ -45,7 +45,7 @@
 
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (welch-ttest {:smpls [ballet-dancers football-players]})
-         #clojure.stats.lom.interval.test.Welch{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+         #clojure.stats.lom.test.Welch{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                 :alpha 0.05,
                                                 :t-stat 1.0947229724603922,
                                                 :dof 17.993567997176537,
@@ -58,7 +58,7 @@
 
 (deftest two-sample-repeated-measure-test
   (is (= (rep-msure-ttest {:smpls [after before]})
-         #clojure.stats.lom.interval.test.RepeatedMeasure{:smpls [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
+         #clojure.stats.lom.test.RepeatedMeasure{:smpls [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
                                                           :h-means [0 0],
                                                           :alpha 0.05,
                                                           :t-stat -2.5017235438103813,
