@@ -7,19 +7,19 @@
 
   "OVERVIEW:
 
-   One sample t-test is a hypothesis test, in which the test statistic follows a Student's t-distribution
+   One sample t-test is a hypothesis test, in which the test statistic follows a student's t-distribution
    under the null hypothesis. It can be used to determine if two sets of data are significantly
    different from each other. The purpose of this test is to determine whether the mean
    of the population from which the sample was drawn and a hypothesized population
    mean are the same
 
-   The one-sample t-test is used to determine whether a sample comes from a population with a specific
-   mean. This population mean is not always known, but is sometimes hypothesized
+   The one-sample t-test is used to determine whether a sample comes from a population with a specific mean. This
+   population mean is not always known, but is sometimes hypothesized
 
    ASSUMPTION:
 
    - Variables are measured at interval level
-   - Datasets are independent
+   - Samples are independent
    - Random sample
    - No significant outliers
    - Variables are normally distributed | approximately normally distributed
@@ -64,10 +64,9 @@
 
    SCENARIO:
 
-    You want to show that a new teaching method for pupils struggling to learn English grammar can
-    improve their grammar skills to the national average. Your sample would be pupils who
-    received the new teaching method and your population (hypothesized) mean would be
-    the national average score"
+    You want to show that a new teaching method for pupils struggling to learn English grammar can improve their grammar
+    skills to the national average. Your sample would be pupils who received the new teaching method and your
+    hypothesized population mean would be the national average score"
 
   [{sample :smpl h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
   (interval (OneSample. sample h-mean alpha)))
@@ -77,18 +76,18 @@
 
   "OVERVIEW:
 
-   Two sample equal variance t-test is a hypothesis test, in which the test statistic follows a Student's
-   t-distribution under the null hypothesis. It can be used to determine if two sets of data are
-   significantly different from each other. The purpose of this test is to determine whether
-   the means of the populations from which the samples were drawn are the same
+   Two sample equal variance t-test is a hypothesis test, in which the test statistic follows a student's t-distribution under
+   the null hypothesis. It can be used to determine if two sets of data are significantly different from each other. The
+   purpose of this test is to determine whether the means of the populations from which the samples were drawn
+   are the same
 
-   The two sample equal variance ttest compares the means of two samples in order to test
-   whether the associated population means are significantly different
+   The two sample equal variance ttest compares the means of two samples in order to test whether the associated population means
+   are significantly different
 
    ASSUMPTION:
 
    - Variables are measured at interval level
-   - Datasets are independent
+   - Samples are independent
    - Random sample
    - No significant outliers
    - Variables are normally distributed | approximately normally distributed
@@ -149,20 +148,18 @@
 
 (defn welch-ttest
 
-  "Welch's two sample unequal variance t-test is a hypothesis test, in which the test
-   statistic follows a Student's t-distribution under the null hypothesis. It can
-   be used to determine if two sets of data are significantly different from
-   each other. The purpose of this test is to determine whether the means
-   of the populations from which the samples were drawn are the same
+  "Welch's two sample unequal variance t-test is a hypothesis test, in which the test statistic follows a
+   student's t-distribution under the null hypothesis. It can be used to determine if two sets of data
+   are significantly different from each other. The purpose of this test is to determine whether the
+   means of the populations from which the samples were drawn are the same
 
-   Welch's two sample unequal variance ttest compares the means of two samples in
-   order to test whether the associated population means are significantly
-   different
+   Welch's two sample unequal variance ttest compares the means of two samples in order to test whether the
+   associated population means are significantly different
 
    ASSUMPTION:
 
    - Variables are measured at interval level
-   - Datasets are independent
+   - Samples are independent
    - Random sample
    - No significant outliers
    - Variables are normally distributed | approximately normally distributed
@@ -214,10 +211,33 @@
 
 (defn rep-msure-ttest
 
-  "Two repeated measure t-test is a hypothesis test, in which the test statistic follows a
-   Student's t-distribution under the null hypothesis. The repeated measure t-test
-   compares the means of two related groups to determine whether there is a
-   statistically significant difference between these means"
+  "Two repeated measure t-test is a hypothesis test, in which the test statistic follows a student's t-distribution
+   under the null hypothesis. The repeated measure t-test compares the means of two related groups to determine
+   whether there is a statistically significant difference between these means
+
+   The repeated measure t-test looks for differences between means when participants are measured on the same dependent
+   variable under two different conditions
+
+   ASSUMPTION
+
+   - Variables are measured at interval level
+   - Samples are independent
+   - Random sample
+   - No significant outliers
+   - Variables are normally distributed | approximately normally distributed
+   - Homogeneity of variance
+   - Participants tested more than once
+   - Same participants tested on each occasion
+
+   INPUT
+
+   
+
+   SCENARIO
+
+   Measure the performance of participants in a spelling test 'before' and 'after' they underwent a new form of computerised
+   teaching method to improve spelling
+   "
 
   [{smpls :smpls h-means :h-mean alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
   (interval (RepeatedMeasure. smpls h-means alpha)))
