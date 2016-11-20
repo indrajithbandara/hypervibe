@@ -7,22 +7,22 @@
 
   "OVERVIEW:
 
-   One sample t-test is a hypothesis test, in which the test statistic follows a student's t-distribution
-   under the null hypothesis. It can be used to determine if two sets of data are significantly
-   different from each other. The purpose of this test is to determine whether the mean
-   of the population from which the sample was drawn and a hypothesized population
-   mean are the same
+    One sample t-test is a hypothesis test, in which the test statistic follows a student's t-distribution
+    under the null hypothesis. It can be used to determine if two sets of data are significantly
+    different from each other. The purpose of this test is to determine whether the mean
+    of the population from which the sample was drawn and a hypothesized population
+    mean are the same
 
-   The one-sample t-test is used to determine whether a sample comes from a population with a specific mean. This
-   population mean is not always known, but is sometimes hypothesized
+    The one-sample t-test is used to determine whether a sample comes from a population with a specific mean. This
+    population mean is not always known, but is sometimes hypothesized
 
    ASSUMPTION:
 
-   - Variables are measured at interval level
-   - Samples are independent
-   - Random sample
-   - No significant outliers
-   - Variables are normally distributed | approximately normally distributed
+    - Variables are measured at interval level
+    - Samples are independent
+    - Random sample
+    - No significant outliers
+    - Variables are normally distributed | approximately normally distributed
 
    INPUT:
 
@@ -76,28 +76,30 @@
 
   "OVERVIEW:
 
-   Two sample equal variance t-test is a hypothesis test, in which the test statistic follows a student's t-distribution under
-   the null hypothesis. It can be used to determine if two sets of data are significantly different from each other. The
-   purpose of this test is to determine whether the means of the populations from which the samples were drawn
-   are the same
+    Two sample equal variance t-test is a hypothesis test, in which the test statistic follows a student's t-distribution under
+    the null hypothesis. It can be used to determine if two sets of data are significantly different from each other. The
+    purpose of this test is to determine whether the means of the populations from which the samples were drawn
+    are the same
 
-   The two sample equal variance ttest compares the means of two samples in order to test whether the associated population means
-   are significantly different
+    The two sample equal variance ttest compares the means of two samples in order to test whether the associated population means
+    are significantly different
 
    ASSUMPTION:
 
-   - Variables are measured at interval level
-   - Samples are independent
-   - Random sample
-   - No significant outliers
-   - Variables are normally distributed | approximately normally distributed
-   - Homogeneity of variance
+    - Variables are measured at interval level
+    - Samples are independent
+    - Random sample
+    - No significant outliers
+    - Variables are normally distributed | approximately normally distributed
+    - Homogeneity of variance
 
    INPUT:
 
-    1) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]> :h-mean <vec[num] | list[num] | seq[num]>}
+    1) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>}
 
-    2) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :h-mean <vec[num] | list[num] | seq[num]> :alpha <num>}
+    2) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :h-means <vec[num] | list[num] | seq[num]>}
+
+    3) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :h-means <vec[num] | list[num] | seq[num]> :alpha <num>}
 
     Possible alpha values:
 
@@ -136,7 +138,7 @@
     - Often the null hypothesis for an independent samples t-test is that the difference between the population means
       is 0
 
-    - Both population means default to 0 unless explicitly defined
+    - Population means default to 0 unless explicitly defined
 
    SCENARIO:
 
@@ -148,13 +150,15 @@
 
 (defn welch-ttest
 
-  "Welch's two sample unequal variance t-test is a hypothesis test, in which the test statistic follows a
-   student's t-distribution under the null hypothesis. It can be used to determine if two sets of data
-   are significantly different from each other. The purpose of this test is to determine whether the
-   means of the populations from which the samples were drawn are the same
+  "OVERVIEW:
 
-   Welch's two sample unequal variance ttest compares the means of two samples in order to test whether the
-   associated population means are significantly different
+    Welch's two sample unequal variance t-test is a hypothesis test, in which the test statistic follows a
+    student's t-distribution under the null hypothesis. It can be used to determine if two sets of data
+    are significantly different from each other. The purpose of this test is to determine whether the
+    means of the populations from which the samples were drawn are the same
+
+    Welch's two sample unequal variance ttest compares the means of two samples in order to test whether the
+    associated population means are significantly different
 
    ASSUMPTION:
 
@@ -190,7 +194,7 @@
 
     :smpls = samples
     :alpha = alpha value
-    :t-stat test statistic
+    :t-stat = test statistic
     :dof = degrees of freedom
     :crtcl-val = critical value
     :smpl-means = sample means
@@ -211,33 +215,72 @@
 
 (defn rep-msure-ttest
 
-  "Two repeated measure t-test is a hypothesis test, in which the test statistic follows a student's t-distribution
-   under the null hypothesis. The repeated measure t-test compares the means of two related groups to determine
-   whether there is a statistically significant difference between these means
+  "OVERVIEW:
 
-   The repeated measure t-test looks for differences between means when participants are measured on the same dependent
-   variable under two different conditions
+    Two repeated measure t-test is a hypothesis test, in which the test statistic follows a student's t-distribution
+    under the null hypothesis. The repeated measure t-test compares the means of two related groups to determine
+    whether there is a statistically significant difference between these means
 
-   ASSUMPTION
+    The repeated measure t-test looks for differences between means when participants are measured on the same dependent
+    variable under two different conditions
 
-   - Variables are measured at interval level
-   - Samples are independent
-   - Random sample
-   - No significant outliers
-   - Variables are normally distributed | approximately normally distributed
-   - Homogeneity of variance
-   - Participants tested more than once
-   - Same participants tested on each occasion
+   ASSUMPTION:
 
-   INPUT
+    - Variables are measured at interval level
+    - Samples are independent
+    - Random sample
+    - No significant outliers
+    - Variables are normally distributed | approximately normally distributed
+    - Homogeneity of variance
+    - Participants tested more than once
+    - Same participants tested on each occasion
 
-   
+   INPUT:
 
-   SCENARIO
+    1) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>}
 
-   Measure the performance of participants in a spelling test 'before' and 'after' they underwent a new form of computerised
-   teaching method to improve spelling
-   "
+    2) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]> :h-means <vec[num] | list[num] | seq[num]>}
+
+    3) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]> :h-means <vec[num] | list[num] | seq[num]> :alpha <num>}
+
+   OUTPUT:
+
+    {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>
+     :h-means <list[num] | vector[num] | seq[num]>
+     :alpha <num>
+     :t-stat <num>
+     :dof <num>
+     :crtcl-val <num>
+     :pop-means <list[num] | vector[num] | seq[num]>
+     :std-dev <num>
+     :smpl-size <num>
+     :diff-mean <num>}
+
+   DETAIL:
+
+    :smpls = samples
+    :h-means = hypothesized means
+    :alpha = alpha value
+    :t-stat = test statistic
+    :dof = degrees of freedom
+    :crtcl-val = critical value
+     :pop-means = population means
+    :std-dev = standard deviation
+    :smpl-size = sample size
+    :diff-mean = mean difference
+
+   NOTE:
+
+    - Alpha value defaults to 0.05 unless explicitly defined
+
+    - Often the null hypothesis for a repeated measure t-test is that the difference between the population means is 0
+
+    - Population means default to 0 unless explicitly defined
+
+   SCENARIO:
+
+    Measure the performance of participants in a spelling test 'before' and 'after' they underwent a new form of computerised
+    teaching method to improve spelling"
 
   [{smpls :smpls h-means :h-mean alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
   (interval (RepeatedMeasure. smpls h-means alpha)))

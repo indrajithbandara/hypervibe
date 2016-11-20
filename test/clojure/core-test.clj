@@ -92,7 +92,7 @@
                                            :lower -2.536759222077789})))
 
 
-(def dataset "/Users/adebesing/Workspace/clojure-stats/resources/datasets/adult/adult.data")
+(def dataset "/Users/gregadebesin/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")
 
 
 (data-frame {:column-names [:age :department :salary
