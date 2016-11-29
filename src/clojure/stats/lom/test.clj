@@ -6,7 +6,8 @@
 
 
 (defprotocol TTest
-  (interval [this] "Conducts a ttest on interval data"))
+  (interval [this] "Conducts a ttest on interval data")
+  (ordinal [this] "Conducts a ttest on ordinal data"))
 
 (defprotocol ChiTest
   (categorical [this] "Conducts a pearson chi square test on categorical data"))
@@ -111,6 +112,8 @@
 (defrecord OneSampleMedian []
   TTest
   (interval [type]
+    (println type))
+  (ordinal [type]
     (println type)))
 
 
