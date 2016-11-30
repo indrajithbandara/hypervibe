@@ -13,6 +13,55 @@
   (categorical [this] "Conducts a pearson chi square test on categorical data"))
 
 
+
+(defprotocol -TTest
+  (one-sample [this] "Conducts a pearson one sample t-test")
+  (equal-variance [this] "Conducts an equal variance t-test")
+  (welch [this] "Conducts a welch t-test")
+  (repeated-measure [this] "Conducts a repeated measure t-test")
+  (median [this] "Conducts a median ttest"))
+
+(defrecord Test [data]
+  -TTest
+
+  (one-sample [type]
+    (let [pcalcs (pvalues (mean (:smpl data))
+                          (smpl-std-dev (:smpl data) (mean (:smpl data)))
+                          (count (:smpl data)))
+          [smpl-mean smpl-std-dev smpl-size] pcalcs
+          dof (dec smpl-size)]
+      (assoc type :t-stat (/ (- smpl-mean (:h-mean data))
+                             (/ smpl-std-dev
+                                (Math/sqrt smpl-size)))
+                  :dof dof
+                  :alpha (:alpha data)
+                  :crtcl-val (crtcl-val t-dist dof (:alpha data))
+                  :smpl-mean smpl-mean
+                  :smpl-std-dev smpl-std-dev
+                  :smpl-size smpl-size)))
+
+  (equal-variance [type]
+    (let [pcalcs (pvalues (map mean (:smpls data))
+                          (map mean (partition 1 (:h-means data)))
+                          (map #(pool-var % (mean %) (dec (count %))) (:smpls data))
+                          (map count (:smpls data)))
+          [[smpl-mean-one smpl-mean-two] [pop-mean-one pop-mean-two]
+           [pool-var-one pool-var-two] [smpl-size-one smpl-size-two]] pcalcs
+          dof (- (+ smpl-size-one smpl-size-two) 2)]
+      (assoc type :t-stat (/ (- (- smpl-mean-one smpl-mean-two)
+                                (- pop-mean-one pop-mean-two))
+                             (Math/sqrt (* (/ (+ pool-var-one pool-var-two) 2)
+                                           (+ (/ 1 smpl-size-one) (/ 1 smpl-size-two)))))
+                  :dof dof
+                  :alpha (:alpha data)
+                  :crtcl-val (crtcl-val t-dist dof (:alpha data))
+                  :smpl-means [smpl-mean-one smpl-mean-two]
+                  :pop-means [pop-mean-one pop-mean-two]
+                  :pool-vars [pool-var-one pool-var-two]
+                  :smpl-sizes [smpl-size-one smpl-size-two]))))
+
+
+
 (defrecord OneSample [smpl h-mean alpha]
   TTest
   (interval [type]
