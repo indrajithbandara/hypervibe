@@ -5,16 +5,8 @@
 (use 'clojure.core.matrix)
 
 
+
 (defprotocol TTest
-  (interval [this] "Conducts a ttest on interval data")
-  (ordinal [this] "Conducts a ttest on ordinal data"))
-
-(defprotocol ChiTest
-  (categorical [this] "Conducts a pearson chi square test on categorical data"))
-
-
-
-(defprotocol -TTest
   (one-sample [this] "Conducts a pearson one sample t-test")
   (equal-variance [this] "Conducts an equal variance t-test")
   (welch [this] "Conducts a welch t-test")
@@ -22,7 +14,7 @@
   (median [this] "Conducts a median ttest"))
 
 (defrecord Test [data]
-  -TTest
+  TTest
 
   (one-sample [type]
     (let [pcalcs (pvalues (mean (:smpl data))
@@ -58,58 +50,12 @@
                   :smpl-means [smpl-mean-one smpl-mean-two]
                   :pop-means [pop-mean-one pop-mean-two]
                   :pool-vars [pool-var-one pool-var-two]
-                  :smpl-sizes [smpl-size-one smpl-size-two]))))
+                  :smpl-sizes [smpl-size-one smpl-size-two])))
 
-
-
-(defrecord OneSample [smpl h-mean alpha]
-  TTest
-  (interval [type]
-    (let [pcalcs (pvalues (mean smpl)
-                          (smpl-std-dev smpl (mean smpl))
-                          (count smpl))
-          [smpl-mean smpl-std-dev smpl-size] pcalcs
-          dof (dec smpl-size)]
-      (assoc type :t-stat (/ (- smpl-mean h-mean)
-                             (/ smpl-std-dev
-                                (Math/sqrt smpl-size)))
-                  :dof dof
-                  :alpha alpha
-                  :crtcl-val (crtcl-val t-dist dof alpha)
-                  :smpl-mean smpl-mean
-                  :smpl-std-dev smpl-std-dev
-                  :smpl-size smpl-size))))
-
-
-(defrecord EqualVariance [smpls h-means alpha]
-  TTest
-  (interval [type]
-    (let [pcalcs (pvalues (map mean smpls)
-                          (map mean (partition 1 h-means))
-                          (map #(pool-var % (mean %) (dec (count %))) smpls)
-                          (map count smpls))
-          [[smpl-mean-one smpl-mean-two] [pop-mean-one pop-mean-two]
-           [pool-var-one pool-var-two] [smpl-size-one smpl-size-two]] pcalcs
-          dof (- (+ smpl-size-one smpl-size-two) 2)]
-      (assoc type :t-stat (/ (- (- smpl-mean-one smpl-mean-two)
-                                (- pop-mean-one pop-mean-two))
-                             (Math/sqrt (* (/ (+ pool-var-one pool-var-two) 2)
-                                           (+ (/ 1 smpl-size-one) (/ 1 smpl-size-two)))))
-                  :dof dof
-                  :alpha alpha
-                  :crtcl-val (crtcl-val t-dist dof alpha)
-                  :smpl-means [smpl-mean-one smpl-mean-two]
-                  :pop-means [pop-mean-one pop-mean-two]
-                  :pool-vars [pool-var-one pool-var-two]
-                  :smpl-sizes [smpl-size-one smpl-size-two]))))
-
-
-(defrecord Welch [smpls alpha]                            ;TODO test in SPSS
-  TTest
-  (interval [type]
-    (let [pcalcs (pvalues (map mean smpls)
-                          (map #(smpl-var % (mean %)) smpls)
-                          (map count smpls))
+  (welch [type]
+    (let [pcalcs (pvalues (map mean (:smpls data))
+                          (map #(smpl-var % (mean %)) (:smpls data))
+                          (map count (:smpls data)))
           [[mean-one mean-two] [smpl-var-one smpl-var-two]
            [smpl-size-one smpl-size-two]] pcalcs
           dof (/ (* (+ (/ smpl-var-one smpl-size-one)
@@ -126,20 +72,17 @@
                              (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
                                            (/ smpl-var-two smpl-size-two))))
                   :dof dof
-                  :alpha alpha
-                  :crtcl-val (crtcl-val t-dist (Math/round dof) alpha)
+                  :alpha (:alpha data)
+                  :crtcl-val (crtcl-val t-dist (Math/round dof) (:alpha data))
                   :smpl-means [mean-one mean-two]
                   :smpl-vars [smpl-var-one smpl-var-two]
-                  :smpl-sizes [smpl-size-one smpl-size-two]))))
+                  :smpl-sizes [smpl-size-one smpl-size-two])))
 
-
-(defrecord RepeatedMeasure [smpls h-means alpha]
-  TTest
-  (interval [type]
-    (let [pcalcs (pvalues (mean (difference smpls))
-                          (map mean (partition 1 h-means))
-                          (smpl-std-dev (difference smpls) (mean (difference smpls)))
-                          (/ (+ (count (first smpls)) (count (second smpls))) 2))
+  (repeated-measure [type]
+    (let [pcalcs (pvalues (mean (difference (:smplsdata)))
+                          (map mean (partition 1 (:h-means data)))
+                          (smpl-std-dev (difference (:smpls data)) (mean (difference (:smpls data))))
+                          (/ (+ (count (first (:smpls data))) (count (second (:smpls data)))) 2))
           [diff-mean [pop-mean-one pop-mean-two] std-dev smpl-size] pcalcs
           dof (dec smpl-size)]
       (assoc type :t-stat (/ (- diff-mean
@@ -147,23 +90,14 @@
                              (/ std-dev
                                 (Math/sqrt smpl-size)))
                   :dof dof
-                  :alpha alpha
-                  :crtcl-val (crtcl-val t-dist dof alpha)
+                  :alpha (:alpha data)
+                  :crtcl-val (crtcl-val t-dist dof (:alpha data))
                   :pop-means [pop-mean-one pop-mean-two]
                   :std-dev std-dev
                   :smpl-size smpl-size
-                  :diff-mean diff-mean))))
+                  :diff-mean diff-mean)))
+  (median [type] (println type)))
 
-
-
-
-
-(defrecord OneSampleMedian []
-  TTest
-  (interval [type]
-    (println type))
-  (ordinal [type]
-    (println type)))
 
 
 (defn chi-square
