@@ -6,6 +6,7 @@
             [clojure.utils :refer [zip]]
             [clojure.core.stats.estimate :refer [one-smpl-conf-inter two-smpl-conf-inter]]
             [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]))
+
 ;TODO add dev code into single file
 ;TODO change defprotocol's to defmethod with deftype
 ;TODO rething confidence interval abstractions
@@ -18,36 +19,36 @@
 ;TODO create protocol named Conduct which compares the absolute value of the t statistic with the critical value ang outputs the test result
 ;TODO reference here for different distrubutions http://www.itl.nist.gov/div898/handbook/eda/section3/eda367.htm
 ;TODO Levene's Test for Equality of Variances
+
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:smpl population-one :h-mean 400})
-         #clojure.stats.lom.test.OneSample{:smpl [490 500 530 550 580 590 600 600 650 700],
-                                                    :h-mean 400,
-                                                    :alpha 0.05,
-                                                    :t-stat 8.700992601418207,
-                                                    :dof 9,
-                                                    :crtcl-val 1.83311293265624,
-                                                    :smpl-mean 579.0,
-                                                    :smpl-std-dev 65.05553183413554,
-                                                    :smpl-size 10})))
+         #clojure.stats.lom.test.Test{:in {:smpl [490 500 530 550 580 590 600 600 650 700], :h-mean 400},
+                                      :out {:t-stat 8.700992601418207,
+                                            :dof 9,
+                                            :alpha 0.05,
+                                            :crtcl-val 1.83311293265624,
+                                            :smpl-mean 579.0,
+                                            :smpl-std-dev 65.05553183413554,
+                                            :smpl-size 10}})))
 
 
 (deftest two-sample-t-test-equal-variance
   (is (= (equal-var-ttest {:smpls [ballet-dancers football-players]})
-         #clojure.stats.lom.test.EqualVariance{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-                                                        :h-means [0 0],
-                                                        :alpha 0.05,
-                                                        :t-stat 1.094722972460392,
-                                                        :dof 18,
-                                                        :crtcl-val 1.73406360661754,
-                                                        :smpl-means [87.94999999999999 85.19],
-                                                        :pop-means [0.0 0.0],
-                                                        :pool-vars [32.382777777777775 31.181000000000015],
-                                                        :smpl-sizes [10 10]})))
+         #clojure.stats.lom.test.Test{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+                                                   [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]]},
+                                      :out {:t-stat 1.094722972460392,
+                                            :dof 18,
+                                            :alpha 0.05,
+                                            :crtcl-val 1.73406360661754,
+                                            :smpl-means [87.94999999999999 85.19],
+                                            :pop-means [0.0 0.0],
+                                            :pool-vars [32.382777777777775 31.181000000000015],
+                                            :smpl-sizes [10 10]}})))
 
 
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (welch-ttest {:smpls [ballet-dancers football-players]})
-         #clojure.stats.lom.test.Welch{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+         #clojure.stats.lom.test.Test{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                 :alpha 0.05,
                                                 :t-stat 1.0947229724603922,
                                                 :dof 17.993567997176537,
@@ -60,7 +61,7 @@
 
 (deftest two-sample-repeated-measure-test
   (is (= (rep-msure-ttest {:smpls [after before]})
-         #clojure.stats.lom.test.RepeatedMeasure{:smpls [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
+         #clojure.stats.lom.test.Test{:smpls [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
                                                           :h-means [0 0],
                                                           :alpha 0.05,
                                                           :t-stat -2.5017235438103813,

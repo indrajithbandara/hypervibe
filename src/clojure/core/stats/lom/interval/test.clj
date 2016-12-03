@@ -1,6 +1,6 @@
 (ns clojure.core.stats.lom.interval.test
-  (:require [clojure.stats.lom.test :refer [interval]])
-  (:import [clojure.stats.lom.test OneSample EqualVariance Welch RepeatedMeasure]))
+  (:require [clojure.stats.lom.test :refer [one-sample equal-variance welch repeated-measure median]])
+  (:import [clojure.stats.lom.test Test]))
 (use 'criterium.core)
 
 (defn one-smpl-ttest
@@ -68,8 +68,7 @@
     skills to the national average. Your sample would be pupils who received the new teaching method and your
     hypothesized population mean would be the national average score"
 
-  [{sample :smpl h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
-  (interval (OneSample. sample h-mean alpha)))
+  [d] (one-sample (Test. d)))
 
 
 (defn equal-var-ttest
@@ -144,8 +143,7 @@
 
     You want to understand whether first year graduate salaries differ based on gender"
 
-  [{smpls :smpls h-means :h-means alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
-  (interval (EqualVariance. smpls h-means alpha)))
+  [data] (equal-variance (Test. data)))
 
 
 (defn welch-ttest
@@ -210,7 +208,7 @@
     Compare the heights in inches of two groups of individuals"
 
   [{smpls :smpls alpha :alpha :or {alpha 0.05}}]
-  (interval (Welch. smpls alpha)))
+  (welch (Test. smpls alpha)))
 
 
 (defn rep-msure-ttest
@@ -283,6 +281,6 @@
     teaching method to improve spelling"
 
   [{smpls :smpls h-means :h-mean alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
-  (interval (RepeatedMeasure. smpls h-means alpha)))
+  (repeated-measure (Test. smpls h-means alpha)))
 
 
