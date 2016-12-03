@@ -68,7 +68,7 @@
     skills to the national average. Your sample would be pupils who received the new teaching method and your
     hypothesized population mean would be the national average score"
 
-  [d] (one-sample (Test. d)))
+  [data] (one-sample (Test. data)))
 
 
 (defn equal-var-ttest
@@ -207,8 +207,7 @@
 
     Compare the heights in inches of two groups of individuals"
 
-  [{smpls :smpls alpha :alpha :or {alpha 0.05}}]
-  (welch (Test. smpls alpha)))
+  [data] (welch (Test. data)))
 
 
 (defn rep-msure-ttest
@@ -280,7 +279,6 @@
     Measure the performance of participants in a spelling test 'before' and 'after' they underwent a new form of computerised
     teaching method to improve spelling"
 
-  [{smpls :smpls h-means :h-mean alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
-  (repeated-measure (Test. smpls h-means alpha)))
+  [data] (repeated-measure (Test. data)))
 
 
