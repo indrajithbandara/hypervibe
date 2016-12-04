@@ -1,4 +1,4 @@
-(ns clojure.stats.lom.test
+(ns clojure.stats.test
   (:require [clojure.stats.utils.central-tendancy :refer [mean difference]]
             [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var pool-var]]
             [clojure.stats.distribution.t.table :refer [t-dist crtcl-val]]))

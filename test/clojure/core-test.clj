@@ -4,8 +4,8 @@
             [clojure.dataset :refer [data-frame]]
             [clojure.extract :refer [file-lines]]
             [clojure.utils :refer [zip]]
-            [clojure.core.stats.estimate :refer [one-smpl-conf-inter two-smpl-conf-inter]]
-            [clojure.core.stats.lom.interval.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]))
+            [clojure.core.stats.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
+            [clojure.core.stats.interval.estimate :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
 
 ;TODO add dev code into single file + remove lom folder
 ;TODO add core code to file based on test type eg ttest, chi square test, confidence interval + remove lom folder etc
@@ -21,7 +21,7 @@
 
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:smpl population-one :h-mean 400})
-         #clojure.stats.lom.test.Test{:in {:smpl [490 500 530 550 580 590 600 600 650 700], :h-mean 400},
+         #clojure.stats.test.Test{:in {:smpl [490 500 530 550 580 590 600 600 650 700], :h-mean 400},
                                       :out {:t-stat 8.700992601418207,
                                             :dof 9,
                                             :alpha 0.05,
@@ -33,8 +33,7 @@
 
 (deftest two-sample-t-test-equal-variance
   (is (= (equal-var-ttest {:smpls [ballet-dancers football-players]})
-         #clojure.stats.lom.test.Test{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                                                   [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]]},
+         #clojure.stats.test.Test{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]]},
                                       :out {:t-stat 1.094722972460392,
                                             :dof 18,
                                             :alpha 0.05,
@@ -47,8 +46,7 @@
 
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (welch-ttest {:smpls [ballet-dancers football-players]})
-         #clojure.stats.lom.test.Test{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                                                   [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]]},
+         #clojure.stats.test.Test{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]]},
                                       :out {:t-stat 1.0947229724603922,
                                             :dof 17.993567997176537,
                                             :alpha 0.05,
@@ -61,8 +59,7 @@
 
 (deftest two-sample-repeated-measure-test
   (is (= (rep-msure-ttest {:smpls [after before]})
-         #clojure.stats.lom.test.Test{:in {:smpls [[200 210 210 170 220 180 190 190 220 210]
-                                                   [220 240 225 180 210 190 195 200 210 240]]},
+         #clojure.stats.test.Test{:in {:smpls [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]]},
                                       :out {:t-stat -2.5017235438103813,
                                             :dof 9,
                                             :alpha 0.05,
@@ -74,28 +71,29 @@
 
 
 (deftest one-sample-conf-inter-test
-  (is (= (one-smpl-conf-inter {:smpl population-one :crtcl-val 1.8331})
-         #clojure.stats.estimate.OneSample{:smpl [490 500 530 550 580 590 600 600 650 700],
-                                           :crtcl-val 1.8331,
-                                           :smpl-std-dev 65.05553183413554,
-                                           :smpl-mean 579.0,
-                                           :smpl-size 10,
-                                           :upper 616.7112031961178,
-                                           :lower 541.2887968038822})))
+  (is (= (one-smpl-conf-intvl {:smpl population-one :crtcl-val 1.8331})
+         #clojure.stats.test.ConfidenceInterval{:in {:smpl [490 500 530 550 580 590 600 600 650 700], :crtcl-val 1.8331},
+                                                    :out {:smpl-std-dev 65.05553183413554,
+                                                          :smpl-mean 579.0,
+                                                          :smpl-size 10,
+                                                          :crtcl-val 1.8331,
+                                                          :upper 616.7112031961178,
+                                                          :lower 541.2887968038822}})))
 
 
 (deftest two-sample-confidence-interval-test-test
-  (is (= (two-smpl-conf-inter {:smpls [ballet-dancers football-players] :crtcl-val 2.1009})
-         #clojure.stats.estimate.TwoSample{:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-                                           :crtcl-val 2.1009,
-                                           :smpl-vars [32.382777777777775 31.181000000000015],
-                                           :smpl-means [87.94999999999999 85.19],
-                                           :smpl-sizes [10 85.19],
-                                           :upper 8.05675922207777,
-                                           :lower -2.536759222077789})))
+  (is (= (equal-var-conf-intvl {:smpls [ballet-dancers football-players] :crtcl-val 2.1009})
+         #clojure.stats.test.ConfidenceInterval{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                                         :crtcl-val 2.1009},
+                                                    :out {:smpl-vars [32.382777777777775 31.181000000000015],
+                                                          :smpl-means [87.94999999999999 85.19],
+                                                          :smpl-sizes [10 85.19],
+                                                          :crtcl-val 2.1009,
+                                                          :upper 8.05675922207777,
+                                                          :lower -2.536759222077789}})))
 
 
-(def dataset "/Users/gregadebesin/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")
+(def dataset "/Users/adebesing/Workspace/clojure-stats/resources/datasets/adult/adult.data")
 
 
 (data-frame {:column-names [:age :department :salary

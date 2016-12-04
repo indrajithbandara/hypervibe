@@ -1,6 +1,6 @@
-(ns clojure.core.stats.lom.interval.test
-  (:require [clojure.stats.lom.test :refer [one-sample equal-variance welch repeated-measure median]])
-  (:import [clojure.stats.lom.test Test]))
+(ns clojure.core.stats.test
+  (:require [clojure.stats.test :refer [one-sample equal-variance welch repeated-measure median]])
+  (:import [clojure.stats.test Test]))
 (use 'criterium.core)
 
 (defn one-smpl-ttest
