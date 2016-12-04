@@ -5,9 +5,8 @@
             [clojure.extract :refer [file-lines]]
             [clojure.utils :refer [zip]]
             [clojure.core.stats.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
-            [clojure.core.stats.interval.estimate :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
+            [clojure.core.stats.estimate.confidence-interval :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
 
-;TODO add dev code into single file + remove lom folder
 ;TODO add core code to file based on test type eg ttest, chi square test, confidence interval + remove lom folder etc
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO create function that outputs test result
@@ -72,7 +71,7 @@
 
 (deftest one-sample-conf-inter-test
   (is (= (one-smpl-conf-intvl {:smpl population-one :crtcl-val 1.8331})
-         #clojure.stats.test.ConfidenceInterval{:in {:smpl [490 500 530 550 580 590 600 600 650 700], :crtcl-val 1.8331},
+         #clojure.stats.estimate.confidence_interval.ConfidenceInterval{:in {:smpl [490 500 530 550 580 590 600 600 650 700], :crtcl-val 1.8331},
                                                     :out {:smpl-std-dev 65.05553183413554,
                                                           :smpl-mean 579.0,
                                                           :smpl-size 10,
@@ -83,7 +82,7 @@
 
 (deftest two-sample-confidence-interval-test-test
   (is (= (equal-var-conf-intvl {:smpls [ballet-dancers football-players] :crtcl-val 2.1009})
-         #clojure.stats.test.ConfidenceInterval{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+         #clojure.stats.estimate.confidence_interval.ConfidenceInterval{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                          :crtcl-val 2.1009},
                                                     :out {:smpl-vars [32.382777777777775 31.181000000000015],
                                                           :smpl-means [87.94999999999999 85.19],
