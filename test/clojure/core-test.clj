@@ -7,7 +7,7 @@
             [clojure.core.stats.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
             [clojure.core.stats.estimate.confidence-interval :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
 
-;TODO add core code to file based on test type eg ttest, chi square test, confidence interval + remove lom folder etc
+;TODO ostt may be wrong as confidence interval is only correct for 95 %
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO create function that outputs test result
 ;TODO using math.round will solve problem of dof for welch ttest

@@ -1,6 +1,5 @@
 (ns clojure.stats.estimate.confidence-interval
-  (:require [clojure.stats.test :refer [one-sample equal-variance]]
-            [clojure.stats.utils.central-tendancy :refer [mean difference]]
+  (:require [clojure.stats.utils.central-tendancy :refer [mean difference]]
             [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var pool-var]])
   (:import [clojure.stats.test TTest]))
 
@@ -43,5 +42,8 @@
                         :lower (- (- smpl-mean-one smpl-mean-two)
                                   (* (:crtcl-val in)
                                      (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
-                                                   (/ smpl-var-two smpl-size-two)))))}))))
+                                                   (/ smpl-var-two smpl-size-two)))))})))
+  (welch [type] (println type))
+
+  (repeated-measure [type] ""))
 
