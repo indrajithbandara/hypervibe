@@ -20,20 +20,21 @@
   (one-sample [type]
     (let [pcalcs (pvalues (mean (:smpl in))
                           (smpl-std-dev (:smpl in) (mean (:smpl in)))
-                          (count (:smpl in)))
-          [smpl-mean smpl-std-dev smpl-size] pcalcs
-          dof (dec smpl-size)
-          alpha (or (:alpha in) 0.05)]
+                          (count (:smpl in))
+                          (:h-mean in))
+          [smpl-mean smpl-std-dev smpl-size h-mean] pcalcs
+           dof (dec smpl-size)
+           alpha (or (:alpha in) 0.05)]
       (assoc type
-        :out { :t-stat (/ (- smpl-mean (or (:h-mean in) 0))
+        :t-stat (/ (- smpl-mean (or (:h-mean in) 0))
                           (/ smpl-std-dev
                              (Math/sqrt smpl-size)))
-              :dof dof
-              :alpha alpha
-              :crtcl-val (crtcl-val t-dist dof alpha)
-              :smpl-mean smpl-mean
-              :smpl-std-dev smpl-std-dev
-              :smpl-size smpl-size})))
+        :dof dof
+        :alpha alpha
+        :crtcl-val (crtcl-val t-dist dof alpha)
+        :smpl-mean smpl-mean
+        :smpl-std-dev smpl-std-dev
+        :smpl-size smpl-size)))
 
 
   (equal-variance [type]
@@ -45,17 +46,17 @@
            [smpl-size-one smpl-size-two]] pcalcs
           dof (- (+ smpl-size-one smpl-size-two) 2)
           alpha (or (:alpha in) 0.05)]
-      (assoc type :out { :t-stat (/ (- (- smpl-mean-one smpl-mean-two)
+      (assoc type  :t-stat (/ (- (- smpl-mean-one smpl-mean-two)
                                        (- pop-mean-one pop-mean-two))
                                     (Math/sqrt (* (/ (+ pool-var-one pool-var-two) 2)
                                                   (+ (/ 1 smpl-size-one) (/ 1 smpl-size-two)))))
-                        :dof dof
-                        :alpha alpha
-                        :crtcl-val (crtcl-val t-dist dof alpha)
-                        :smpl-means [smpl-mean-one smpl-mean-two]
-                        :pop-means [pop-mean-one pop-mean-two]
-                        :pool-vars [pool-var-one pool-var-two]
-                        :smpl-sizes [smpl-size-one smpl-size-two]})))
+                  :dof dof
+                  :alpha alpha
+                  :crtcl-val (crtcl-val t-dist dof alpha)
+                  :smpl-means [smpl-mean-one smpl-mean-two]
+                  :pop-means [pop-mean-one pop-mean-two]
+                  :pool-vars [pool-var-one pool-var-two]
+                  :smpl-sizes [smpl-size-one smpl-size-two])))
 
   (welch [type]
     (let [pcalcs (pvalues (map mean (:smpls in))
@@ -73,15 +74,15 @@
                           (/ smpl-var-two smpl-size-two))
                        (- smpl-size-two 1))))
           alpha (or (:alpha in) 0.05)]
-      (assoc type :out {:t-stat (/ (- mean-one mean-two)
-                                   (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
-                                                 (/ smpl-var-two smpl-size-two))))
-                        :dof dof
-                        :alpha alpha
-                        :crtcl-val (crtcl-val t-dist (Math/round dof) alpha)
-                        :smpl-means [mean-one mean-two]
-                        :smpl-vars [smpl-var-one smpl-var-two]
-                        :smpl-sizes [smpl-size-one smpl-size-two]})))
+      (assoc type :t-stat (/ (- mean-one mean-two)
+                                    (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
+                                                  (/ smpl-var-two smpl-size-two))))
+                  :dof dof
+                  :alpha alpha
+                  :crtcl-val (crtcl-val t-dist (Math/round dof) alpha)
+                  :smpl-means [mean-one mean-two]
+                  :smpl-vars [smpl-var-one smpl-var-two]
+                  :smpl-sizes [smpl-size-one smpl-size-two])))
 
   (repeated-measure [type]
     (let [pcalcs (pvalues (mean (difference (:smpls in)))
@@ -91,17 +92,17 @@
           [diff-mean [pop-mean-one pop-mean-two] std-dev smpl-size] pcalcs
           dof (dec smpl-size)
           alpha (or (:alpha in) 0.05)]
-      (assoc type :out {:t-stat (/ (- diff-mean
-                                      (- pop-mean-one pop-mean-two))
-                                   (/ std-dev
-                                      (Math/sqrt smpl-size)))
-                        :dof dof
-                        :alpha alpha
-                        :crtcl-val (crtcl-val t-dist dof alpha)
-                        :pop-means [pop-mean-one pop-mean-two]
-                        :std-dev std-dev
-                        :smpl-size smpl-size
-                        :diff-mean diff-mean})))
+      (assoc type :t-stat (/ (- diff-mean
+                                       (- pop-mean-one pop-mean-two))
+                                    (/ std-dev
+                                       (Math/sqrt smpl-size)))
+                  :dof dof
+                  :alpha alpha
+                  :crtcl-val (crtcl-val t-dist dof alpha)
+                  :pop-means [pop-mean-one pop-mean-two]
+                  :std-dev std-dev
+                  :smpl-size smpl-size
+                  :diff-mean diff-mean)))
   (median [type] (println type)))
 
 
