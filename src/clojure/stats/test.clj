@@ -34,6 +34,7 @@
       :type :TTest)))
 
 
+
 (defprotocol TTest
   (one-sample [this] "Conducts a pearson one sample t-test")
   (equal-variance [this] "Conducts an equal variance t-test")
