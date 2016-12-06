@@ -8,6 +8,7 @@
   TTest
 
   (one-sample [type]
+    (println type)
     (let [pcalcs (pvalues (mean (:smpl in))
                           (smpl-std-dev (:smpl in) (mean (:smpl in)))
                           (count (:smpl in))

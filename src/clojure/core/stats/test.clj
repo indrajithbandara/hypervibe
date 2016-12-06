@@ -1,6 +1,6 @@
 (ns clojure.core.stats.test
-  (:require [clojure.stats.test :refer [one-sample equal-variance welch repeated-measure median]])
-  (:import [clojure.stats.test Test]))
+  (:require [clojure.stats.test :refer [ttest one-sample equal-variance welch repeated-measure median]])
+  (:import [clojure.stats.test Test OneSample]))
 (use 'criterium.core)
 
 (defn one-smpl-ttest
@@ -68,7 +68,7 @@
     skills to the national average. Your sample would be pupils who received the new teaching method and your
     hypothesized population mean would be the national average score"
 
-  [data] (one-sample (Test. data)))
+  [{smpl :smpl h-mean :h-mean alpha :alpha :or {alpha 0.05}}] (ttest (OneSample. smpl h-mean alpha)))
 
 
 (defn equal-var-ttest

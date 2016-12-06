@@ -5,6 +5,34 @@
 (use 'clojure.core.matrix)
 
 
+(deftype OneSample [smpl h-mean alpha])
+(deftype -EqualVariance [this])
+
+
+(defmulti ttest class)
+
+(defmethod ttest OneSample [this]
+  (let [pcalcs (pvalues (mean (.smpl this))
+                        (smpl-std-dev (.smpl this) (mean (.smpl this)))
+                        (count (.smpl this))
+                        (.h-mean this))
+        [smpl-mean smpl-std-dev smpl-size h-mean] pcalcs
+         dof (dec smpl-size)
+         alpha (or (.alpha this) 0.05)]
+    (assoc {}
+      :smpl (.smpl this)
+      :h-mean h-mean
+      :t-stat (/ (- smpl-mean h-mean)
+                 (/ smpl-std-dev
+                    (Math/sqrt smpl-size)))
+      :dof dof
+      :alpha alpha
+      :crtcl-val (crtcl-val t-dist dof alpha)
+      :smpl-mean smpl-mean
+      :smpl-std-dev smpl-std-dev
+      :smpl-size smpl-size
+      :type :TTest)))
+
 
 (defprotocol TTest
   (one-sample [this] "Conducts a pearson one sample t-test")
@@ -16,26 +44,6 @@
 
 (defrecord Test [in]
   TTest
-
-  (one-sample [type]
-    (let [pcalcs (pvalues (mean (:smpl in))
-                          (smpl-std-dev (:smpl in) (mean (:smpl in)))
-                          (count (:smpl in))
-                          (:h-mean in))
-          [smpl-mean smpl-std-dev smpl-size h-mean] pcalcs
-           dof (dec smpl-size)
-           alpha (or (:alpha in) 0.05)]
-      (assoc type
-        :t-stat (/ (- smpl-mean (or (:h-mean in) 0))
-                          (/ smpl-std-dev
-                             (Math/sqrt smpl-size)))
-        :dof dof
-        :alpha alpha
-        :crtcl-val (crtcl-val t-dist dof alpha)
-        :smpl-mean smpl-mean
-        :smpl-std-dev smpl-std-dev
-        :smpl-size smpl-size)))
-
 
   (equal-variance [type]
     (let [pcalcs (pvalues (map mean (:smpls in))

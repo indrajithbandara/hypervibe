@@ -7,6 +7,7 @@
             [clojure.core.stats.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
             [clojure.core.stats.estimate.confidence-interval :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
 
+;TODO change all protocols to defttype as in ostt
 ;TODO make ostt compose into confidence interval
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO create function that outputs test result
@@ -20,14 +21,16 @@
 
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:smpl population-one :h-mean 400})
-         #clojure.stats.test.Test{:in {:smpl [490 500 530 550 580 590 600 600 650 700], :h-mean 400},
-                                  :t-stat 8.700992601418207,
-                                  :dof 9,
-                                  :alpha 0.05,
-                                  :crtcl-val 1.83311293265624,
-                                  :smpl-mean 579.0,
-                                  :smpl-std-dev 65.05553183413554,
-                                  :smpl-size 10})))
+         {:dof 9,
+          :type :TTest,
+          :crtcl-val 1.83311293265624,
+          :h-mean 400,
+          :smpl-size 10,
+          :smpl-mean 579.0,
+          :alpha 0.05,
+          :smpl-std-dev 65.05553183413554,
+          :t-stat 8.700992601418207,
+          :smpl [490 500 530 550 580 590 600 600 650 700]})))
 
 
 (deftest two-sample-t-test-equal-variance
