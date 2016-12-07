@@ -1,15 +1,15 @@
 
 (ns clojure.core.stats.estimate.confidence-interval
-  (:require [clojure.stats.test :refer [one-sample equal-variance]])
-  (:import [clojure.stats.estimate.confidence_interval ConfidenceInterval]))
+  (:require [clojure.stats.estimate.confidence-interval :refer [confidence-interval]])
+  (:import [clojure.stats.estimate.confidence_interval OneSample EqualVariance]))
 (use 'criterium.core)
 
 (defn one-smpl-conf-intvl
   "TODO"
-  [data] (one-sample (ConfidenceInterval. data)))
+  [smpl crtcl-val h-mean] (confidence-interval (OneSample. smpl crtcl-val h-mean)))
 
 
 (defn equal-var-conf-intvl
   "TODO"
-  [data] (equal-variance (ConfidenceInterval. data)))
+  [smpls crtcl-val] (confidence-interval (EqualVariance. smpls crtcl-val)))
 

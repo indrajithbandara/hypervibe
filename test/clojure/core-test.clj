@@ -6,7 +6,7 @@
             [clojure.utils :refer [zip]]
             [clojure.core.stats.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
             [clojure.core.stats.estimate.confidence-interval :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
-
+;TODO fix tests.. for hypothesized means welch and repeated measure is a vec of zerod [0 0]
 ;TODO change all protocols to defttype as in ostt
 ;TODO make ostt compose into confidence interval
 ;TODO confidence interval for welch and repeated measure ttest
