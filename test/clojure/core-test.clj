@@ -77,17 +77,17 @@
 
 
 (deftest one-sample-conf-inter-test
-  (is (= (one-smpl-conf-intvl {:smpl population-one :crtcl-val 1.8331 :h-mean 400})
-         {:smpl [490 500 530 550 580 590 600 600 650 700],
-          :crtcl-val 1.8331,
+  (is (= (one-smpl-conf-intvl {:smpl population-one :crtcl-val  1.83311293265624 :h-mean 400})
+         {:upper 216.71146925144888,
+          :type :ConfidenceInterval,
+          :crtcl-val 1.83311293265624,
           :h-mean 400,
-          :smpl-std-dev 65.05553183413554,
-          :smpl-mean 579.0,
           :smpl-size 10,
+          :smpl-mean 579.0,
           :mean-diff 179.0,
-          :upper 216.71120319611785,
-          :lower 141.28879680388215
-          :type :ConfidenceInterval})))
+          :lower 141.28853074855112,
+          :smpl-std-dev 65.05553183413554,
+          :smpl [490 500 530 550 580 590 600 600 650 700]})))
 
 
 (deftest two-sample-confidence-interval-test-test
@@ -101,6 +101,19 @@
           :lower -2.536759222077789
           :type :ConfidenceInterval})))
 
+
+(deftest compose-one-sample-ttest-confidence-interval
+  (is (= ((comp one-smpl-conf-intvl) (one-smpl-ttest {:smpl population-one :h-mean 400}))
+         {:upper 216.71146925144888,
+          :type :ConfidenceInterval,
+          :crtcl-val 1.83311293265624,
+          :h-mean 400,
+          :smpl-size 10,
+          :smpl-mean 579.0,
+          :mean-diff 179.0,
+          :lower 141.28853074855112,
+          :smpl-std-dev 65.05553183413554,
+          :smpl [490 500 530 550 580 590 600 600 650 700]})))
 
 (def dataset "/Users/gregadebesin/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")
 
