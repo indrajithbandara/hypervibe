@@ -5,10 +5,9 @@
             [clojure.extract :refer [file-lines]]
             [clojure.utils :refer [zip]]
             [clojure.core.stats.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
-            [clojure.core.stats.estimate.confidence-interval :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
-;TODO fix tests.. for hypothesized means welch and repeated measure is a vec of zerod [0 0]
-;TODO change all protocols to defttype as in ostt
-;TODO make ostt compose into confidence interval
+            [clojure.core.stats.estimate.confidence_interval :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
+
+
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO create function that outputs test result
 ;TODO using math.round will solve problem of dof for welch ttest
@@ -35,69 +34,72 @@
 
 (deftest two-sample-t-test-equal-variance
   (is (= (equal-var-ttest {:smpls [ballet-dancers football-players]})
-         #clojure.stats.test.Test{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                                               [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]]},
-                                  :t-stat 1.094722972460392,
-                                  :dof 18,
-                                  :alpha 0.05,
-                                  :crtcl-val 1.73406360661754,
-                                  :smpl-means [87.94999999999999 85.19],
-                                  :pop-means [0.0 0.0],
-                                  :pool-vars [32.382777777777775 31.181000000000015],
-                                  :smpl-sizes [10 10]})))
+         {:pop-means [0.0 0.0],
+          :dof 18,
+          :smpl-means [87.94999999999999 85.19],
+          :h-means [0 0],
+          :smpl-sizes [10 10],
+          :crtcl-val 1.73406360661754,
+          :alpha 0.05,
+          :pool-vars [32.382777777777775 31.181000000000015],
+          :smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+          :t-stat 1.094722972460392
+          :type :TTest})))
 
 
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (welch-ttest {:smpls [ballet-dancers football-players]})
-         #clojure.stats.test.Test{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                                               [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]]},
-                                  :t-stat 1.0947229724603922,
-                                  :dof 17.993567997176537,
-                                  :alpha 0.05,
-                                  :crtcl-val 1.73406360661754,
-                                  :smpl-means [87.94999999999999 85.19],
-                                  :smpl-vars [32.382777777777775 31.181000000000015],
-                                  :smpl-sizes [10 10]})))
+         {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+          :t-stat 1.0947229724603922,
+          :dof 17.993567997176537,
+          :alpha 0.05,
+          :crtcl-val 1.73406360661754,
+          :smpl-means [87.94999999999999 85.19],
+          :smpl-vars [32.382777777777775 31.181000000000015],
+          :smpl-sizes [10 10]
+          :type :TTest})))
 
 
 
 (deftest two-sample-repeated-measure-test
   (is (= (rep-msure-ttest {:smpls [after before]})
-         #clojure.stats.test.Test{:in {:smpls [[200 210 210 170 220 180 190 190 220 210]
-                                               [220 240 225 180 210 190 195 200 210 240]]},
-                                  :t-stat -2.5017235438103813,
-                                  :dof 9,
-                                  :alpha 0.05,
-                                  :crtcl-val 1.83311293265624,
-                                  :pop-means [0.0 0.0],
-                                  :std-dev 13.90443574307614,
-                                  :smpl-size 10,
-                                  :diff-mean -11.0})))
+         {:pop-means [0.0 0.0],
+          :dof 9,
+          :diff-mean -11.0,
+          :h-means [0 0],
+          :crtcl-val 1.83311293265624,
+          :smpl-size 10,
+          :alpha 0.05,
+          :std-dev 13.90443574307614,
+          :smpls [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
+          :t-stat -2.5017235438103813
+          :type :TTest})))
 
 
 (deftest one-sample-conf-inter-test
   (is (= (one-smpl-conf-intvl {:smpl population-one :crtcl-val 1.8331 :h-mean 400})
-         #clojure.stats.estimate.confidence_interval.ConfidenceInterval{:in {:smpl [490 500 530 550 580 590 600 600 650 700],
-                                                                             :crtcl-val 1.8331,
-                                                                             :h-mean 400},
-                                                                        :smpl-std-dev 65.05553183413554,
-                                                                        :smpl-mean 579.0,
-                                                                        :smpl-size 10,
-                                                                        :mean-diff 179.0,
-                                                                        :upper 216.71120319611785,
-                                                                        :lower 141.28879680388215})))
+         {:smpl [490 500 530 550 580 590 600 600 650 700],
+          :crtcl-val 1.8331,
+          :h-mean 400,
+          :smpl-std-dev 65.05553183413554,
+          :smpl-mean 579.0,
+          :smpl-size 10,
+          :mean-diff 179.0,
+          :upper 216.71120319611785,
+          :lower 141.28879680388215
+          :type :ConfidenceInterval})))
 
 
 (deftest two-sample-confidence-interval-test-test
   (is (= (equal-var-conf-intvl {:smpls [ballet-dancers football-players] :crtcl-val 2.1009})
-         #clojure.stats.estimate.confidence_interval.ConfidenceInterval{:in {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-                                                                             :crtcl-val 2.1009},
-                                                                        :smpl-vars [32.382777777777775 31.181000000000015],
-                                                                        :smpl-means [87.94999999999999 85.19],
-                                                                        :smpl-sizes [10 85.19],
-                                                                        :crtcl-val 2.1009,
-                                                                        :upper 8.05675922207777,
-                                                                        :lower -2.536759222077789})))
+         {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+          :smpl-vars [32.382777777777775 31.181000000000015],
+          :smpl-means [87.94999999999999 85.19],
+          :smpl-sizes [10 85.19],
+          :crtcl-val 2.1009,
+          :upper 8.05675922207777,
+          :lower -2.536759222077789
+          :type :ConfidenceInterval})))
 
 
 (def dataset "/Users/gregadebesin/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")

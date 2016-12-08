@@ -1,5 +1,5 @@
 (ns clojure.stats.utils.variation
-  (:require [clojure.stats.utils.central-tendancy :refer [mean mean-1]]))
+  (:require [clojure.stats.utils.central_tendancy :refer [mean mean-1]]))
 
 
 (defn smpl-std-dev [data mean]

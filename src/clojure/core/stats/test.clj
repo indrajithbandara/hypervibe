@@ -1,6 +1,6 @@
 (ns clojure.core.stats.test
-  (:require [clojure.stats.test :refer [ttest one-sample equal-variance welch repeated-measure median]])
-  (:import [clojure.stats.test Test OneSample]))
+  (:require [clojure.stats.test :refer [ttest]])
+  (:import [clojure.stats.test OneSample EqualVariance Welch RepeatedMeasure]))
 (use 'criterium.core)
 
 (defn one-smpl-ttest
@@ -68,7 +68,8 @@
     skills to the national average. Your sample would be pupils who received the new teaching method and your
     hypothesized population mean would be the national average score"
 
-  [{smpl :smpl h-mean :h-mean alpha :alpha :or {alpha 0.05}}] (ttest (OneSample. smpl h-mean alpha)))
+  [{smpl :smpl h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
+  (ttest (OneSample. smpl h-mean alpha)))
 
 
 (defn equal-var-ttest
@@ -143,7 +144,8 @@
 
     You want to understand whether first year graduate salaries differ based on gender"
 
-  [data] (equal-variance (Test. data)))
+  [{smpls :smpls h-means :h-means alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
+  (ttest (EqualVariance. smpls h-means alpha)))
 
 
 (defn welch-ttest
@@ -207,7 +209,8 @@
 
     Compare the heights in inches of two groups of individuals"
 
-  [data] (welch (Test. data)))
+  [{smpls :smpls alpha :alpha :or {alpha 0.05}}]
+  (ttest (Welch. smpls alpha)))
 
 
 (defn rep-msure-ttest
@@ -261,7 +264,7 @@
     :t-stat = test statistic
     :dof = degrees of freedom
     :crtcl-val = critical value
-     :pop-means = population means
+    :pop-means = population means
     :std-dev = standard deviation
     :smpl-size = sample size
     :diff-mean = mean difference
@@ -279,6 +282,7 @@
     Measure the performance of participants in a spelling test 'before' and 'after' they underwent a new form of computerised
     teaching method to improve spelling"
 
-  [data] (repeated-measure (Test. data)))
+  [{smpls :smpls h-means :h-means alpha :alpha :or {alpha 0.05 h-means [0 0]}}]
+  (ttest (RepeatedMeasure. smpls h-means alpha)))
 
 

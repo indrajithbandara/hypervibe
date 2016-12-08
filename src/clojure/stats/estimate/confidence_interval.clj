@@ -1,5 +1,5 @@
-(ns clojure.stats.estimate.confidence-interval
-  (:require [clojure.stats.utils.central-tendancy :refer [mean difference]]
+(ns clojure.stats.estimate.confidence_interval
+  (:require [clojure.stats.utils.central_tendancy :refer [mean difference]]
             [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var pool-var]]))
 
 (deftype OneSample [smpl crtcl-val h-mean])
@@ -29,7 +29,8 @@
       :lower (- mean-diff
                 (* crtcl-val
                    (/ smpl-std-dev
-                      (Math/sqrt smpl-size)))))))
+                      (Math/sqrt smpl-size))))
+      :type :ConfidenceInterval)))
 
 
 (defmethod confidence-interval EqualVariance [this]
@@ -50,7 +51,8 @@
       :lower (- (- smpl-mean-one smpl-mean-two)
                 (* (.crtcl-val this)
                    (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
-                                 (/ smpl-var-two smpl-size-two))))))))
+                                 (/ smpl-var-two smpl-size-two)))))
+      :type :ConfidenceInterval)))
 
 
 ;(defmethod confidence-interval Welch [this])

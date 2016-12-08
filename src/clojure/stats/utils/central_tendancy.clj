@@ -1,4 +1,4 @@
-(ns clojure.stats.utils.central-tendancy
+(ns clojure.stats.utils.central_tendancy
   (:require [clojure.core.reducers :as r]))
 
 
