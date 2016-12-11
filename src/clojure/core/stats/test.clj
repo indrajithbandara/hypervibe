@@ -1,7 +1,12 @@
 (ns clojure.core.stats.test
-  (:require [clojure.stats.test :refer [ttest]])
+  (:require [clojure.stats.test :refer [ttest hypothesis-test]])
   (:import [clojure.stats.test OneSample EqualVariance Welch RepeatedMeasure]))
 (use 'criterium.core)
+
+
+#_(defn one-smpl-hypo-test [{smpl :smpl h-mean :h-mean alpha :alpha :or {alpha 0.05}}]
+  (hypothesis-test (OneSample. )))
+
 
 (defn one-smpl-ttest
 

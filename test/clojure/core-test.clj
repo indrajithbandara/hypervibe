@@ -7,7 +7,7 @@
             [clojure.core.stats.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
             [clojure.core.stats.estimate.confidence_interval :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
 
-
+;TODO continue rethink of test abstractions plus hypothesis test function for null and alternative hypothesis
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO create function that outputs test result
 ;TODO using math.round will solve problem of dof for welch ttest
@@ -20,16 +20,15 @@
 
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:smpl population-one :h-mean 400})
-         {:dof 9,
-          :type :TTest,
-          :crtcl-val 1.83311293265624,
-          :h-mean 400,
-          :smpl-size 10,
-          :smpl-mean 579.0,
-          :alpha 0.05,
-          :smpl-std-dev 65.05553183413554,
-          :t-stat 8.700992601418207,
-          :smpl [490 500 530 550 580 590 600 600 650 700]})))
+         #clojure.stats.test.OneSampleTTest{:smpl [490 500 530 550 580 590 600 600 650 700],
+                                            :h-mean 400,
+                                            :t-stat 8.700992601418207,
+                                            :dof 9,
+                                            :alpha 0.05,
+                                            :crtcl-val 1.83311293265624,
+                                            :smpl-mean 579.0,
+                                            :smpl-std-dev 65.05553183413554,
+                                            :smpl-size 10})))
 
 
 (deftest two-sample-t-test-equal-variance
