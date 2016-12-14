@@ -16,24 +16,19 @@
 (defrecord EqualVarianceTTest [])
 (defrecord WelchTTest [])
 (defrecord RepeatedMeasureTTest [])
-(defrecord OneSampleHypothesisTest [reject? smpl h-mean t-stat dof alpha crtcl-val smpl-mean smpl-std-dev smpl-size])
+
+(defrecord OneSampleHypothesisTest [smpl h-mean alpha reject?])
 
 (defmulti ttest class)
 (defmulti hypothesis-test class)
 (defmulti alternative class)
 
-(defmethod hypothesis-test OneSample [this]
+(defmethod hypothesis-test OneSampleTTest [this]
   (OneSampleHypothesisTest.
-
     (.smpl this)
     (.h-mean this)
-    (.t-stat this)
-    (.dof this)
     (.alpha this)
-    (.crtcl-val this)
-    (.smpl-mean this)
-    (.smpl-std-dev this)
-    (.smpl-size this)))
+    (.reject? (> (Math/abs (.t-stat this)) (.crtcl-val this)))))
 
 (defmethod ttest OneSample [this]
   (let [pcalcs (pvalues (mean (.smpl this))
@@ -42,7 +37,7 @@
                         (.h-mean this))
         [smpl-mean smpl-std-dev smpl-size h-mean] pcalcs
          dof (dec smpl-size)
-         alpha (or (.alpha this) 0.05)]
+         alpha (.alpha this)]
     (OneSampleTTest.
       (.smpl this)
        h-mean
