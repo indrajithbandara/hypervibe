@@ -17,7 +17,7 @@
 (defrecord WelchTTest [])
 (defrecord RepeatedMeasureTTest [])
 
-(defrecord OneSampleHypothesisTest [smpl h-mean alpha reject?])
+(defrecord OneSampleHypothesisTest [smpl h-mean t-stat dof alpha crtcl-val smpl-mean smpl-std-dev smpl-size reject?])
 
 (defmulti ttest class)
 (defmulti hypothesis-test class)
@@ -27,7 +27,13 @@
   (OneSampleHypothesisTest.
     (.smpl this)
     (.h-mean this)
+    (.t-stat this)
+    (.dof this)
     (.alpha this)
+    (.crtcl-val this)
+    (.smpl-mean this)
+    (.smpl-std-dev this)
+    (.smpl-size this)
     (.reject? (> (Math/abs (.t-stat this)) (.crtcl-val this)))))
 
 (defmethod ttest OneSample [this]
