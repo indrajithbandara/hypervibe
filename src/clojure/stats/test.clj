@@ -12,48 +12,32 @@
 (deftype Median [smpls h-means alpha])
 (deftype Hypothesis [test])
 
-(defrecord OneSampleTTest [smpl h-mean t-stat dof alpha crtcl-val smpl-mean smpl-std-dev smpl-size])
-(defrecord EqualVarianceTTest [])
-(defrecord WelchTTest [])
-(defrecord RepeatedMeasureTTest [])
-
-(defrecord OneSampleHypothesisTest [smpl h-mean t-stat dof alpha crtcl-val smpl-mean smpl-std-dev smpl-size reject?])
-
 (defmulti ttest class)
-(defmulti hypothesis-test class)
-(defmulti alternative class)
 
-(defmethod hypothesis-test OneSampleTTest [this]
-  (OneSampleHypothesisTest.
-    (.smpl this)
-    (.h-mean this)
-    (.t-stat this)
-    (.dof this)
-    (.alpha this)
-    (.crtcl-val this)
-    (.smpl-mean this)
-    (.smpl-std-dev this)
-    (.smpl-size this)
-    (.reject? (> (Math/abs (.t-stat this)) (.crtcl-val this)))))
 
 (defmethod ttest OneSample [this]
   (let [pcalcs (pvalues (mean (.smpl this))
                         (smpl-std-dev (.smpl this) (mean (.smpl this)))
                         (count (.smpl this))
-                        (.h-mean this))
-        [smpl-mean smpl-std-dev smpl-size h-mean] pcalcs
+                        (.h-mean this)
+                        (.smpl this)
+                        (.alpha this))
+        [smpl-mean smpl-std-dev smpl-size h-mean smpl alpha] pcalcs
          dof (dec smpl-size)
-         alpha (.alpha this)]
-    (OneSampleTTest.
-      (.smpl this)
-       h-mean
-      (/ (- smpl-mean h-mean) (/ smpl-std-dev (Math/sqrt smpl-size)))
-       dof
-       alpha
-      (crtcl-val t-dist dof alpha)
-       smpl-mean
-       smpl-std-dev
-       smpl-size)))
+         crtcl-val (crtcl-val t-dist dof alpha)
+         t-stat (/ (- smpl-mean h-mean) (/ smpl-std-dev (Math/sqrt smpl-size)))]
+    {:smpl smpl
+     :h-mean h-mean
+     :t-stat t-stat
+     :dof dof
+     :alpha alpha
+     :crtcl-val crtcl-val
+     :reject? (> (Math/abs t-stat) crtcl-val)
+     :diff (- t-stat crtcl-val)
+     :smpl-mean smpl-mean
+     :smpl-std-dev smpl-std-dev
+     :smpl-size smpl-size
+     :type :OneSampleTTest}))
 
 
 (defmethod ttest EqualVariance [this]
@@ -65,22 +49,21 @@
          [smpl-size-one smpl-size-two]] pcalcs
           dof (- (+ smpl-size-one smpl-size-two) 2)
           alpha (.alpha this)]
-    (assoc {}
-      :smpls (.smpls this)
-      :h-means (.h-means this)
-      :t-stat (/ (- (- smpl-mean-one smpl-mean-two)
-                    (- pop-mean-one pop-mean-two))
-                 (Math/sqrt (* (/ (+ pool-var-one pool-var-two) 2)
-                               (+ (/ 1 smpl-size-one)
-                                  (/ 1 smpl-size-two)))))
-      :dof dof
-      :alpha alpha
-      :crtcl-val (crtcl-val t-dist dof alpha)
-      :smpl-means [smpl-mean-one smpl-mean-two]
-      :pop-means [pop-mean-one pop-mean-two]
-      :pool-vars [pool-var-one pool-var-two]
-      :smpl-sizes [smpl-size-one smpl-size-two]
-      :type :TTest)))
+    {:smpls (.smpls this)
+     :h-means (.h-means this)
+     :t-stat (/ (- (- smpl-mean-one smpl-mean-two)
+                   (- pop-mean-one pop-mean-two))
+                (Math/sqrt (* (/ (+ pool-var-one pool-var-two) 2)
+                              (+ (/ 1 smpl-size-one)
+                                 (/ 1 smpl-size-two)))))
+     :dof dof
+     :alpha alpha
+     :crtcl-val (crtcl-val t-dist dof alpha)
+     :smpl-means [smpl-mean-one smpl-mean-two]
+     :pop-means [pop-mean-one pop-mean-two]
+     :pool-vars [pool-var-one pool-var-two]
+     :smpl-sizes [smpl-size-one smpl-size-two]
+     :type :EqualVarianceTTest}))
 
 
 (defmethod ttest Welch [this]
@@ -99,18 +82,17 @@
                           (/ smpl-var-two smpl-size-two))
                        (- smpl-size-two 1))))
           alpha (.alpha this)]
-    (assoc {}
-      :smpls (.smpls this)
-      :t-stat (/ (- mean-one mean-two)
-                 (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
-                               (/ smpl-var-two smpl-size-two))))
-      :dof dof
-      :alpha alpha
-      :crtcl-val (crtcl-val t-dist (Math/round dof) alpha)
-      :smpl-means [mean-one mean-two]
-      :smpl-vars [smpl-var-one smpl-var-two]
-      :smpl-sizes [smpl-size-one smpl-size-two]
-      :type :TTest)))
+    {:smpls (.smpls this)
+     :t-stat (/ (- mean-one mean-two)
+                (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
+                              (/ smpl-var-two smpl-size-two))))
+     :dof dof
+     :alpha alpha
+     :crtcl-val (crtcl-val t-dist (Math/round dof) alpha)
+     :smpl-means [mean-one mean-two]
+     :smpl-vars [smpl-var-one smpl-var-two]
+     :smpl-sizes [smpl-size-one smpl-size-two]
+     :type :WelchTTest}))
 
 
 (defmethod ttest RepeatedMeasure [this]
@@ -121,21 +103,20 @@
         [diff-mean [pop-mean-one pop-mean-two] std-dev smpl-size] pcalcs
          dof (dec smpl-size)
          alpha (.alpha this)]
-    (assoc {}
-      :smpls (.smpls this)
-      :h-means (.h-means this)
-      :t-stat (/ (- diff-mean
-                    (- pop-mean-one pop-mean-two))
-                 (/ std-dev
-                    (Math/sqrt smpl-size)))
-      :dof dof
-      :alpha alpha
-      :crtcl-val (crtcl-val t-dist dof alpha)
-      :pop-means [pop-mean-one pop-mean-two]
-      :std-dev std-dev
-      :smpl-size smpl-size
-      :diff-mean diff-mean
-      :type :TTest)))
+    {:smpls (.smpls this)
+     :h-means (.h-means this)
+     :t-stat (/ (- diff-mean
+                   (- pop-mean-one pop-mean-two))
+                (/ std-dev
+                   (Math/sqrt smpl-size)))
+     :dof dof
+     :alpha alpha
+     :crtcl-val (crtcl-val t-dist dof alpha)
+     :pop-means [pop-mean-one pop-mean-two]
+     :std-dev std-dev
+     :smpl-size smpl-size
+     :diff-mean diff-mean
+     :type :RepeatedMeasureTTest}))
 
 
 

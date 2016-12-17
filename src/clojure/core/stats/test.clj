@@ -4,7 +4,7 @@
 (use 'criterium.core)
 
 
-(defn one-smpl-hypo-test
+#_(defn one-smpl-hypo-test
   [{smpl :smpl h-mean :h-mean alpha :alpha reject? :reject?}]
   (hypothesis-test (OneSampleHypothesisTest. smpl h-mean alpha reject?)))
 
