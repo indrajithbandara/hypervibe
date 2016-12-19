@@ -10,7 +10,7 @@
 (deftype Welch [smpls alpha])
 (deftype RepeatedMeasure [smpls h-means alpha])
 (deftype Median [smpls h-means alpha])
-(deftype Hypothesis [test])
+
 
 (defmulti ttest class)
 
@@ -18,21 +18,18 @@
 (defmethod ttest OneSample [this]
   (let [pcalcs (pvalues (mean (.smpl this))
                         (smpl-std-dev (.smpl this) (mean (.smpl this)))
-                        (count (.smpl this))
-                        (.h-mean this)
-                        (.smpl this)
-                        (.alpha this))
-        [smpl-mean smpl-std-dev smpl-size h-mean smpl alpha] pcalcs
+                        (count (.smpl this)))
+        [smpl-mean smpl-std-dev smpl-size] pcalcs
          dof (dec smpl-size)
-         crtcl-val (crtcl-val t-dist dof alpha)
-         t-stat (/ (- smpl-mean h-mean) (/ smpl-std-dev (Math/sqrt smpl-size)))]
-    {:smpl smpl
-     :h-mean h-mean
+         crtcl-val (crtcl-val t-dist dof (.alpha this))
+         t-stat (/ (- smpl-mean (.h-mean this)) (/ smpl-std-dev (Math/sqrt smpl-size)))]
+    {:smpl  (.smpl this)
+     :h-mean (.h-mean this)
      :t-stat t-stat
      :dof dof
-     :alpha alpha
+     :alpha  (.alpha this)
      :crtcl-val crtcl-val
-     :reject? (> (Math/abs t-stat) crtcl-val)
+     :rej-null? (> (Math/abs t-stat) crtcl-val)
      :diff (- t-stat crtcl-val)
      :smpl-mean smpl-mean
      :smpl-std-dev smpl-std-dev
@@ -48,17 +45,20 @@
         [[smpl-mean-one smpl-mean-two] [pop-mean-one pop-mean-two] [pool-var-one pool-var-two]
          [smpl-size-one smpl-size-two]] pcalcs
           dof (- (+ smpl-size-one smpl-size-two) 2)
-          alpha (.alpha this)]
+          crtcl-val (crtcl-val t-dist dof (.alpha this))
+          t-stat (/ (- (- smpl-mean-one smpl-mean-two)
+                       (- pop-mean-one pop-mean-two))
+                    (Math/sqrt (* (/ (+ pool-var-one pool-var-two) 2)
+                                  (+ (/ 1 smpl-size-one)
+                                     (/ 1 smpl-size-two)))))]
     {:smpls (.smpls this)
      :h-means (.h-means this)
-     :t-stat (/ (- (- smpl-mean-one smpl-mean-two)
-                   (- pop-mean-one pop-mean-two))
-                (Math/sqrt (* (/ (+ pool-var-one pool-var-two) 2)
-                              (+ (/ 1 smpl-size-one)
-                                 (/ 1 smpl-size-two)))))
+     :t-stat t-stat
      :dof dof
-     :alpha alpha
-     :crtcl-val (crtcl-val t-dist dof alpha)
+     :alpha (.alpha this)
+     :crtcl-val crtcl-val
+     :rej-null? (> (Math/abs t-stat) crtcl-val)
+     :diff (- t-stat  crtcl-val)
      :smpl-means [smpl-mean-one smpl-mean-two]
      :pop-means [pop-mean-one pop-mean-two]
      :pool-vars [pool-var-one pool-var-two]
@@ -81,14 +81,17 @@
                     (/ (* (/ smpl-var-two smpl-size-two)
                           (/ smpl-var-two smpl-size-two))
                        (- smpl-size-two 1))))
-          alpha (.alpha this)]
+          crtcl-val (crtcl-val t-dist (Math/round dof) (.alpha this))
+          t-stat (/ (- mean-one mean-two)
+                    (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
+                                  (/ smpl-var-two smpl-size-two))))]
     {:smpls (.smpls this)
-     :t-stat (/ (- mean-one mean-two)
-                (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
-                              (/ smpl-var-two smpl-size-two))))
+     :t-stat t-stat
      :dof dof
-     :alpha alpha
-     :crtcl-val (crtcl-val t-dist (Math/round dof) alpha)
+     :alpha (.alpha this)
+     :crtcl-val crtcl-val
+     :rej-null? (> (Math/abs t-stat) crtcl-val)
+     :diff (- t-stat crtcl-val)
      :smpl-means [mean-one mean-two]
      :smpl-vars [smpl-var-one smpl-var-two]
      :smpl-sizes [smpl-size-one smpl-size-two]

@@ -26,7 +26,7 @@
           :h-mean 400,
           :smpl-size 10,
           :smpl-mean 579.0,
-          :reject? true,
+          :rej-null? true,
           :alpha 0.05,
           :smpl-std-dev 65.05553183413554,
           :t-stat 8.700992601418207,
@@ -38,28 +38,32 @@
   (is (= (equal-var-ttest {:smpls [ballet-dancers football-players]})
          {:pop-means [0.0 0.0],
           :dof 18,
+          :type :EqualVarianceTTest,
           :smpl-means [87.94999999999999 85.19],
           :h-means [0 0],
           :smpl-sizes [10 10],
           :crtcl-val 1.73406360661754,
+          :rej-null? false,
           :alpha 0.05,
           :pool-vars [32.382777777777775 31.181000000000015],
           :smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-          :t-stat 1.094722972460392
-          :type :EqualVarianceTTest})))
+          :t-stat 1.094722972460392,
+          :diff -0.6393406341571481})))
 
 
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (welch-ttest {:smpls [ballet-dancers football-players]})
-         {:smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-          :t-stat 1.0947229724603922,
-          :dof 17.993567997176537,
-          :alpha 0.05,
-          :crtcl-val 1.73406360661754,
+         {:dof 17.993567997176537,
+          :type :WelchTTest,
           :smpl-means [87.94999999999999 85.19],
+          :smpl-sizes [10 10],
+          :crtcl-val 1.73406360661754,
           :smpl-vars [32.382777777777775 31.181000000000015],
-          :smpl-sizes [10 10]
-          :type :WelchTTest})))
+          :rej-null? false,
+          :alpha 0.05,
+          :smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+          :t-stat 1.0947229724603922,
+          :diff -0.6393406341571479})))
 
 
 

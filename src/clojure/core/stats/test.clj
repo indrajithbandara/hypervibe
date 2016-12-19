@@ -1,6 +1,6 @@
 (ns clojure.core.stats.test
-  (:require [clojure.stats.test :refer [ttest hypothesis-test]])
-  (:import [clojure.stats.test OneSample EqualVariance Welch RepeatedMeasure OneSampleHypothesisTest]))
+  (:require [clojure.stats.test :refer [ttest]])
+  (:import [clojure.stats.test OneSample EqualVariance Welch RepeatedMeasure]))
 (use 'criterium.core)
 
 
