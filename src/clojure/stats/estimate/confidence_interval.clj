@@ -2,7 +2,7 @@
   (:require [clojure.stats.utils.central_tendancy :refer [mean difference]]
             [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var pool-var]]))
 
-(deftype OneSample [smpl crtcl-val h-mean])
+(deftype OneSample [smpl crtcl-val hmean])
 (deftype EqualVariance [smpls crtcl-val])
 
 (defmulti confidence-interval class)
@@ -13,13 +13,13 @@
                         (smpl-std-dev (.smpl this) (mean (.smpl this)))
                         (count (.smpl this))
                         (.crtcl-val this)
-                        (.h-mean this))
-        [smpl-mean smpl-std-dev smpl-size crtcl-val h-mean] pcalcs
-         mean-diff (- smpl-mean h-mean)]
+                        (.hmean this))
+        [smpl-mean smpl-std-dev smpl-size crtcl-val hmean] pcalcs
+         mean-diff (- smpl-mean hmean)]
     (assoc {}
       :smpl (.smpl this)
       :crtcl-val crtcl-val
-      :h-mean h-mean
+      :hmean hmean
       :smpl-std-dev smpl-std-dev
       :smpl-mean smpl-mean
       :smpl-size smpl-size
