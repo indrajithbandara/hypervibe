@@ -1,5 +1,5 @@
 (ns clojure.dataset
-  (:require [clojure.utils :refer [zip]]
+  (:require [clojure.stats.utils :refer [zip]]
             [clojure.extract :refer [file-lines]]
             [clojure.transform.string :refer [splitter]]))
 

@@ -1,6 +1,5 @@
 (ns clojure.stats.estimate.confidence_interval
-  (:require [clojure.stats.utils.central_tendancy :refer [mean difference]]
-            [clojure.stats.utils.variation :refer [smpl-std-dev smpl-var pool-var]]))
+  (:require [clojure.stats.utils :refer [mean difference smpl-std-dev smpl-var pool-var]]))
 
 (deftype OneSample [smpl crtcl-val hmean])
 (deftype EqualVariance [smpls crtcl-val])

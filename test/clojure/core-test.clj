@@ -1,13 +1,15 @@
 (ns clojure.core-test
   (:require [clojure.test :refer :all]
-            [clojure.stats.utils.samples :refer :all]
+            [clojure.stats.samples :refer :all]
             [clojure.dataset :refer [data-frame]]
             [clojure.extract :refer [file-lines]]
-            [clojure.utils :refer [zip]]
+            [clojure.stats.utils :refer [zip]]
             [clojure.core.stats.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
             [clojure.core.stats.estimate.confidence_interval :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
 
 ;TODO change docs to add hmean, null-rej etc
+;TODO research more into what constitutes to a rejected null hypothesis
+;TODO add alternative hypothesis
 ;TODO put helper functions into utils name space
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO update docs to add null hypothesis result
@@ -19,6 +21,7 @@
 ;TODO create protocol named Conduct which compares the absolute value of the t statistic with the critical value ang outputs the test result
 ;TODO reference here for different distrubutions http://www.itl.nist.gov/div898/handbook/eda/section3/eda367.htm
 ;TODO Levene's Test for Equality of Variances
+;TODO start implementing chart api
 
 (deftest one-sample-t-test-test
   (is (= (one-smpl-ttest {:smpl population-one :hmean 400})
@@ -39,8 +42,9 @@
 (deftest two-sample-t-test-equal-variance
   (is (= (equal-var-ttest {:smpls [ballet-dancers football-players]})
          {:pop-means [0.0 0.0],
+          :tstat 1.094722972460392,
           :dof 18,
-          :type :EqualVarianceTTest,
+          :type clojure.stats.test.EqualVariance,
           :smpl-means [87.94999999999999 85.19],
           :hmeans [0 0],
           :smpl-sizes [10 10],
@@ -49,14 +53,14 @@
           :alpha 0.05,
           :pool-vars [32.382777777777775 31.181000000000015],
           :smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-          :tstat 1.094722972460392,
           :diff -0.6393406341571481})))
 
 
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (welch-ttest {:smpls [ballet-dancers football-players]})
-         {:dof 17.993567997176537,
-          :type :WelchTTest,
+         {:tstat 1.0947229724603922,
+          :dof 17.993567997176537,
+          :type clojure.stats.test.Welch,
           :smpl-means [87.94999999999999 85.19],
           :smpl-sizes [10 10],
           :crtcl-val 1.73406360661754,
@@ -64,7 +68,6 @@
           :rej-null? false,
           :alpha 0.05,
           :smpls [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-          :tstat 1.0947229724603922,
           :diff -0.6393406341571479})))
 
 
@@ -75,7 +78,7 @@
           :tstat -2.5017235438103813,
           :dof 9,
           :diff-mean -11.0,
-          :type :RepeatedMeasureTTest,
+          :type clojure.stats.test.RepeatedMeasure,
           :hmeans [0 0],
           :crtcl-val 1.83311293265624,
           :rej-null? true,
@@ -124,10 +127,10 @@
           :smpl-std-dev 65.05553183413554,
           :smpl [490 500 530 550 580 590 600 600 650 700]})))
 
-(def dataset "/Users/adebesing/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")
+#_(def dataset "/Users/adebesing/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")
 
 
-(data-frame {:column-names [:age :department :salary
+#_(data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status
                             :job :family-status :race
                             :gender :n1 :n2 :n3 :country :salary-range]
@@ -136,7 +139,7 @@
              :type         :csv/read
              :return '()})
 
-(data-frame {:column-names [:age :department :salary
+#_(data-frame {:column-names [:age :department :salary
                             :degree :study-time :marital-status
                             :job :family-status :race
                             :gender :n1 :n2 :n3 :country :salary-range]
