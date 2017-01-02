@@ -44,7 +44,6 @@
          {:pop-means [0.0 0.0],
           :tstat 1.094722972460392,
           :dof 18,
-          :type clojure.stats.test.EqualVariance,
           :smpl-means [87.94999999999999 85.19],
           :hmeans [0 0],
           :smpl-sizes [10 10],
