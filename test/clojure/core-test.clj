@@ -4,7 +4,8 @@
             [clojure.dataset :refer [data-frame]]
             [clojure.extract :refer [file-lines]]
             [clojure.stats.utils :refer [zip]]
-            [clojure.core.stats.test :refer [one-smpl-ttest equal-var-ttest welch-ttest rep-msure-ttest]]
+            [clojure.stats.test :refer [ttest]]
+            [clojure.core.stats.test :refer [one-smpl equal-var welch rep-msure]]
             [clojure.core.stats.estimate.confidence_interval :refer [one-smpl-conf-intvl equal-var-conf-intvl]]))
 
 ;TODO change docs to add hmean, null-rej etc
@@ -24,9 +25,8 @@
 ;TODO start implementing chart api
 
 (deftest one-sample-t-test-test
-  (is (= (one-smpl-ttest {:smpl population-one :hmean 400})
+  (is (= (ttest (one-smpl {:smpl population-one :hmean 400}))
          {:dof 9,
-          :type :OneSampleTTest,
           :crtcl-val 1.83311293265624,
           :hmean 400,
           :smpl-size 10,
@@ -40,7 +40,7 @@
 
 
 (deftest two-sample-t-test-equal-variance
-  (is (= (equal-var-ttest {:smpls [ballet-dancers football-players]})
+  (is (= (ttest (equal-var {:smpls [ballet-dancers football-players]}))
          {:pop-means [0.0 0.0],
           :tstat 1.094722972460392,
           :dof 18,
@@ -56,10 +56,9 @@
 
 
 (deftest two-sample-t-test-unequal-variance-welch
-  (is (= (welch-ttest {:smpls [ballet-dancers football-players]})
+  (is (= (ttest (welch {:smpls [ballet-dancers football-players]}))
          {:tstat 1.0947229724603922,
           :dof 17.993567997176537,
-          :type clojure.stats.test.Welch,
           :smpl-means [87.94999999999999 85.19],
           :smpl-sizes [10 10],
           :crtcl-val 1.73406360661754,
@@ -72,7 +71,7 @@
 
 
 (deftest two-sample-repeated-measure-test
-  (is (= (rep-msure-ttest {:smpls [after before]})
+  (is (= (ttest (rep-msure {:smpls [after before]}))
          {:pop-means [0.0 0.0],
           :tstat -2.5017235438103813,
           :dof 9,
@@ -114,7 +113,7 @@
 
 
 (deftest compose-one-sample-ttest-confidence-interval
-  (is (= ((comp one-smpl-conf-intvl) (one-smpl-ttest {:smpl population-one :hmean 400}))
+  (is (= ((comp one-smpl-conf-intvl) (ttest (one-smpl {:smpl population-one :hmean 400})))
          {:upper 216.71146925144888,
           :type :ConfidenceInterval,
           :crtcl-val 1.83311293265624,

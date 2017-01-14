@@ -1,21 +1,20 @@
 (ns clojure.stats.test
-  (:require [clojure.stats.utils :refer [mean difference rej-null? smpl-std-dev smpl-var pool-var one-smpl-tstat equal-var-tstat
-                                         welch-tstat rep-msure-tstat welch-dof]]
+  (:require [clojure.stats.utils :refer [mean difference rej-null? smpl-std-dev
+                                         smpl-var pool-var one-smpl-tstat
+                                         equal-var-tstat welch-tstat rep-msure-tstat
+                                         welch-dof]]
             [clojure.stats.distribution.t.table :refer [t-dist crtcl-val]]))
 (use 'clojure.core.matrix)
 
-
-(str (symbol (str (namespace-munge *ns*) "." name)) "/create")
-
-(defrecord OneSample [smpl hmean alpha])
-(defrecord EqualVariance [smpls hmeans alpha])
+(deftype OneSample [smpl hmean alpha])
+(deftype EqualVariance [smpls hmeans alpha])
 (deftype Welch [smpls alpha])
 (deftype RepeatedMeasure [smpls hmeans alpha])
 (deftype Median [smpls hmeans alpha])
 
+
 (defmulti ttest class)
 
-;TODO create light weight macro that returns type outside
 
 (defn one-sample
   [smpl hmean tstat
@@ -33,8 +32,7 @@
    :diff         diff
    :smpl-mean    smpl-mean
    :smpl-std-dev smpl-std-dev
-   :smpl-size    smpl-size
-   :type         :clojure.stats.test/OneSample})
+   :smpl-size    smpl-size})
 
 
 (defn equal-variance
@@ -54,8 +52,25 @@
    :smpl-means smpl-means
    :pop-means  pop-means
    :pool-vars  pool-vars
-   :smpl-sizes smpl-sizes
-   :type       :clojure.stats.test/EqualVariance})
+   :smpl-sizes smpl-sizes})
+
+
+(defn welch
+  [smpls tstat dof
+   alpha crtcl-val rej-null?
+   diff smpl-means smpl-vars
+   smpl-sizes]
+  ^{:type ::Welch}
+  {:smpls smpls
+   :tstat tstat
+   :dof dof
+   :alpha alpha
+   :crtcl-val crtcl-val
+   :rej-null? rej-null?
+   :diff diff
+   :smpl-means smpl-means
+   :smpl-vars smpl-vars
+   :smpl-sizes smpl-sizes})
 
 
 (defmethod ttest OneSample [this]
@@ -97,18 +112,11 @@
                          smpl-size-two)
           crtcl-val (crtcl-val t-dist (Math/round dof) (.alpha this))
           tstat (welch-tstat mean-one mean-two smpl-var-one
-                              smpl-var-two smpl-size-one smpl-size-two)]
-    {:smpls (.smpls this)
-     :tstat tstat
-     :dof dof
-     :alpha (.alpha this)
-     :crtcl-val crtcl-val
-     :rej-null? (rej-null? tstat crtcl-val)
-     :diff (- tstat crtcl-val)
-     :smpl-means [mean-one mean-two]
-     :smpl-vars [smpl-var-one smpl-var-two]
-     :smpl-sizes [smpl-size-one smpl-size-two]
-     :type clojure.stats.test.Welch}))
+                             smpl-var-two smpl-size-one smpl-size-two)]
+    (welch (.smpls this) tstat dof
+           (.alpha this) crtcl-val (rej-null? tstat crtcl-val)
+           (- tstat crtcl-val) [mean-one mean-two] [smpl-var-one smpl-var-two]
+           [smpl-size-one smpl-size-two])))
 
 
 (defmethod ttest RepeatedMeasure [this]

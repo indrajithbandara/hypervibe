@@ -3,7 +3,7 @@
   (:import [clojure.stats.test OneSample EqualVariance Welch RepeatedMeasure]))
 (use 'criterium.core)
 
-(defn one-smpl-ttest
+(defn one-smpl
 
   "OVERVIEW:
 
@@ -68,11 +68,10 @@
     skills to the national average. Your sample would be pupils who received the new teaching method and your
     hypothesized population mean would be the national average score"
 
-  [{smpl :smpl hmean :hmean alpha :alpha :or {alpha 0.05}}]
-  (ttest (OneSample. smpl hmean alpha)))
+  [{smpl :smpl hmean :hmean alpha :alpha :or {alpha 0.05}}] (OneSample. smpl hmean alpha))
 
 
-(defn equal-var-ttest
+(defn equal-var
 
   "OVERVIEW:
 
@@ -144,11 +143,10 @@
 
     You want to understand whether first year graduate salaries differ based on gender"
 
-  [{smpls :smpls hmeans :hmeans alpha :alpha :or {alpha 0.05 hmeans [0 0]}}]
-  (ttest (EqualVariance. smpls hmeans alpha)))
+  [{smpls :smpls hmeans :hmeans alpha :alpha :or {alpha 0.05 hmeans [0 0]}}] (EqualVariance. smpls hmeans alpha))
 
 
-(defn welch-ttest
+(defn welch
 
   "OVERVIEW:
 
@@ -209,11 +207,10 @@
 
     Compare the heights in inches of two groups of individuals"
 
-  [{smpls :smpls alpha :alpha :or {alpha 0.05}}]
-  (ttest (Welch. smpls alpha)))
+  [{smpls :smpls alpha :alpha :or {alpha 0.05}}] (Welch. smpls alpha))
 
 
-(defn rep-msure-ttest
+(defn rep-msure
 
   "OVERVIEW:
 
@@ -282,7 +279,6 @@
     Measure the performance of participants in a spelling test 'before' and 'after' they underwent a new form of computerised
     teaching method to improve spelling"
 
-  [{smpls :smpls hmeans :hmeans alpha :alpha :or {alpha 0.05 hmeans [0 0]}}]
-  (ttest (RepeatedMeasure. smpls hmeans alpha)))
+  [{smpls :smpls hmeans :hmeans alpha :alpha :or {alpha 0.05 hmeans [0 0]}}] (RepeatedMeasure. smpls hmeans alpha))
 
 
