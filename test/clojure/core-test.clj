@@ -76,7 +76,6 @@
           :tstat -2.5017235438103813,
           :dof 9,
           :diff-mean -11.0,
-          :type clojure.stats.test.RepeatedMeasure,
           :hmeans [0 0],
           :crtcl-val 1.83311293265624,
           :rej-null? true,
