@@ -6,7 +6,7 @@
 
 (defn one-smpl-conf-intvl
   "TODO"
-  [{smpl :smpl crtcl-val :crtcl-val hmean :hmean}]
+  [{smpl :smpl crtcl-val :cval hmean :hmean}]
   (confidence-interval (OneSample. smpl crtcl-val hmean)))
 
 

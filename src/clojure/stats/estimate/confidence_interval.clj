@@ -7,26 +7,32 @@
 (defmulti confidence-interval class)
 
 
+(defn one-smpl []
+  )
+
+(defn equal-var []
+  )
+
+(defn pone-smpl [this]
+  (pvalues (mean (.smpl this))
+           (smpl-std-dev (.smpl this) (mean (.smpl this)))
+           (count (.smpl this))))
+
 (defmethod confidence-interval OneSample [this]
-  (let [pcalcs (pvalues (mean (.smpl this))
-                        (smpl-std-dev (.smpl this) (mean (.smpl this)))
-                        (count (.smpl this))
-                        (.crtcl-val this)
-                        (.hmean this))
-        [smpl-mean smpl-std-dev smpl-size crtcl-val hmean] pcalcs
-         mean-diff (- smpl-mean hmean)]
+  (let [[smpl-mean smpl-std-dev smpl-size] (pone-smpl this)
+         mean-diff (- smpl-mean (.hmean this))]
     (assoc {}
       :smpl (.smpl this)
-      :crtcl-val crtcl-val
-      :hmean hmean
+      :cval  (.crtcl-val this)
+      :hmean (.hmean this)
       :smpl-std-dev smpl-std-dev
       :smpl-mean smpl-mean
       :smpl-size smpl-size
       :mean-diff mean-diff
       :upper (+ mean-diff
-                (* crtcl-val (/ smpl-std-dev (Math/sqrt smpl-size))))
+                (*  (.crtcl-val this) (/ smpl-std-dev (Math/sqrt smpl-size))))
       :lower (- mean-diff
-                (* crtcl-val
+                (*  (.crtcl-val this)
                    (/ smpl-std-dev
                       (Math/sqrt smpl-size))))
       :type :ConfidenceInterval)))

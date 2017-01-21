@@ -27,7 +27,7 @@
 (deftest one-sample-t-test-test
   (is (= (ttest (one-smpl {:smpl population-one :hmean 400}))
          {:dof 9,
-          :crtcl-val 1.83311293265624,
+          :cval 1.83311293265624,
           :hmean 400,
           :smpl-size 10,
           :smpl-mean 579.0,
@@ -47,7 +47,7 @@
           :smpl-means [87.94999999999999 85.19],
           :hmeans [0 0],
           :smpl-sizes [10 10],
-          :crtcl-val 1.73406360661754,
+          :cval 1.73406360661754,
           :rej-null? false,
           :alpha 0.05,
           :pool-vars [32.382777777777775 31.181000000000015],
@@ -61,7 +61,7 @@
           :dof 17.993567997176537,
           :smpl-means [87.94999999999999 85.19],
           :smpl-sizes [10 10],
-          :crtcl-val 1.73406360661754,
+          :cval 1.73406360661754,
           :smpl-vars [32.382777777777775 31.181000000000015],
           :rej-null? false,
           :alpha 0.05,
@@ -77,7 +77,7 @@
           :dof 9,
           :diff-mean -11.0,
           :hmeans [0 0],
-          :crtcl-val 1.83311293265624,
+          :cval 1.83311293265624,
           :rej-null? true,
           :smpl-size 10,
           :alpha 0.05,
@@ -86,10 +86,10 @@
 
 
 (deftest one-sample-conf-inter-test
-  (is (= (one-smpl-conf-intvl {:smpl population-one :crtcl-val  1.83311293265624 :hmean 400})
+  (is (= (one-smpl-conf-intvl {:smpl population-one :cval  1.83311293265624 :hmean 400})
          {:upper 216.71146925144888,
           :type :ConfidenceInterval,
-          :crtcl-val 1.83311293265624,
+          :cval 1.83311293265624,
           :hmean 400,
           :smpl-size 10,
           :smpl-mean 579.0,
@@ -115,7 +115,7 @@
   (is (= ((comp one-smpl-conf-intvl) (ttest (one-smpl {:smpl population-one :hmean 400})))
          {:upper 216.71146925144888,
           :type :ConfidenceInterval,
-          :crtcl-val 1.83311293265624,
+          :cval 1.83311293265624,
           :hmean 400,
           :smpl-size 10,
           :smpl-mean 579.0,

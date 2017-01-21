@@ -18,7 +18,7 @@
 
 (defn one-sample
   [smpl hmean tstat
-   dof alpha crtcl-val
+   dof alpha cval
    rej-null? diff smpl-mean
    smpl-std-dev smpl-size]
   ^{:type ::OneSample}
@@ -27,7 +27,7 @@
    :tstat        tstat
    :dof          dof
    :alpha        alpha
-   :crtcl-val    crtcl-val
+   :cval    cval
    :rej-null?    rej-null?
    :diff         diff
    :smpl-mean    smpl-mean
@@ -37,7 +37,7 @@
 
 (defn equal-variance
   [smpls hmeans tstat
-   dof alpha crtcl-val
+   dof alpha cval
    rej-null? diff smpl-means
    pop-means pool-vars smpl-sizes]
   ^{:type ::EqualVariance}
@@ -46,7 +46,7 @@
    :tstat      tstat
    :dof        dof
    :alpha      alpha
-   :crtcl-val  crtcl-val
+   :cval  cval
    :rej-null?  rej-null?
    :diff       diff
    :smpl-means smpl-means
@@ -57,7 +57,7 @@
 
 (defn welch
   [smpls tstat dof
-   alpha crtcl-val rej-null?
+   alpha cval rej-null?
    diff smpl-means smpl-vars
    smpl-sizes]
   ^{:type ::Welch}
@@ -65,7 +65,7 @@
    :tstat      tstat
    :dof        dof
    :alpha      alpha
-   :crtcl-val  crtcl-val
+   :cval  cval
    :rej-null?  rej-null?
    :diff       diff
    :smpl-means smpl-means
@@ -74,7 +74,7 @@
 
 (defn rep-msure
   [smpls hmeans tstat
-   dof alpha crtcl-val
+   dof alpha cval
    rej-null? pop-means
    std-dev smpl-size
    diff-mean]
@@ -84,7 +84,7 @@
    :tstat tstat
    :dof dof
    :alpha alpha
-   :crtcl-val crtcl-val
+   :cval cval
    :rej-null? rej-null?
    :pop-means pop-means
    :std-dev std-dev
@@ -104,7 +104,7 @@
     (one-sample (.smpl this) (.hmean this) tstat
                 (dec ssize) (.alpha this) cval
                 (rej-null? tstat cval) (- tstat cval) smean
-                ssdev ssize)))
+                 ssdev ssize)))
 
 
 (defn- pequal-var [this]
