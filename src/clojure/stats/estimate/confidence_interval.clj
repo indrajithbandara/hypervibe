@@ -7,11 +7,8 @@
 (defmulti confidence-interval class)
 
 
-(defn one-smpl []
-  )
-
-(defn equal-var []
-  )
+(defn one-smpl [])
+(defn equal-var [])
 
 (defn pone-smpl [this]
   (pvalues (mean (.smpl this))
