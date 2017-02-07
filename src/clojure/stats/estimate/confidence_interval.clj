@@ -6,7 +6,6 @@
 
 (defmulti confidence-interval class)
 
-
 (defn one-smpl [])
 (defn equal-var [])
 
