@@ -58,6 +58,3 @@
 
 ;(defmethod confidence-interval Welch [this])
 ;(defmethod confidence-interval RepeatedMeasure [this])
-
-
-; 2.2621571627982 two tail (0.05 / 2)
