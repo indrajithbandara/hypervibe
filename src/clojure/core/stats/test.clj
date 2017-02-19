@@ -3,7 +3,7 @@
   (:import [clojure.stats.test OneSample EqualVariance Welch RepeatedMeasure]))
 (use 'criterium.core)
 
-(defn one-smpl
+(defn osmpl
 
   "OVERVIEW:
 
@@ -26,9 +26,9 @@
 
    INPUT:
 
-    1) {:smpl <list[num] | vector[num] | seq[num]> :h-mean <num>}
+    1) {:smpl <list[num] | vector[num] | seq[num]> :hmean <num>}
 
-    2) {:smpl <list[num] | vector[num] | seq[num]> :h-mean <num> :alpha <num>}
+    2) {:smpl <list[num] | vector[num] | seq[num]> :hmean <num> :alpha <num>}
 
     Possible alpha values:
 
@@ -37,26 +37,26 @@
    OUTPUT:
 
     {:smpl <list[num] | vector[num] | seq[num]>
-     :h-mean <num>
+     :hmean <num>
      :alpha <num>
      :t-stat <num>
      :dof <num>
-     :crtcl-value <num>
-     :smpl-mean <num>
-     :smpl-std-dev <num>
-     :smpl-size <num>}
+     :cval <num>
+     :smean <num>
+     :ssdev <num>
+     :ssize <num>}
 
    DETAIL:
 
     :smpl = sample data
-    :h-mean = hypothesized mean
+    :hmean = hypothesized mean
     :alpha = alpha value
-    :t-stat = test statistic
+    :tstat = test statistic
     :dof = degrees of freedom
-    :crtcl-value = critical value
-    :smpl-mean = sample mean
-    :smpl-std-dev =  sample standard deviation
-    :smpl-size = sample size
+    :cval = critical value
+    :smean = sample mean
+    :ssdev =  sample standard deviation
+    :ssize = sample size
 
    NOTE:
 
@@ -71,7 +71,7 @@
   [{smpl :smpl hmean :hmean alpha :alpha :or {alpha 0.05}}] (OneSample. smpl hmean alpha))
 
 
-(defn equal-var
+(defn evar
 
   "OVERVIEW:
 
@@ -96,9 +96,9 @@
 
     1) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>}
 
-    2) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :h-means <vec[num] | list[num] | seq[num]>}
+    2) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :hmeans <vec[num] | list[num] | seq[num]>}
 
-    3) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :h-means <vec[num] | list[num] | seq[num]> :alpha <num>}
+    3) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :hmeans <vec[num] | list[num] | seq[num]> :alpha <num>}
 
     Possible alpha values:
 
@@ -107,28 +107,28 @@
    OUTPUT:
 
     {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>
-     :h-means <list[num] | vector[num] | seq[num]>
+     :hmeans <list[num] | vector[num] | seq[num]>
      :alpha <num>
-     :t-stat <num>
+     :tstat <num>
      :dof <num>
      :crtcl-val <num>
-     :smpl-means <list[num] | vector[num] | seq[num]>
-     :pop-means <list[num] | vector[num] | seq[num]>
+     :smeans <list[num] | vector[num] | seq[num]>
+     :pmeans <list[num] | vector[num] | seq[num]>
      :pool-vars <list[num] | vector[num] | seq[num]>
-     :smpl-sizes <list[num] | vector[num] | seq[num]>}
+     :ssizes <list[num] | vector[num] | seq[num]>}
 
    DETAIL:
 
     :smpls = samples
-    :h-means = hypothesized means
+    :hmeans = hypothesized means
     :alpha = alpha value
-    :t-stat test statistic
+    :tstat test statistic
     :dof = degrees of freedom
     :crtcl-val = critical value
-    :smpl-means = sample means
-    :pop-means = population means
+    :smeans = sample means
+    :pmeans = population means
     :pool-vars = pooled variances
-    :smpl-sizes = sample sizes
+    :ssizes = sample sizes
 
    NOTE:
 
@@ -181,23 +181,23 @@
 
     {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>
      :alpha <num>
-     :t-stat <num>
+     :tstat <num>
      :dof <num>
      :crtcl-val <num>
-     :smpl-means <list[num] | vector[num] | seq[num]>
-     :smpl-vars <list[num] | vector[num] | seq[num]>
-     :smpl-sizes <list[num] | vector[num] | seq[num]>}
+     :smeans <list[num] | vector[num] | seq[num]>
+     :svars <list[num] | vector[num] | seq[num]>
+     :ssizes <list[num] | vector[num] | seq[num]>}
 
    DETAIL:
 
     :smpls = samples
     :alpha = alpha value
-    :t-stat = test statistic
+    :tstat = test statistic
     :dof = degrees of freedom
     :crtcl-val = critical value
-    :smpl-means = sample means
-    :smpl-vars = sample variances
-    :smpl-sizes = sample sizes
+    :smeans = sample means
+    :svars = sample variances
+    :ssizes = sample sizes
 
    NOTE:
 
@@ -210,7 +210,7 @@
   [{smpls :smpls alpha :alpha :or {alpha 0.05}}] (Welch. smpls alpha))
 
 
-(defn rep-msure
+(defn rmsure
 
   "OVERVIEW:
 
@@ -236,35 +236,35 @@
 
     1) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>}
 
-    2) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]> :h-means <vec[num] | list[num] | seq[num]>}
+    2) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]> :hmeans <vec[num] | list[num] | seq[num]>}
 
-    3) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]> :h-means <vec[num] | list[num] | seq[num]> :alpha <num>}
+    3) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]> :hmeans <vec[num] | list[num] | seq[num]> :alpha <num>}
 
    OUTPUT:
 
     {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>
-     :h-means <list[num] | vector[num] | seq[num]>
+     :hmeans <list[num] | vector[num] | seq[num]>
      :alpha <num>
-     :t-stat <num>
+     :tstat <num>
      :dof <num>
      :crtcl-val <num>
-     :pop-means <list[num] | vector[num] | seq[num]>
+     :pmeans <list[num] | vector[num] | seq[num]>
      :std-dev <num>
-     :smpl-size <num>
-     :diff-mean <num>}
+     :ssize <num>
+     :diff <num>}
 
    DETAIL:
 
     :smpls = samples
-    :h-means = hypothesized means
+    :hmeans = hypothesized means
     :alpha = alpha value
-    :t-stat = test statistic
+    :tstat = test statistic
     :dof = degrees of freedom
     :crtcl-val = critical value
-    :pop-means = population means
+    :pmeans = population means
     :std-dev = standard deviation
-    :smpl-size = sample size
-    :diff-mean = mean difference
+    :ssize = sample size
+    :diff = mean difference
 
    NOTE:
 

@@ -1,17 +1,17 @@
 
 (ns clojure.core.stats.estimate.confidence_interval
-  (:require [clojure.stats.estimate.confidence_interval :refer [confidence-interval]])
+  (:require [clojure.stats.estimate.confidence_interval :refer [cintvl]])
   (:import [clojure.stats.estimate.confidence_interval OneSample EqualVariance]))
 (use 'criterium.core)
 
-(defn one-smpl-conf-intvl
+(defn osc-intvl
   "TODO"
-  [{smpl :smpl crtcl-val :cval hmean :hmean}]
-  (confidence-interval (OneSample. smpl crtcl-val hmean)))
+  [{smpl :smpl cval :cval hmean :hmean}]
+  (cintvl (OneSample. smpl cval hmean)))
 
 
-(defn equal-var-conf-intvl
+(defn evc-intvl
   "TODO"
-  [{smpls :smpls crtcl-val :crtcl-val}]
-  (confidence-interval (EqualVariance. smpls crtcl-val)))
+  [{smpls :smpls cval :cval}]
+  (cintvl (EqualVariance. smpls cval)))
 

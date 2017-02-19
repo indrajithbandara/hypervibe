@@ -6,7 +6,7 @@
 
 (defn ^double mean-1 [data] (/ (r/fold + data) (dec (count data))))
 
-(defn ^doubles difference [[sample-one sample-two]] (map - sample-one sample-two))
+(defn ^doubles diff [[sample-one sample-two]] (map - sample-one sample-two))
 
 (defn permutations
   [x xs]
@@ -64,7 +64,7 @@
                      (first ks)
                      (cond (= (second ks) :string)
                            (first vs)
-                           (=  (second ks) :integer)
+                           (= (second ks) :integer)
                            (Integer/parseInt (first vs))
                            (= (second ks) :long)
                            (Long/parseLong (first vs))
@@ -77,12 +77,12 @@
              (next vs)) (persistent! map))))
 
 
-(defn smpl-std-dev [data mean]
+(defn ssdev [data mean]
   "Computes the sample standard deviation"
   (Math/sqrt (mean-1 (map #(* (- mean %)
                               (- mean %)) data))))
 
-(defn pop-std-dev [data mean]
+(defn ps-dev [data mean]
   "Computes the population standard deviation"
   (Math/sqrt (mean (map #(* (- mean %) (- mean %)) data))))
 
@@ -93,69 +93,69 @@
      (count data)))
 
 
-(defn smpl-var [data mean]
+(defn svar [data mean]
   "Computes the sample variance"
   (/ (reduce + (map #(* (- % mean) (- % mean)) data))
      (dec (count data))))
 
 
-(defn pool-var [data mean size-minus-one]
+(defn pvar [data mean size-minus-one]
   "Computes the pooled variance"
   (/ (* size-minus-one
         (/ (reduce + (map #(* (- % mean) (- % mean)) data))
            size-minus-one)) size-minus-one))
 
 
-(defn rej-null?
-  [t-stat crtcl-val]
-  (> (Math/abs t-stat) crtcl-val))
+(defn rnull?
+  [tstat cval]
+  (> (Math/abs tstat) cval))
 
 
-(defn one-smpl-tstat
-  [smpl-mean hmean smpl-std-dev smpl-size]
+(defn oststat
+  [smpl-mean hmean ssdev smpl-size]
   (/ (- smpl-mean (.hmean hmean))
-     (/ smpl-std-dev (Math/sqrt smpl-size))))
+     (/ ssdev (Math/sqrt smpl-size))))
 
 
 (defn equal-var-tstat
-  [smpl-mean-one smpl-mean-two pop-mean-one
-   pop-mean-two pool-var-one pool-var-two
+  [smpl-mean-one smpl-mean-two pmean-one
+   pmean-two pool-var-one pool-var-two
    smpl-size-one smpl-size-two]
   (/ (- (- smpl-mean-one smpl-mean-two)
-        (- pop-mean-one pop-mean-two))
+        (- pmean-one pmean-two))
      (Math/sqrt (* (/ (+ pool-var-one pool-var-two) 2)
                    (+ (/ 1 smpl-size-one)
                       (/ 1 smpl-size-two))))))
 
 
 (defn welch-dof
-  [smpl-var-one smpl-var-two smpl-size-one
+  [svar-one svar-two smpl-size-one
    smpl-size-two]
-  (/ (* (+ (/ smpl-var-one smpl-size-one)
-           (/ smpl-var-two smpl-size-two))
-        (+ (/ smpl-var-one smpl-size-one)
-           (/ smpl-var-two smpl-size-two)))
-     (+ (/ (* (/ smpl-var-one smpl-size-one)
-              (/ smpl-var-one smpl-size-one))
+  (/ (* (+ (/ svar-one smpl-size-one)
+           (/ svar-two smpl-size-two))
+        (+ (/ svar-one smpl-size-one)
+           (/ svar-two smpl-size-two)))
+     (+ (/ (* (/ svar-one smpl-size-one)
+              (/ svar-one smpl-size-one))
            (- smpl-size-one 1))
-        (/ (* (/ smpl-var-two smpl-size-two)
-              (/ smpl-var-two smpl-size-two))
+        (/ (* (/ svar-two smpl-size-two)
+              (/ svar-two smpl-size-two))
            (- smpl-size-two 1)))))
 
 
 (defn welch-tstat
-  [mean-one mean-two smpl-var-one
-   smpl-var-two smpl-size-one smpl-size-two]
+  [mean-one mean-two svar-one
+   svar-two smpl-size-one smpl-size-two]
   (/ (- mean-one mean-two)
-     (Math/sqrt (+ (/ smpl-var-one smpl-size-one)
-                   (/ smpl-var-two smpl-size-two)))))
+     (Math/sqrt (+ (/ svar-one smpl-size-one)
+                   (/ svar-two smpl-size-two)))))
 
 
-(defn rep-msure-tstat
-  [diff-mean pop-mean-one pop-mean-two
-   std-dev smpl-size]
+(defn rmsure-tstat
+  [diff-mean pmean-one pmean-two
+   sdev smpl-size]
   (/ (- diff-mean
-        (- pop-mean-one pop-mean-two))
-     (/ std-dev
+        (- pmean-one pmean-two))
+     (/ sdev
         (Math/sqrt smpl-size))))
 

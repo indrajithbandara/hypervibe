@@ -1,7 +1,7 @@
 (ns clojure.stats.test
-  (:require [clojure.stats.utils :refer [mean difference rej-null? smpl-std-dev
-                                         smpl-var pool-var one-smpl-tstat
-                                         equal-var-tstat welch-tstat rep-msure-tstat
+  (:require [clojure.stats.utils :refer [mean diff rnull? ssdev
+                                         svar pvar oststat
+                                         equal-var-tstat welch-tstat rmsure-tstat
                                          welch-dof]]
             [clojure.stats.distribution.t.table :refer [t-dist crtcl-val]]))
 (use 'clojure.core.matrix)
@@ -19,141 +19,141 @@
 (defn one-sample
   [smpl hmean tstat
    dof alpha cval
-   rej-null? diff smpl-mean
-   smpl-std-dev smpl-size]
+   rnull? diff smean
+   ssdev ssize]
   ^{:type ::OneSample}
-  {:smpl         smpl
-   :hmean        hmean
-   :tstat        tstat
-   :dof          dof
-   :alpha        alpha
-   :cval    cval
-   :rej-null?    rej-null?
-   :diff         diff
-   :smpl-mean    smpl-mean
-   :smpl-std-dev smpl-std-dev
-   :smpl-size    smpl-size})
+  {:smpl   smpl
+   :hmean  hmean
+   :tstat  tstat
+   :dof    dof
+   :alpha  alpha
+   :cval   cval
+   :rnull? rnull?
+   :diff   diff
+   :smean  smean
+   :ssdev  ssdev
+   :ssize  ssize})
 
 
 (defn equal-variance
   [smpls hmeans tstat
    dof alpha cval
-   rej-null? diff smpl-means
-   pop-means pool-vars smpl-sizes]
+   rnull? diff smeans
+   pmeans pool-vars ssizes]
   ^{:type ::EqualVariance}
-  {:smpls      smpls
-   :hmeans     hmeans
-   :tstat      tstat
-   :dof        dof
-   :alpha      alpha
-   :cval  cval
-   :rej-null?  rej-null?
-   :diff       diff
-   :smpl-means smpl-means
-   :pop-means  pop-means
-   :pool-vars  pool-vars
-   :smpl-sizes smpl-sizes})
+  {:smpls     smpls
+   :hmeans    hmeans
+   :tstat     tstat
+   :dof       dof
+   :alpha     alpha
+   :cval      cval
+   :rnull?    rnull?
+   :diff      diff
+   :smeans    smeans
+   :pmeans    pmeans
+   :pool-vars pool-vars
+   :ssizes    ssizes})
 
 
 (defn welch
   [smpls tstat dof
-   alpha cval rej-null?
-   diff smpl-means smpl-vars
-   smpl-sizes]
+   alpha cval rnull?
+   diff smeans svars
+   ssizes]
   ^{:type ::Welch}
-  {:smpls      smpls
-   :tstat      tstat
-   :dof        dof
-   :alpha      alpha
-   :cval  cval
-   :rej-null?  rej-null?
-   :diff       diff
-   :smpl-means smpl-means
-   :smpl-vars  smpl-vars
-   :smpl-sizes smpl-sizes})
+  {:smpls  smpls
+   :tstat  tstat
+   :dof    dof
+   :alpha  alpha
+   :cval   cval
+   :rnull? rnull?
+   :diff   diff
+   :smeans smeans
+   :svars  svars
+   :ssizes ssizes})
 
-(defn rep-msure
+(defn rmsure
   [smpls hmeans tstat
    dof alpha cval
-   rej-null? pop-means
-   std-dev smpl-size
+   rnull? pmeans
+   sdev ssize
    diff-mean]
   ^{:type ::RepeatedMeasure}
-  {:smpls smpls
-   :hmeans hmeans
-   :tstat tstat
-   :dof dof
-   :alpha alpha
-   :cval cval
-   :rej-null? rej-null?
-   :pop-means pop-means
-   :std-dev std-dev
-   :smpl-size smpl-size
+  {:smpls     smpls
+   :hmeans    hmeans
+   :tstat     tstat
+   :dof       dof
+   :alpha     alpha
+   :cval      cval
+   :rnull?    rnull?
+   :pmeans    pmeans
+   :sdev      sdev
+   :ssize     ssize
    :diff-mean diff-mean})
 
 
 (defn- pone-sample [this]
   (pvalues (mean (.smpl this))
-           (smpl-std-dev (.smpl this) (mean (.smpl this)))
+           (ssdev (.smpl this) (mean (.smpl this)))
            (count (.smpl this))))
 
 (defmethod ttest OneSample [this]
   (let [[smean ssdev ssize] (pone-sample this)
-         cval (crtcl-val t-dist (dec ssize) (.alpha this))
-         tstat (one-smpl-tstat smean this ssdev ssize)]
+        cval (crtcl-val t-dist (dec ssize) (.alpha this))
+        tstat (oststat smean this ssdev ssize)]
     (one-sample (.smpl this) (.hmean this) tstat
                 (dec ssize) (.alpha this) cval
-                (rej-null? tstat cval) (- tstat cval) smean
-                 ssdev ssize)))
+                (rnull? tstat cval) (- tstat cval) smean
+                ssdev ssize)))
 
 
 (defn- pequal-var [this]
   (pvalues (map mean (.smpls this))
            (map mean (partition 1 (.hmeans this)))
-           (map #(pool-var % (mean %) (dec (count %))) (.smpls this))
+           (map #(pvar % (mean %) (dec (count %))) (.smpls this))
            (map count (.smpls this))))
 
 (defmethod ttest EqualVariance [this]
   (let [[[smone smtwo] [pmone pmtwo] [pvone pvtwo]
          [ssone sstwo]] (pequal-var this)
-          cval (crtcl-val t-dist (- (+ ssone sstwo) 2) (.alpha this))
-          tstat (equal-var-tstat smone smtwo pmone pmtwo pvone pvtwo ssone sstwo)]
+        cval (crtcl-val t-dist (- (+ ssone sstwo) 2) (.alpha this))
+        tstat (equal-var-tstat smone smtwo pmone pmtwo pvone pvtwo ssone sstwo)]
     (equal-variance (.smpls this) (.hmeans this) tstat
                     (- (+ ssone sstwo) 2) (.alpha this) cval
-                    (rej-null? tstat cval) (- tstat cval) [smone smtwo]
+                    (rnull? tstat cval) (- tstat cval) [smone smtwo]
                     [pmone pmtwo] [pvone pvtwo] [ssone sstwo])))
 
 
 (defn- pwelch [this]
   (pvalues (map mean (.smpls this))
-           (map #(smpl-var % (mean %)) (.smpls this))
+           (map #(svar % (mean %)) (.smpls this))
            (map count (.smpls this))))
 
 (defmethod ttest Welch [this]
   (let [[[mone mtwo] [svone svtwo] [ssone sstwo]] (pwelch this)
-          dof (welch-dof svone svtwo ssone sstwo)
-          cval (crtcl-val t-dist (Math/round dof) (.alpha this))
-          tstat (welch-tstat mone mtwo svone svtwo ssone sstwo)]
+        dof (welch-dof svone svtwo ssone sstwo)
+        cval (crtcl-val t-dist (Math/round dof) (.alpha this))
+        tstat (welch-tstat mone mtwo svone svtwo ssone sstwo)]
     (welch (.smpls this) tstat dof
-           (.alpha this) cval (rej-null? tstat cval)
+           (.alpha this) cval (rnull? tstat cval)
            (- tstat cval) [mone mtwo] [svone svtwo]
            [ssone sstwo])))
 
 
-(defn- prep-msure [this]
-  (pvalues (mean (difference (.smpls this)))
+(defn- prmsure [this]
+  (pvalues (mean (diff (.smpls this)))
            (map mean (partition 1 (.hmeans this)))
-           (smpl-std-dev (difference (.smpls this)) (mean (difference (.smpls this))))
+           (ssdev (diff (.smpls this)) (mean (diff (.smpls this))))
            (/ (+ (count (first (.smpls this))) (count (second (.smpls this)))) 2)))
 
 (defmethod ttest RepeatedMeasure [this]
-  (let [[diff-mean [pmone pmtwo] std-dev smpl-size] (prep-msure this)
-         cval (crtcl-val t-dist (dec smpl-size) (.alpha this))
-         tstat (rep-msure-tstat diff-mean pmone pmtwo std-dev smpl-size)]
-    (rep-msure (.smpls this) (.hmeans this) tstat
-               (dec smpl-size) (.alpha this) cval
-               (rej-null? tstat cval) [pmone pmtwo] std-dev
-                smpl-size diff-mean)))
+  (let [[diff-mean [pmone pmtwo] sdev ssize] (prmsure this)
+        cval (crtcl-val t-dist (dec ssize) (.alpha this))
+        tstat (rmsure-tstat diff-mean pmone pmtwo sdev ssize)]
+    (rmsure (.smpls this) (.hmeans this) tstat
+            (dec ssize) (.alpha this) cval
+            (rnull? tstat cval) [pmone pmtwo] sdev
+            ssize diff-mean)))
 
 
 
