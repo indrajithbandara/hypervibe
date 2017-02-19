@@ -12,9 +12,7 @@
 (deftype RepeatedMeasure [smpls hmeans alpha])
 (deftype Median [smpls hmeans alpha])
 
-
 (defmulti ttest class)
-
 
 (defn one-sample
   [smpl hmean tstat
@@ -93,6 +91,8 @@
 
 
 (defn- pone-sample [this]
+  {:doc "Parallel one sample t-test xform"
+   :arglists '([ttest])}
   (pvalues (mean (.smpl this))
            (ssdev (.smpl this) (mean (.smpl this)))
            (count (.smpl this))))
@@ -108,6 +108,8 @@
 
 
 (defn- pequal-var [this]
+  {:doc "Parallel equal variance t-test xform"
+   :arglists '([ttest])}
   (pvalues (map mean (.smpls this))
            (map mean (partition 1 (.hmeans this)))
            (map #(pvar % (mean %) (dec (count %))) (.smpls this))
@@ -125,6 +127,8 @@
 
 
 (defn- pwelch [this]
+  {:doc "Parallel welch t-test xform"
+   :arglists '([ttest])}
   (pvalues (map mean (.smpls this))
            (map #(svar % (mean %)) (.smpls this))
            (map count (.smpls this))))
@@ -141,6 +145,8 @@
 
 
 (defn- prmsure [this]
+  {:doc "Parallel repeated measure t-test xform"
+   :arglists '([ttest])}
   (pvalues (mean (diff (.smpls this)))
            (map mean (partition 1 (.hmeans this)))
            (ssdev (diff (.smpls this)) (mean (diff (.smpls this))))
@@ -156,11 +162,7 @@
             ssize diff-mean)))
 
 
-
 (defn chi-square
-  "Assumes in to be in the form
-  [[x1 observed, x1 expected] [x2 observed, x2 expected]].
-   The Chi-square test computes the sum of the squares of the differences in values"
   [values]
   (reduce + 0 (map (fn [[observed expected]]
                      (double (/ (Math/pow (- observed expected) 2) expected))) values)))
