@@ -1,14 +1,11 @@
 (ns clojure.core-test
   (:require [clojure.test :refer :all]
             [clojure.stats.samples :refer :all]
-            [clojure.dataset :refer [data-frame]]
-            [clojure.extract :refer [file-lines]]
             [clojure.stats.utils :refer [zip]]
             [clojure.stats.test :refer [ttest]]
             [clojure.core.stats.test :refer [osmpl evar welch rmsure]]
-            [clojure.core.stats.estimate.confidence_interval :refer [osc-intvl evc-intvl]]))
+            [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]))
 
-;TODO change docs to add hmean, null-rej etc
 ;TODO research more into what constitutes to a rejected null hypothesis
 ;TODO add alternative hypothesis
 ;TODO put helper functions into utils name space
@@ -88,7 +85,6 @@
 (deftest one-sample-conf-inter-test
   (is (= (osc-intvl {:smpl population-one :cval 1.83311293265624 :hmean 400})
          {:upper 216.71146925144888,
-          :type  :ConfidenceInterval,
           :cval  1.83311293265624,
           :hmean 400,
           :ssize 10,
@@ -107,14 +103,12 @@
           :ssizes [10 85.19],
           :cval   2.1009,
           :upper  8.05675922207777,
-          :lower  -2.536759222077789
-          :type   :ConfidenceInterval})))
+          :lower  -2.536759222077789})))
 
 
 (deftest compose-one-sample-ttest-confidence-interval
   (is (= ((comp osc-intvl) (ttest (osmpl {:smpl population-one :hmean 400})))
          {:upper 216.71146925144888,
-          :type  :ConfidenceInterval,
           :cval  1.83311293265624,
           :hmean 400,
           :ssize 10,
@@ -123,29 +117,6 @@
           :lower 141.28853074855112,
           :ssdev 65.05553183413554,
           :smpl  [490 500 530 550 580 590 600 600 650 700]})))
-
-#_(def dataset "/Users/adebesing/Dropbox/Workspace/clojure-stats/resources/datasets/adult/adult.data")
-
-
-#_(data-frame {:column-names [:age :department :salary
-                              :degree :study-time :marital-status
-                              :job :family-status :race
-                              :gender :n1 :n2 :n3 :country :salary-range]
-               :delimiter    ","
-               :file-path    dataset
-               :type         :csv/read
-               :return       '()})
-
-#_(data-frame {:column-names [:age :department :salary
-                              :degree :study-time :marital-status
-                              :job :family-status :race
-                              :gender :n1 :n2 :n3 :country :salary-range]
-               :delimiter    ","
-               :file-path    dataset
-               :type         :csv/read
-               :xform        (comp clojure.string/upper-case
-                                   #(clojure.string/replace % #" " ""))
-               :return       []})
 
 ;NOTES
 ;http://www.ats.ucla.edu/stat/mult_pkg/whatstat/choosestat.html

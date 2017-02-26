@@ -14,7 +14,7 @@
 
 (defmulti ttest class)
 
-(defn one-sample
+(defn one-sample-ttest
   [smpl hmean tstat
    dof alpha cval
    rnull? diff smean
@@ -33,7 +33,7 @@
    :ssize  ssize})
 
 
-(defn equal-variance
+(defn equal-var-ttest
   [smpls hmeans tstat
    dof alpha cval
    rnull? diff smeans
@@ -53,7 +53,7 @@
    :ssizes    ssizes})
 
 
-(defn welch
+(defn welch-ttest
   [smpls tstat dof
    alpha cval rnull?
    diff smeans svars
@@ -70,7 +70,7 @@
    :svars  svars
    :ssizes ssizes})
 
-(defn rmsure
+(defn rmsure-ttest
   [smpls hmeans tstat
    dof alpha cval
    rnull? pmeans
@@ -101,10 +101,10 @@
   (let [[smean ssdev ssize] (pone-sample this)
         cval (crtcl-val t-dist (dec ssize) (.alpha this))
         tstat (oststat smean this ssdev ssize)]
-    (one-sample (.smpl this) (.hmean this) tstat
-                (dec ssize) (.alpha this) cval
-                (rnull? tstat cval) (- tstat cval) smean
-                ssdev ssize)))
+    (one-sample-ttest (.smpl this) (.hmean this) tstat
+                      (dec ssize) (.alpha this) cval
+                      (rnull? tstat cval) (- tstat cval) smean
+                      ssdev ssize)))
 
 
 (defn- pequal-var [this]
@@ -120,10 +120,10 @@
          [ssone sstwo]] (pequal-var this)
         cval (crtcl-val t-dist (- (+ ssone sstwo) 2) (.alpha this))
         tstat (equal-var-tstat smone smtwo pmone pmtwo pvone pvtwo ssone sstwo)]
-    (equal-variance (.smpls this) (.hmeans this) tstat
-                    (- (+ ssone sstwo) 2) (.alpha this) cval
-                    (rnull? tstat cval) (- tstat cval) [smone smtwo]
-                    [pmone pmtwo] [pvone pvtwo] [ssone sstwo])))
+    (equal-var-ttest (.smpls this) (.hmeans this) tstat
+                     (- (+ ssone sstwo) 2) (.alpha this) cval
+                     (rnull? tstat cval) (- tstat cval) [smone smtwo]
+                     [pmone pmtwo] [pvone pvtwo] [ssone sstwo])))
 
 
 (defn- pwelch [this]
@@ -138,10 +138,9 @@
         dof (welch-dof svone svtwo ssone sstwo)
         cval (crtcl-val t-dist (Math/round dof) (.alpha this))
         tstat (welch-tstat mone mtwo svone svtwo ssone sstwo)]
-    (welch (.smpls this) tstat dof
-           (.alpha this) cval (rnull? tstat cval)
-           (- tstat cval) [mone mtwo] [svone svtwo]
-           [ssone sstwo])))
+    (welch-ttest (.smpls this) tstat dof
+                 (.alpha this) cval (rnull? tstat cval)
+                 (- tstat cval) [mone mtwo] [svone svtwo] [ssone sstwo])))
 
 
 (defn- prmsure [this]
@@ -156,10 +155,9 @@
   (let [[diff-mean [pmone pmtwo] sdev ssize] (prmsure this)
         cval (crtcl-val t-dist (dec ssize) (.alpha this))
         tstat (rmsure-tstat diff-mean pmone pmtwo sdev ssize)]
-    (rmsure (.smpls this) (.hmeans this) tstat
-            (dec ssize) (.alpha this) cval
-            (rnull? tstat cval) [pmone pmtwo] sdev
-            ssize diff-mean)))
+    (rmsure-ttest (.smpls this) (.hmeans this) tstat
+                  (dec ssize) (.alpha this) cval
+                  (rnull? tstat cval) [pmone pmtwo] sdev ssize diff-mean)))
 
 
 (defn chi-square

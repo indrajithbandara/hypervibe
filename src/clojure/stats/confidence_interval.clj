@@ -1,0 +1,71 @@
+(ns clojure.stats.confidence_interval
+  (:require [clojure.stats.utils :refer [mean diff ssdev svar pvar]]))
+
+(deftype OneSample [smpl cval hmean])
+(deftype EqualVariance [smpls cval])
+
+(defmulti cintvl class)
+
+(defn one-smpl-conf-int
+  [smpl cval hmean
+   ssdev smean ssize
+   mdiff upper lower]
+  ^{:type :OneSample}
+  {:smpl  smpl
+   :cval  cval
+   :hmean hmean
+   :ssdev ssdev
+   :smean smean
+   :ssize ssize
+   :mdiff mdiff
+   :upper upper
+   :lower lower})
+
+(defn two-smpl-conf-int
+  [smpls svars smeans
+   ssizes cval upper lower]
+  ^{:type :EqualVariance}
+  {:smpls  smpls
+   :svars  svars
+   :smeans smeans
+   :ssizes ssizes
+   :cval   cval
+   :upper  upper
+   :lower  lower})
+
+
+(defn equal-var [])
+
+(defn- posmpl [this]
+  (pvalues (mean (.smpl this))
+           (ssdev (.smpl this) (mean (.smpl this)))
+           (count (.smpl this))))
+
+(defmethod cintvl OneSample [this]
+  (let [[smean ssdev ssize] (posmpl this)
+         mdiff (- smean (.hmean this))]
+    (one-smpl-conf-int (.smpl this) (.cval this) (.hmean this)
+                        ssdev smean ssize
+                        mdiff (+ mdiff (* (.cval this)
+                                          (/ ssdev (Math/sqrt ssize))))
+                       (- mdiff (* (.cval this)
+                                   (/ ssdev (Math/sqrt ssize)))))))
+
+(defn- ptsmpl [this]
+  (pvalues (map mean (.smpls this))
+           (map #(svar % (mean %)) (.smpls this))
+           (map count (.smpls this))))
+
+(defmethod cintvl EqualVariance [this]
+  (let [[[smean-one smean-two] [svar-one svar-two] [ssize-one ssize-two]] (ptsmpl this)]
+    (two-smpl-conf-int (.smpls this) [svar-one svar-two] [smean-one smean-two]
+                       [ssize-one smean-two] (.cval this) (+ (- smean-one smean-two)
+                                                             (* (.cval this)
+                                                                (Math/sqrt (+ (/ svar-one ssize-one)
+                                                                              (/ svar-two ssize-two)))))
+                       (- (- smean-one smean-two)
+                          (* (.cval this) (Math/sqrt (+ (/ svar-one ssize-one) (/ svar-two ssize-two))))))))
+
+
+;(defmethod cintvl Welch [this])
+;(defmethod cintvl RepeatedMeasure [this])

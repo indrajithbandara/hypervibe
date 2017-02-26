@@ -1,7 +1,7 @@
 
-(ns clojure.core.stats.estimate.confidence_interval
-  (:require [clojure.stats.estimate.confidence_interval :refer [cintvl]])
-  (:import [clojure.stats.estimate.confidence_interval OneSample EqualVariance]))
+(ns clojure.core.stats.confidence_interval
+  (:require [clojure.stats.confidence_interval :refer [cintvl]])
+  (:import [clojure.stats.confidence_interval OneSample EqualVariance]))
 (use 'criterium.core)
 
 (defn osc-intvl

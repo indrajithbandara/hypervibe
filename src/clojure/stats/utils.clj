@@ -14,13 +14,15 @@
   [data]
   (/ (r/fold + data) (dec (count data))))
 
-(defn ^doubles diff [[sample-one sample-two]] (map - sample-one sample-two))
+(defn ^doubles diff
+  {:doc "Calculates mean difference"
+   :arglists '([data mean])}
+  [[sample-one sample-two]] (map - sample-one sample-two))
 
 (defn ssdev [data mean]
   {:doc  "Calculates sample standard deviation"
    :arglists '([data mean])}
-  (Math/sqrt (mean-1 (map #(* (- mean %)
-                              (- mean %)) data))))
+  (Math/sqrt (mean-1 (map #(* (- mean %) (- mean %)) data))))
 
 (defn ^double ps-dev
   {:doc "Calculates population standard deviation"

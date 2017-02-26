@@ -26,9 +26,9 @@
 
    INPUT:
 
-    1) {:smpl <list[num] | vector[num] | seq[num]> :hmean <num>}
+    1) {:smpl <list | vec> :hmean <num>}
 
-    2) {:smpl <list[num] | vector[num] | seq[num]> :hmean <num> :alpha <num>}
+    2) {:smpl <list | vec> :hmean <num> :alpha <num>}
 
     Possible alpha values:
 
@@ -36,7 +36,7 @@
 
    OUTPUT:
 
-    {:smpl <list[num] | vector[num] | seq[num]>
+    {:smpl <list | vec>
      :hmean <num>
      :alpha <num>
      :t-stat <num>
@@ -94,11 +94,11 @@
 
    INPUT:
 
-    1) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>}
+    1) {:smpls<list | vec>}
 
-    2) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :hmeans <vec[num] | list[num] | seq[num]>}
+    2) {:smpls <list | vec> :hmeans <list | vec>}
 
-    3) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :hmeans <vec[num] | list[num] | seq[num]> :alpha <num>}
+    3) {:smpls <list | vec> :hmeans <list | vec> :alpha <num>}
 
     Possible alpha values:
 
@@ -106,16 +106,16 @@
 
    OUTPUT:
 
-    {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>
-     :hmeans <list[num] | vector[num] | seq[num]>
+    {:smpls <list | vec>
+     :hmeans <list | vec>
      :alpha <num>
      :tstat <num>
      :dof <num>
      :crtcl-val <num>
-     :smeans <list[num] | vector[num] | seq[num]>
-     :pmeans <list[num] | vector[num] | seq[num]>
-     :pool-vars <list[num] | vector[num] | seq[num]>
-     :ssizes <list[num] | vector[num] | seq[num]>}
+     :smeans <list | vec>
+     :pmeans <list | vec>
+     :pool-vars <list | vec>
+     :ssizes <list | vec>}
 
    DETAIL:
 
@@ -169,9 +169,9 @@
 
    INPUT:
 
-    1) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>}
+    1) {:smpls <list | vec>}
 
-    2) {:smpls <list[list[num]] | vector[vector[num]] | seq[seq[num]]> :alpha <num>}
+    2) {:smpls <list | vec>}
 
     Possible alpha values:
 
@@ -179,14 +179,14 @@
 
    OUTPUT:
 
-    {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>
+    {:smpls <list | vec>
      :alpha <num>
      :tstat <num>
      :dof <num>
      :crtcl-val <num>
-     :smeans <list[num] | vector[num] | seq[num]>
-     :svars <list[num] | vector[num] | seq[num]>
-     :ssizes <list[num] | vector[num] | seq[num]>}
+     :smeans <list | vec>
+     :svars <list | vec>
+     :ssizes <list | vec>}
 
    DETAIL:
 
@@ -234,21 +234,21 @@
 
    INPUT:
 
-    1) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>}
+    1) {:smpls <list | vec>}
 
-    2) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]> :hmeans <vec[num] | list[num] | seq[num]>}
+    2) {:smpls <list | vec> :hmeans <list | vec>}
 
-    3) {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]> :hmeans <vec[num] | list[num] | seq[num]> :alpha <num>}
+    3) {:smpls <list | vec> :hmeans <list | vec> :alpha <num>}
 
    OUTPUT:
 
-    {:smpls <list[list[num]] | vector[vector[num] | seq[seq[num]]>
-     :hmeans <list[num] | vector[num] | seq[num]>
+    {:smpls <list | vec>
+     :hmeans <list | vec>
      :alpha <num>
      :tstat <num>
      :dof <num>
      :crtcl-val <num>
-     :pmeans <list[num] | vector[num] | seq[num]>
+     :pmeans <list | vec>
      :std-dev <num>
      :ssize <num>
      :diff <num>}
