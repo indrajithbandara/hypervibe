@@ -8,4 +8,6 @@
                  [com.google.guava/guava "19.0"]
                  [net.mikera/core.matrix "0.51.0"]
                  [uncomplicate/fluokitten "0.5.0"]]
-  :repl-options {:init (set! *print-length* 100)})
+  :repl-options {:init (set! *print-length* 100)}
+  :source-paths ["src/clojure"]
+  :java-source-paths ["src/java"])

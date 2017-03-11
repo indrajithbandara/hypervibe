@@ -6,10 +6,11 @@
             [clojure.core.stats.test :refer [osmpl evar welch rmsure]]
             [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]))
 
+;TODO create own collection in java that uses primitives + create xform functions in java eg mean etc
+;TODO confidence interval for welch and repeated measure ttest
 ;TODO research more into what constitutes to a rejected null hypothesis
 ;TODO add alternative hypothesis
 ;TODO put helper functions into utils name space
-;TODO confidence interval for welch and repeated measure ttest
 ;TODO update docs to add null hypothesis result
 ;TODO create function that outputs test result
 ;TODO using math.round will solve problem of dof for welch ttest
