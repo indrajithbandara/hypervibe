@@ -30,14 +30,12 @@
   [data mean]
   (Math/sqrt (mean (map #(* (- mean %) (- mean %)) data))))
 
-
 (defn ^double pop-var
   {:doc "Calculates population variance"
    :arglists '([data mean])}
   [data mean]
   (/ (reduce + (map #(* (- % mean) (- % mean)) data))
      (count data)))
-
 
 (defn ^double svar
   {:doc "Calculates sample variance"
@@ -46,13 +44,11 @@
   (/ (reduce + (map #(* (- % mean) (- % mean)) data))
      (dec (count data))))
 
-
 (defn ^double pvar
   {:doc "Calculates pooled variance"
    :arglists '([data mean size-1])}
   [data mean size-1]
   (/ (* size-1 (/ (reduce + (map #(* (- % mean) (- % mean)) data)) size-1)) size-1))
-
 
 (defn rnull?
   {:doc "Checks whether to reject
@@ -61,7 +57,6 @@
   [tstat cval]
   (> (Math/abs tstat) cval))
 
-
 (defn oststat
   {:doc "Calculates one sample test
          statistic"
@@ -69,7 +64,6 @@
   [smpl-mean hmean ssdev ssize]
   (/ (- smpl-mean (.hmean hmean))
      (/ ssdev (Math/sqrt ssize))))
-
 
 (defn equal-var-tstat
   {:doc "Calculates equal variance test
@@ -85,7 +79,6 @@
      (Math/sqrt (* (/ (+ pv-one pool-var-two) 2)
                    (+ (/ 1 ssize-one)
                       (/ 1 ssize-two))))))
-
 
 (defn welch-dof
   {:doc "Calculates Welch's degrees of
@@ -104,7 +97,6 @@
               (/ svar-two ssize-two))
            (- ssize-two 1)))))
 
-
 (defn welch-tstat
   {:doc "Calculates Welch's test
          statistic"
@@ -115,7 +107,6 @@
   (/ (- mean-one mean-two)
      (Math/sqrt (+ (/ svar-one ssize-one)
                    (/ svar-two ssize-two)))))
-
 
 (defn rmsure-tstat
   {:doc "Calculates repeated measure test

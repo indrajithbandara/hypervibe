@@ -6,7 +6,7 @@
             [clojure.core.stats.test :refer [osmpl evar welch rmsure]]
             [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]))
 
-;TODO create own collection in java that uses primitives + create xform functions in java eg mean etc
+;TODO change all input vextors to mikera matrix / vector.. also look at hip hip array
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO research more into what constitutes to a rejected null hypothesis
 ;TODO add alternative hypothesis
