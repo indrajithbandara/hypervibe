@@ -129,7 +129,7 @@
     :pmeans = population means
     :pool-vars = pooled variances
     :ssizes = sample sizes
-
+  
    NOTE:
 
     - Alpha value defaults to 0.05 unless explicitly defined

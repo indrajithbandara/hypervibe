@@ -4,9 +4,12 @@
             [clojure.stats.utils :refer [zip]]
             [clojure.stats.test :refer [ttest]]
             [clojure.core.stats.test :refer [osmpl evar welch rmsure]]
-            [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]))
+            [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]
+            [criterium.core :as cri]))
 
-;TODO change all input vextors to mikera matrix / vector.. also look at hip hip array
+;TODO look into allowing large numbers for gamma
+;TODO Create function for students probability density functione to replace "t-dist" at it throws index out of bounds on large seq's
+;TODO change all input vextors to mikera matrix / vector.. also look at hip hip array (set reflection so i can manage boxing and unboxing using *, - look at Vectorz lib for core.matrix)
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO research more into what constitutes to a rejected null hypothesis
 ;TODO add alternative hypothesis
@@ -118,6 +121,14 @@
           :lower 141.28853074855112,
           :ssdev 65.05553183413554,
           :smpl  [490 500 530 550 580 590 600 600 650 700]})))
+
+(def dummy1 (range 1000000))
+
+;(cri/with-progress-reporting
+;  (cri/bench
+;    (ttest (osmpl {:smpl dummy1 :hmean 400}))))
+
+;(ttest (osmpl {:smpl dummy1 :hmean 400}))
 
 ;NOTES
 ;http://www.ats.ucla.edu/stat/mult_pkg/whatstat/choosestat.html
