@@ -9,5 +9,3 @@
                  [net.mikera/vectorz-clj "0.46.0"]]
   :repl-options {:init (set! *print-length* 100)}
   :java-source-paths ["src/stats/java"])
-
-

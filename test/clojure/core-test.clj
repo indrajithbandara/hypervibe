@@ -6,7 +6,13 @@
             [clojure.core.stats.test :refer [osmpl evar welch rmsure]]
             [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]
             [criterium.core :as cri]))
+; pt <- c(0.40, 0.30, 0.20, 0.15, 0.10, 0.05, 0.025, 0.02, 0.015, 0.01, 0.0075, 0.005, 0.0025, 0.0005)
+; s <- seq(1,1000000)
+;foo <- qt(pt, s)
 
+;TODO add approximate degrees of freedom for any + 1000 eg 1000, 20000 50000 10000 500000 1000000 th dof
+;TODO put each percentiles vector of p values in multi method that dispatches on percentile then index will be dof.. look into caching result?
+;TODO instead of below try precomputing the t distribution and jaring and importing (will be large)
 ;TODO look into allowing large numbers for gamma
 ;TODO Create function for students probability density functione to replace "t-dist" at it throws index out of bounds on large seq's
 ;TODO change all input vextors to mikera matrix / vector.. also look at hip hip array (set reflection so i can manage boxing and unboxing using *, - look at Vectorz lib for core.matrix)
