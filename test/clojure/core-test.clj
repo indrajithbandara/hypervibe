@@ -30,6 +30,7 @@
 ;TODO reference here for different distrubutions http://www.itl.nist.gov/div898/handbook/eda/section3/eda367.htm
 ;TODO Levene's Test for Equality of Variances
 ;TODO start implementing chart api
+;TODO compile all distrubution tables into seperate jar files
 
 (deftest one-sample-t-test-test
   (is (= (ttest (osmpl {:smpl population-one :hmean 400}))
