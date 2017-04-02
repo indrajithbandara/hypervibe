@@ -7,5 +7,6 @@
                  [criterium "0.4.4"]
                  [net.mikera/core.matrix "0.58.0"]
                  [net.mikera/vectorz-clj "0.46.0"]]
+  :aot [clojure.stats.distribution.t.table]
   :repl-options {:init (set! *print-length* 100)}
   :java-source-paths ["src/stats/java"])

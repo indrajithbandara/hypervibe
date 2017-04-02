@@ -10,7 +10,7 @@
 ; s <- seq(1,1000000)
 ;foo <- qt(pt, s)
 
-;TODO add approximate degrees of freedom for any + 1000 eg 1000, 20000 50000 10000 500000 1000000 th dof
+;TODO assign all table sizes to 5000
 ;TODO put each percentiles vector of p values in multi method that dispatches on percentile then index will be dof.. look into caching result?
 ;TODO instead of below try precomputing the t distribution and jaring and importing (will be large)
 ;TODO look into allowing large numbers for gamma
