@@ -3,7 +3,7 @@
                                          svar pvar oststat
                                          equal-var-tstat welch-tstat rmsure-tstat
                                          welch-dof]]
-            [clojure.stats.distribution.t.table :refer [t-dist crtcl-val]]))
+            [clojure.stats.distribution.t.table :refer [t]]))
 (use 'clojure.core.matrix)
 
 (deftype OneSample [smpl hmean alpha])
@@ -99,7 +99,7 @@
 
 (defmethod ttest OneSample [this]
   (let [[smean ssdev ssize] (pone-sample this)
-        cval (crtcl-val t-dist (dec ssize) (.alpha this))
+        cval (t {:Ptile (.alpha this) :dof (dec ssize)})
         tstat (oststat smean this ssdev ssize)]
     (one-sample-ttest (.smpl this) (.hmean this) tstat
                       (dec ssize) (.alpha this) cval
@@ -118,7 +118,7 @@
 (defmethod ttest EqualVariance [this]
   (let [[[smone smtwo] [pmone pmtwo] [pvone pvtwo]
          [ssone sstwo]] (pequal-var this)
-        cval (crtcl-val t-dist (- (+ ssone sstwo) 2) (.alpha this))
+        cval (t {:Ptile (.alpha this) :dof (- (+ ssone sstwo) 2)})
         tstat (equal-var-tstat smone smtwo pmone pmtwo pvone pvtwo ssone sstwo)]
     (equal-var-ttest (.smpls this) (.hmeans this) tstat
                      (- (+ ssone sstwo) 2) (.alpha this) cval
@@ -136,7 +136,7 @@
 (defmethod ttest Welch [this]
   (let [[[mone mtwo] [svone svtwo] [ssone sstwo]] (pwelch this)
         dof (welch-dof svone svtwo ssone sstwo)
-        cval (crtcl-val t-dist (Math/round dof) (.alpha this))
+        cval (t {:Ptile (.alpha this) :dof (Math/round dof)})
         tstat (welch-tstat mone mtwo svone svtwo ssone sstwo)]
     (welch-ttest (.smpls this) tstat dof
                  (.alpha this) cval (rnull? tstat cval)

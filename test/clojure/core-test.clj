@@ -10,6 +10,7 @@
 ; s <- seq(1,1000000)
 ;foo <- qt(pt, s)
 
+;TODO set t distribution to 4 decimal places and rm {:approx ...}
 ;TODO assign all table sizes to 5000
 ;TODO put each percentiles vector of p values in multi method that dispatches on percentile then index will be dof.. look into caching result?
 ;TODO instead of below try precomputing the t distribution and jaring and importing (will be large)
