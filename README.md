@@ -1,1 +1,1 @@
-# Clojure for statistical inference
+# Clojure statistical inference
