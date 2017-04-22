@@ -7,7 +7,7 @@
             [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]
             [criterium.core :as cri]))
 ; pt <- c(0.40, 0.30, 0.20, 0.15, 0.10, 0.05, 0.025, 0.02, 0.015, 0.01, 0.0075, 0.005, 0.0025, 0.0005)
-; s <- seq(1,1000000)
+; s <- seq(1,5000)
 ;foo <- qt(pt, s)
 
 ;TODO set t distribution to 4 decimal places and rm {:approx ...}
