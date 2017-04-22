@@ -27,75 +27,75 @@
 
 (deftest one-sample-t-test-test
   (is (= (ttest (osmpl {:smpl population-one :hmean 400}))
-         {:dof    9,
-          :cval   1.83311293265624,
-          :hmean  400,
+         {:tstat  8.700992601418207,
+          :ssdev  65.05553183413554,
+          :dof    9,
+          :cval   1.83311,
+          :rnull? true,
           :ssize  10,
           :smean  579.0,
-          :rnull? true,
+          :hmean  400,
           :alpha  0.05,
-          :ssdev  65.05553183413554,
-          :tstat  8.700992601418207,
           :smpl   [490 500 530 550 580 590 600 600 650 700],
-          :diff   6.867879668761967})))
+          :diff   6.8678826014182075})))
 
 
 (deftest two-sample-t-test-evariance
   (is (= (ttest (evar {:smpls [ballet-dancers football-players]}))
-         {:pmeans    [0.0 0.0],
-          :tstat     1.094722972460392,
+         {:tstat     1.094722972460392,
           :dof       18,
-          :smeans    [87.94999999999999 85.19],
-          :hmeans    [0 0],
-          :ssizes    [10 10],
-          :cval      1.73406360661754,
+          :cval      1.73406,
           :rnull?    false,
+          :pmeans    [0.0 0.0],
+          :hmeans    [0 0],
+          :smeans    [87.94999999999999 85.19],
           :alpha     0.05,
           :pool-vars [32.382777777777775 31.181000000000015],
           :smpls     [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-          :diff      -0.6393406341571481})))
+          :ssizes    [10 10],
+          :diff      -0.639337027539608})))
 
 
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (ttest (welch {:smpls [ballet-dancers football-players]}))
          {:tstat  1.0947229724603922,
           :dof    17.993567997176537,
-          :smeans [87.94999999999999 85.19],
-          :ssizes [10 10],
-          :cval   1.73406360661754,
-          :svars  [32.382777777777775 31.181000000000015],
+          :cval   1.73406,
           :rnull? false,
+          :svars  [32.382777777777775 31.181000000000015],
+          :smeans [87.94999999999999 85.19],
           :alpha  0.05,
           :smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-          :diff   -0.6393406341571479})))
+          :ssizes [10 10],
+          :diff   -0.6393370275396077})))
 
 
 
 (deftest two-sample-repeated-measure-test
   (is (= (ttest (rmsure {:smpls [after before]}))
-         {:pmeans    [0.0 0.0],
-          :tstat     -2.5017235438103813,
-          :dof       9,
-          :diff-mean -11.0,
-          :hmeans    [0 0],
-          :cval      1.83311293265624,
-          :rnull?    true,
-          :ssize     10,
-          :alpha     0.05,
-          :sdev      13.90443574307614,
-          :smpls     [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]]})))
+         {:sdev   13.90443574307614,
+          :tstat  -2.5017235438103813,
+          :dof    9,
+          :cval   1.83311,
+          :rnull? true,
+          :pmeans [0.0 0.0],
+          :dmean  -11.0,
+          :ssize  10,
+          :hmeans [0 0],
+          :alpha  0.05,
+          :smpls  [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]]})))
 
 
 (deftest one-sample-conf-inter-test
   (is (= (osc-intvl {:smpl population-one :cval 1.83311293265624 :hmean 400})
          {:upper 216.71146925144888,
+          :ssdev 65.05553183413554,
+          :mdiff 179.0,
           :cval  1.83311293265624,
-          :hmean 400,
           :ssize 10,
           :smean 579.0,
-          :mdiff 179.0,
           :lower 141.28853074855112,
-          :ssdev 65.05553183413554,
+          :hmean 400,
           :smpl  [490 500 530 550 580 590 600 600 650 700]})))
 
 
@@ -112,14 +112,14 @@
 
 (deftest compose-one-sample-ttest-confidence-interval
   (is (= ((comp osc-intvl) (ttest (osmpl {:smpl population-one :hmean 400})))
-         {:upper 216.71146925144888,
-          :cval  1.83311293265624,
-          :hmean 400,
+         {:upper 216.71140891977285,
+          :ssdev 65.05553183413554,
+          :mdiff 179.0,
+          :cval  1.83311,
           :ssize 10,
           :smean 579.0,
-          :mdiff 179.0,
-          :lower 141.28853074855112,
-          :ssdev 65.05553183413554,
+          :lower 141.28859108022715,
+          :hmean 400,
           :smpl  [490 500 530 550 580 590 600 600 650 700]})))
 
 (def dummy1 (range 1000000))

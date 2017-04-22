@@ -132,32 +132,9 @@
          (+ (first c)
             (apply + (map-indexed #(/ %2 (+ n %1 1)) (next c))))))))
 
-(defn zip
-  ([keys vals]
-   (loop [map (transient {})
-          ks (seq keys)
-          vs (seq vals)]
-     (if (and ks vs)
-       (recur (assoc! map (first ks)
-                      (first vs))
-              (next ks)
-              (next vs))
-       (persistent! map))))
-  ([keys vals xform]
-   (if-not (nil? xform)
-     (loop [map (transient {})
-            ks (seq keys)
-            vs (seq vals)]
-       (if (and ks vs)
-         (recur (assoc! map (first ks)
-                        (xform (first vs)))
-                (next ks)
-                (next vs))
-         (persistent! map)))
-     (zip keys vals))))
-
-
 (defn zip-types [keys vals]
+  {:doc "Zipmap with type parsing"
+   :arglists '([keys vals])}
   (loop [map (transient {})
          ks (seq keys)
          vs (seq vals)]
