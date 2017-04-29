@@ -1,7 +1,6 @@
 (ns clojure.core-test
   (:require [clojure.test :refer :all]
             [clojure.stats.samples :refer :all]
-            [clojure.stats.utils :refer [zip]]
             [clojure.stats.test :refer [ttest]]
             [clojure.core.stats.test :refer [osmpl evar welch rmsure]]
             [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]
@@ -73,17 +72,17 @@
 
 (deftest two-sample-repeated-measure-test
   (is (= (ttest (rmsure {:smpls [after before]}))
-         {:sdev   13.90443574307614,
-          :tstat  -2.5017235438103813,
-          :dof    9,
-          :cval   1.83311,
+         {:sdev 13.90443574307614,
+          :tstat -2.5017235438103813,
+          :dof 9,
+          :cval 1.83311,
           :rnull? true,
           :pmeans [0.0 0.0],
-          :dmean  -11.0,
-          :ssize  10,
+          :ssize 10,
           :hmeans [0 0],
-          :alpha  0.05,
-          :smpls  [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]]})))
+          :alpha 0.05,
+          :smpls [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
+          :dmean -11.0})))
 
 
 (deftest one-sample-conf-inter-test
