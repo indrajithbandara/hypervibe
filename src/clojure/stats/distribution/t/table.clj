@@ -2,17 +2,17 @@
 
 
 (defn- ldof
-  [dof size]
-  {:doc "Limits dof to size"
-   :arglists '([dof size])}
-  (if (>= (:dof dof) size) size (:dof dof)))
+    [dof size]
+    {:doc      "Limits dof to size"
+     :arglists '([dof size])}
+    (if (>= (:dof dof) size) size (:dof dof)))
 
 (defn utail
-  [x]
-  {:doc "Upper tail of Students t
-         distribution"
-   :arglists '([x])}
-  (Math/abs x))
+    [x]
+    {:doc      "Upper tail of Students
+                distribution"
+     :arglists '([x])}
+    (Math/abs x))
 
 (defmulti t :Ptile)
 
