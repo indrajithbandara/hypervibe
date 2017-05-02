@@ -4,8 +4,9 @@
                        svar pvar oststat
                        equal-var-tstat welch-tstat rmsure-tstat
                        welch-dof]]
-              [clojure.stats.distribution.t.table :refer [t utail]]))
-(use 'clojure.core.matrix)
+              [clojure.stats.distribution.t.table :refer [t utail]]
+              [clojure.core.matrix.operators :as op]
+              [clojure.core.matrix :as matrix]))
 
 (deftype OneSample [smpl hmean alpha])
 (deftype EqualVariance [smpls hmeans alpha])
@@ -97,7 +98,7 @@
     (pvalues (mean (.smpl this))
              (ssdev (.smpl this)
                     (mean (.smpl this)))
-             (count (.smpl this))))
+             (matrix/ecount (.smpl this))))
 
 (defmethod ttest OneSample [this]
     (let [[smean ssdev ssize] (pone-sample this)

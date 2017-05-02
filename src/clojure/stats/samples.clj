@@ -1,9 +1,14 @@
-(ns clojure.stats.samples)
+(ns clojure.stats.samples
+    (:require [clojure.core.matrix.operators :as op]
+              [clojure.core.matrix :as matrix]))
+(matrix/set-current-implementation :vectorz)
 
 (def observed-vals [60 300 10 390])
 (def expected-vals '(33.1578947368421 36.8421052631579 326.8421052631579 363.1578947368421))
 
 (def population-one [490 500 530 550 580 590 600 600 650 700])
+
+(def population-one-arr (matrix/array [490 500 530 550 580 590 600 600 650 700]))
 (def sample-two [560 500 510 600 600 620 550 630 650 750])
 
 (def ballet-dancers [89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3])
