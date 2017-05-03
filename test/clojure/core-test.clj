@@ -6,7 +6,8 @@
               [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]
               [criterium.core :as cri]))
 
-
+;TODO restructure and rename project
+;TODO seperate to primitive (vectorz) and parallel computation
 ;TODO change all input vextors to mikera matrix / vector.. also look at hip hip array (set reflection so i can manage boxing and unboxing using *, - look at Vectorz lib for core.matrix)
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO research more into what constitutes to a rejected null hypothesis
