@@ -1,5 +1,5 @@
-(ns clojure.stats.confidence_interval
-  (:require [clojure.stats.utils :refer [mean diff ssdev svar pvar]]))
+(ns hypervibe.api.confidence_interval
+  (:require [hypervibe.api.utils :refer [mean diff ssdev svar pvar]]))
 
 (deftype OneSample [smpl cval hmean])
 (deftype EqualVariance [smpls cval])

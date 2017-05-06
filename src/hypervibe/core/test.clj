@@ -1,6 +1,6 @@
-(ns clojure.core.stats.test
-    (:require [clojure.stats.test :refer [ttest]])
-    (:import [clojure.stats.test OneSample EqualVariance Welch RepeatedMeasure]))
+(ns hypervibe.core.test
+    (:require [hypervibe.api.test :refer [ttest]])
+    (:import [hypervibe.api.test OneSample EqualVariance Welch RepeatedMeasure]))
 (use 'criterium.core)
 
 (defn osmpl

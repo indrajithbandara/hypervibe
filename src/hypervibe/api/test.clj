@@ -1,10 +1,10 @@
-(ns clojure.stats.test
-    (:require [clojure.stats.utils
+(ns hypervibe.api.test
+    (:require [hypervibe.api.utils
                :refer [mean diff rnull? ssdev
                        svar pvar oststat
                        equal-var-tstat welch-tstat rmsure-tstat
                        welch-dof]]
-              [clojure.stats.distribution.t.table :refer [t utail]]
+              [hypervibe.api.distribution.t.table :refer [t utail]]
               [clojure.core.matrix.operators :as op]))
 
 (deftype OneSample [smpl hmean alpha])

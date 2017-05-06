@@ -1,4 +1,4 @@
-(ns clojure.stats.distribution.t.table)
+(ns hypervibe.api.distribution.t.table)
 
 
 (defn- ldof

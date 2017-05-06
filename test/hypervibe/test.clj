@@ -1,9 +1,9 @@
-(ns clojure.core-test
+(ns hypervibe.test
     (:require [clojure.test :refer :all]
-              [clojure.stats.samples :refer :all]
-              [clojure.stats.test :refer [ttest]]
-              [clojure.core.stats.test :refer [osmpl evar welch rmsure]]
-              [clojure.core.stats.confidence_interval :refer [osc-intvl evc-intvl]]
+              [hypervibe.api.samples :refer :all]
+              [hypervibe.api.test :refer [ttest]]
+              [hypervibe.core.test :refer [osmpl evar welch rmsure]]
+              [hypervibe.core.confidence_interval :refer [osc-intvl evc-intvl]]
               [criterium.core :as cri]))
 
 ;TODO restructure and rename project

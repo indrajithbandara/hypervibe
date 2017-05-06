@@ -1,4 +1,4 @@
-(ns clojure.stats.utils
+(ns hypervibe.api.utils
     (:require [clojure.core.reducers :as r]
               [clojure.core.matrix.operators :as op]
               [clojure.core.matrix :as matrix]))

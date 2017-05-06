@@ -1,7 +1,7 @@
 
-(ns clojure.core.stats.confidence_interval
-  (:require [clojure.stats.confidence_interval :refer [cintvl]])
-  (:import [clojure.stats.confidence_interval OneSample EqualVariance]))
+(ns hypervibe.core.confidence_interval
+  (:require [hypervibe.api.confidence_interval :refer [cintvl]])
+  (:import [hypervibe.api.confidence_interval OneSample EqualVariance]))
 (use 'criterium.core)
 
 (defn osc-intvl
