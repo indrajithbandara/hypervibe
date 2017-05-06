@@ -7,12 +7,14 @@
               [hypervibe.api.distribution.t.table :refer [t utail]]
               [clojure.core.matrix.operators :as op]))
 
+
 (deftype OneSample [smpl hmean alpha])
 (deftype EqualVariance [smpls hmeans alpha])
 (deftype Welch [smpls alpha])
 (deftype RepeatedMeasure [smpls hmeans alpha])
 (deftype Median [smpls hmeans alpha])
 
+(defmulti pttest class)
 (defmulti ttest class)
 
 (defn one-sample-ttest
@@ -90,17 +92,12 @@
      :ssize  ssize
      :dmean  dmean})
 
-
-(defn- pone-sample [this]
-    {:doc      "Parallel one sample t-test xform"
-     :arglists '([ttest])}
-    (pvalues (mean (.smpl this))
-             (ssdev (.smpl this)
-                    (mean (.smpl this)))
-             (count (.smpl this))))
-
-(defmethod ttest OneSample [this]
-    (let [[smean ssdev ssize] (pone-sample this)
+(defmethod pttest OneSample [this]
+    (let [[smean ssdev ssize]
+          (pvalues (mean (.smpl this))
+                   (ssdev (.smpl this)
+                          (mean (.smpl this)))
+                   (count (.smpl this)))
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (dec ssize)}))
           tstat (/ (- smean (.hmean this))
@@ -117,27 +114,22 @@
                           ssdev
                           ssize)))
 
-
-(defn- pequal-var [this]
-    {:doc      "Parallel equal variance t-test xform"
-     :arglists '([ttest])}
-    (pvalues (map mean
-                  (.smpls this))
-             (map mean
-                  (partition 1
-                             (.hmeans this)))
-             (map #(pvar %
-                         (mean %)
-                         (dec (count %)))
-                  (.smpls this))
-             (map count
-                  (.smpls this))))
-
-(defmethod ttest EqualVariance [this]
+(defmethod pttest EqualVariance [this]
     (let [[[smone smtwo]
            [pmone pmtwo]
            [pvone pvtwo]
-           [ssone sstwo]] (pequal-var this)
+           [ssone sstwo]]
+          (pvalues (map mean
+                        (.smpls this))
+                   (map mean
+                        (partition 1
+                                   (.hmeans this)))
+                   (map #(pvar %
+                               (mean %)
+                               (dec (count %)))
+                        (.smpls this))
+                   (map count
+                        (.smpls this)))
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (- (+ ssone sstwo)
                                     2)}))
@@ -145,13 +137,14 @@
                       (- pmone pmtwo))
                    (Math/sqrt (* (/ (+ pvone pvtwo)
                                     2)
-                                 (+ (/ 1 ssone)
-                                    (/ 1 sstwo)))))]
+                                 (+ (/ 1
+                                       ssone)
+                                    (/ 1
+                                       sstwo)))))]
         (equal-var-ttest (.smpls this)
                          (.hmeans this)
                          tstat
-                         (- (+ ssone sstwo)
-                            2)
+                         (- (+ ssone sstwo) 2)
                          (.alpha this) cval
                          (rnull? tstat cval)
                          (- tstat cval) [smone smtwo]
@@ -159,32 +152,32 @@
                          [pvone pvtwo]
                          [ssone sstwo])))
 
-
-(defn- pwelch [this]
-    {:doc      "Parallel welch t-test xform"
-     :arglists '([ttest])}
-    (pvalues (map mean
-                  (.smpls this))
-             (map #(svar %
-                         (mean %))
-                  (.smpls this))
-             (map count
-                  (.smpls this))))
-
-(defmethod ttest Welch [this]
+(defmethod pttest Welch [this]
     (let [[[mone mtwo]
            [svone svtwo]
-           [ssone sstwo]] (pwelch this)
+           [ssone sstwo]]
+          (pvalues (map mean
+                        (.smpls this))
+                   (map #(svar %
+                               (mean %))
+                        (.smpls this))
+                   (map count (.smpls this)))
           dof (/ (* (+ (/ svone ssone)
                        (/ svtwo sstwo))
                     (+ (/ svone ssone)
                        (/ svtwo sstwo)))
-                 (+ (/ (* (/ svone ssone)
-                          (/ svone ssone))
-                       (- ssone 1))
-                    (/ (* (/ svtwo sstwo)
-                          (/ svtwo sstwo))
-                       (- sstwo 1))))
+                 (+ (/ (* (/ svone
+                             ssone)
+                          (/ svone
+                             ssone))
+                       (- ssone
+                          1))
+                    (/ (* (/ svtwo
+                             sstwo)
+                          (/ svtwo
+                             sstwo))
+                       (- sstwo
+                          1))))
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (Math/round dof)}))
           tstat (/ (- mone mtwo)
@@ -201,29 +194,31 @@
                      [svone svtwo]
                      [ssone sstwo])))
 
-
-(defn- prmsure [this]
-    {:doc      "Parallel repeated measure t-test xform"
-     :arglists '([ttest])}
-    (pvalues (mean (diff (.smpls this)))
-             (map mean
-                  (partition 1
-                             (.hmeans this)))
-             (ssdev (diff (.smpls this))
-                    (mean (diff (.smpls this))))
-             (/ (+ (count (first (.smpls this)))
-                   (count (second (.smpls this))))
-                2)))
-
-(defmethod ttest RepeatedMeasure [this]
+(defmethod pttest RepeatedMeasure [this]
     (let [[dmean
            [pmone pmtwo]
            sdev
-           ssize] (prmsure this)
+           ssize]
+          (pvalues (mean (diff (.smpls this)))
+                   (map mean
+                        (partition 1
+                                   (.hmeans this)))
+                   (ssdev (diff (.smpls this))
+                          (-> (.smpls this)
+                              diff
+                              mean))
+                   (/ (+ (-> (.smpls this)
+                             first
+                             count)
+                         (-> (.smpls this)
+                             second
+                             count))
+                      2))
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (dec ssize)}))
           tstat (/ (- dmean
-                      (- pmone pmtwo))
+                      (- pmone
+                         pmtwo))
                    (/ sdev
                       (Math/sqrt ssize)))]
         (rmsure-ttest (.smpls this)
@@ -238,6 +233,8 @@
                       ssize
                       dmean)))
 
+(defmethod ttest OneSample [this]
+    )
 
 ;(defn chi-square
 ;    [values]
