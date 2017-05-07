@@ -1,9 +1,7 @@
 (ns hypervibe.api.test
-    (:require [hypervibe.api.utils
-               :refer [mean diff rnull? ssdev
-                       svar pvar oststat
-                       equal-var-tstat welch-tstat rmsure-tstat
-                       welch-dof]]
+    (:require [hypervibe.api.parallel.utils
+               :refer [pmean pssdev diff rnull? svar pvar]]
+              [hypervibe.api.utils :refer [mean ssdev]]
               [hypervibe.api.distribution.t.table :refer [t utail]]
               [clojure.core.matrix.operators :as op]))
 
@@ -94,10 +92,31 @@
 
 (defmethod pttest OneSample [this]
     (let [[smean ssdev ssize]
-          (pvalues (mean (.smpl this))
-                   (ssdev (.smpl this)
-                          (mean (.smpl this)))
+          (pvalues (pmean (.smpl this))
+                   (pssdev (.smpl this)
+                          (pmean (.smpl this)))
                    (count (.smpl this)))
+          cval (utail (t {:Ptile (.alpha this)
+                          :dof   (dec ssize)}))
+          tstat (/ (- smean (.hmean this))
+                   (/ ssdev (Math/sqrt ssize)))]
+        (one-sample-ttest (.smpl this)
+                          (.hmean this)
+                          tstat
+                          (dec ssize)
+                          (.alpha this)
+                          cval
+                          (rnull? tstat cval)
+                          (- tstat cval)
+                          smean
+                          ssdev
+                          ssize)))
+
+(defmethod ttest OneSample [this]
+    (let [smean ^double (mean (.smpl this))
+          ssdev ^double (ssdev (.smpl this)
+                       (mean (.smpl this)))
+          ssize (count (.smpl this))
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (dec ssize)}))
           tstat (/ (- smean (.hmean this))
@@ -119,13 +138,13 @@
            [pmone pmtwo]
            [pvone pvtwo]
            [ssone sstwo]]
-          (pvalues (map mean
+          (pvalues (map pmean
                         (.smpls this))
-                   (map mean
+                   (map pmean
                         (partition 1
                                    (.hmeans this)))
                    (map #(pvar %
-                               (mean %)
+                               (pmean %)
                                (dec (count %)))
                         (.smpls this))
                    (map count
@@ -156,10 +175,10 @@
     (let [[[mone mtwo]
            [svone svtwo]
            [ssone sstwo]]
-          (pvalues (map mean
+          (pvalues (map pmean
                         (.smpls this))
                    (map #(svar %
-                               (mean %))
+                               (pmean %))
                         (.smpls this))
                    (map count (.smpls this)))
           dof (/ (* (+ (/ svone ssone)
@@ -199,20 +218,16 @@
            [pmone pmtwo]
            sdev
            ssize]
-          (pvalues (mean (diff (.smpls this)))
-                   (map mean
+          (pvalues (pmean (diff (.smpls this)))
+                   (map pmean
                         (partition 1
                                    (.hmeans this)))
-                   (ssdev (diff (.smpls this))
+                   (pssdev (diff (.smpls this))
                           (-> (.smpls this)
                               diff
-                              mean))
-                   (/ (+ (-> (.smpls this)
-                             first
-                             count)
-                         (-> (.smpls this)
-                             second
-                             count))
+                              pmean))
+                   (/ (+ (count (first (.smpls this)))
+                         (count (second (.smpls this))))
                       2))
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (dec ssize)}))
@@ -233,8 +248,6 @@
                       ssize
                       dmean)))
 
-(defmethod ttest OneSample [this]
-    )
 
 ;(defn chi-square
 ;    [values]

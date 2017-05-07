@@ -1,5 +1,5 @@
 (ns hypervibe.api.confidence_interval
-  (:require [hypervibe.api.utils :refer [mean diff ssdev svar pvar]]))
+  (:require [hypervibe.api.parallel.utils :refer [pmean diff ssdev svar pvar]]))
 
 (deftype OneSample [smpl cval hmean])
 (deftype EqualVariance [smpls cval])
@@ -33,38 +33,57 @@
    :upper  upper
    :lower  lower})
 
-
-(defn equal-var [])
-
-(defn- posmpl [this]
-  (pvalues (mean (.smpl this))
-           (ssdev (.smpl this) (mean (.smpl this)))
-           (count (.smpl this))))
-
 (defmethod cintvl OneSample [this]
-  (let [[smean ssdev ssize] (posmpl this)
+  (let [[smean ssdev ssize]
+        (pvalues (pmean (.smpl this))
+                 (ssdev (.smpl this)
+                        (pmean (.smpl this)))
+                 (count (.smpl this)))
          mdiff (- smean (.hmean this))]
-    (one-smpl-conf-int (.smpl this) (.cval this) (.hmean this)
-                        ssdev smean ssize
-                        mdiff (+ mdiff (* (.cval this)
-                                          (/ ssdev (Math/sqrt ssize))))
-                       (- mdiff (* (.cval this)
-                                   (/ ssdev (Math/sqrt ssize)))))))
-
-(defn- ptsmpl [this]
-  (pvalues (map mean (.smpls this))
-           (map #(svar % (mean %)) (.smpls this))
-           (map count (.smpls this))))
+    (one-smpl-conf-int (.smpl this)
+                       (.cval this)
+                       (.hmean this)
+                       ssdev
+                       smean
+                       ssize
+                       mdiff (+ mdiff
+                                (* (.cval this)
+                                   (/ ssdev (Math/sqrt ssize))))
+                       (- mdiff
+                          (* (.cval this)
+                             (/ ssdev
+                                (Math/sqrt ssize)))))))
 
 (defmethod cintvl EqualVariance [this]
-  (let [[[smean-one smean-two] [svar-one svar-two] [ssize-one ssize-two]] (ptsmpl this)]
-    (two-smpl-conf-int (.smpls this) [svar-one svar-two] [smean-one smean-two]
-                       [ssize-one smean-two] (.cval this) (+ (- smean-one smean-two)
-                                                             (* (.cval this)
-                                                                (Math/sqrt (+ (/ svar-one ssize-one)
-                                                                              (/ svar-two ssize-two)))))
-                       (- (- smean-one smean-two)
-                          (* (.cval this) (Math/sqrt (+ (/ svar-one ssize-one) (/ svar-two ssize-two))))))))
+  (let [[[smean-one smean-two]
+         [svar-one svar-two]
+         [ssize-one ssize-two]]
+        (pvalues (map pmean
+                      (.smpls this))
+                 (map #(svar % (pmean %))
+                      (.smpls this))
+                 (map count
+                      (.smpls this)))]
+    (two-smpl-conf-int
+        (.smpls this)
+        [svar-one svar-two]
+        [smean-one smean-two]
+        [ssize-one smean-two]
+        (.cval this)
+        (+ (- smean-one
+              smean-two)
+           (* (.cval this)
+              (Math/sqrt (+ (/ svar-one
+                               ssize-one)
+                            (/ svar-two
+                               ssize-two)))))
+        (- (- smean-one
+              smean-two)
+           (* (.cval this)
+              (Math/sqrt (+ (/ svar-one
+                               ssize-one)
+                            (/ svar-two
+                               ssize-two))))))))
 
 
 ;(defmethod cintvl Welch [this])
