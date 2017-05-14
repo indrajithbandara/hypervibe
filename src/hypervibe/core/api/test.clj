@@ -1,5 +1,6 @@
 (ns hypervibe.core.api.test
     (:require [hypervibe.core.api.utils :refer [mean ssdev diff rnull? svar pvar]]
+              [clojure.core.matrix :as m]
               [hypervibe.core.api.distribution.t.table :refer [t utail]]
               [clojure.core.matrix.operators :as op]))
 
@@ -47,7 +48,7 @@
      :rnull?    rnull?
      :diff      diff
      :smeans    smeans
-     :means    means
+     :means     means
      :pool-vars pool-vars
      :ssizes    ssizes})
 
@@ -83,7 +84,7 @@
      :alpha  alpha
      :cval   cval
      :rnull? rnull?
-     :means means
+     :means  means
      :sdev   sdev
      :ssize  ssize
      :dmean  dmean})
@@ -93,28 +94,7 @@
           (pvalues (mean (.smpl this))
                    (ssdev (.smpl this)
                           (mean (.smpl this)))
-                   (count (.smpl this)))
-          cval (utail (t {:Ptile (.alpha this)
-                          :dof   (dec ssize)}))
-          tstat (/ (- smean (.hmean this))
-                   (/ ssdev (Math/sqrt ssize)))]
-        (one-sample-ttest (.smpl this)
-                          (.hmean this)
-                          tstat
-                          (dec ssize)
-                          (.alpha this)
-                          cval
-                          (rnull? tstat cval)
-                          (- tstat cval)
-                          smean
-                          ssdev
-                          ssize)))
-
-(defmethod ttest OneSample [this]
-    (let [smean ^double (mean (.smpl this))
-          ssdev ^double (ssdev (.smpl this)
-                       (mean (.smpl this)))
-          ssize (count (.smpl this))
+                   (m/ecount (.smpl this)))
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (dec ssize)}))
           tstat (/ (- smean (.hmean this))

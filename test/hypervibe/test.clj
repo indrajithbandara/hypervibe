@@ -1,14 +1,16 @@
 (ns hypervibe.test
     (:require [clojure.test :refer :all]
+              [clojure.core.matrix :as m]
               [hypervibe.core.api.samples :refer :all]
-              [hypervibe.core.api.test :refer [ttest]]
+              [hypervibe.core.api.test :refer [ttest ttest!]]
               [hypervibe.core.test :refer [osmpl evar welch rmsure]]
               [hypervibe.core.confidence_interval :refer [osc-intvl evc-intvl]]
               [criterium.core :as cri]))
+(m/set-current-implementation :vectorz)
 
-;TODO restructure and rename project
-;TODO seperate to primitive (vectorz) and parallel computation
+;TODO fix failing tests due to change to mikera matrix
 ;TODO change all input vextors to mikera matrix / vector.. also look at hip hip array (set reflection so i can manage boxing and unboxing using *, - look at Vectorz lib for core.matrix)
+;TODO specifications for all current functions input type  etc
 ;TODO confidence interval for welch and repeated measure ttest
 ;TODO research more into what constitutes to a rejected null hypothesis
 ;TODO add alternative hypothesis
@@ -26,6 +28,22 @@
 ;TODO compile all distrubution tables into seperate jar files
 
 
+
+(deftest one-sample-t-test-test!
+    (is (= (ttest (osmpl {:smpl (m/matrix [490 500 530 550 580 590 600 600 650 700]) :hmean 400}))
+           {:tstat  8.700992601418207,
+            :ssdev  65.05553183413554,
+            :dof    9,
+            :cval   1.83311,
+            :rnull? true,
+            :ssize  10,
+            :smean  579.0,
+            :hmean  400,
+            :alpha  0.05,
+            :smpl   #vectorz/vector[490 500 530 550 580 590 600 600 650 700],
+            :diff   6.8678826014182075})))
+
+
 (deftest one-sample-t-test-test
     (is (= (ttest (osmpl {:smpl population-one :hmean 400}))
            {:tstat  8.700992601418207,
@@ -37,23 +55,9 @@
             :smean  579.0,
             :hmean  400,
             :alpha  0.05,
-            :smpl   [490 500 530 550 580 590 600 600 650 700],
+            :smpl   #vectorz/vector[490 500 530 550 580 590 600 600 650 700],
             :diff   6.8678826014182075})))
 
-
-(deftest pone-sample-t-test-test
-    (is (= (ttest (osmpl {:smpl population-one :hmean 400}))
-           {:tstat  8.700992601418207,
-            :ssdev  65.05553183413554,
-            :dof    9,
-            :cval   1.83311,
-            :rnull? true,
-            :ssize  10,
-            :smean  579.0,
-            :hmean  400,
-            :alpha  0.05,
-            :smpl   [490 500 530 550 580 590 600 600 650 700],
-            :diff   6.8678826014182075})))
 
 (deftest two-sample-t-test-evariance
     (is (= (ttest (evar {:smpls [ballet-dancers football-players]}))
@@ -61,7 +65,7 @@
             :dof       18,
             :cval      1.73406,
             :rnull?    false,
-            :means    [0.0 0.0],
+            :means     [0.0 0.0],
             :hmeans    [0 0],
             :smeans    [87.94999999999999 85.19],
             :alpha     0.05,
@@ -88,12 +92,12 @@
 
 (deftest two-sample-repeated-measure-test
     (is (= (ttest (rmsure {:smpls [after before]}))
-           {:sdev   13.90443574307614,
+           {:sdev   13.904435743076139,
             :tstat  -2.5017235438103813,
             :dof    9,
             :cval   1.83311,
             :rnull? true,
-            :means [0.0 0.0],
+            :means  [0.0 0.0],
             :ssize  10,
             :hmeans [0 0],
             :alpha  0.05,

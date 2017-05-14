@@ -1,16 +1,17 @@
 (ns hypervibe.core.api.utils
     (:require [clojure.core.reducers :as r]
-              [clojure.core.matrix :as matrix]
-              [clojure.core.matrix.operators :as op]))
-(matrix/set-current-implementation :vectorz)
+              [clojure.core.matrix :as m]
+              [clojure.core.matrix.operators :as op]
+              [criterium.core :as cri])
+    (:import (mikera.vectorz Vector)))
+(m/set-current-implementation :vectorz)
 
-(defn ^double mean!
+(defn ^double mean
     {:doc      "Mean"
-     :arglists '([^mikera.vectorz.Vector data])}
-    [data]
-    (op/div= (reduce matrix/add
-                     data))
-    (matrix/ecount data))
+     :arglists '([mikera.vectorz.Vector data])}
+    [^Vector data]
+    (m/div (m/esum data)
+           (m/ecount data)))
 
 (defn mean-1! [a])
 
@@ -18,24 +19,15 @@
     {:doc      "Sample standard deviation"
      :arglists '([data mean])}
     (Math/sqrt (mean-1! (map #(* (- mean %)
-                                (- mean %))
-                            data))))
-
-(defn ^double mean
-    {:doc "Mean"
-     :arglists '([data])}
-    [data]
-    (/ (r/fold +
-               data)
-       (count data)))
+                                 (- mean %))
+                             data))))
 
 (defn ^double mean-1
     {:doc      "Mean -1"
      :arglists '([data])}
     [data]
-    (/ (r/fold +
-               data)
-       (dec (count data))))
+    (m/div (m/esum data)
+           (dec (m/ecount data))))
 
 (defn ^doubles diff
     {:doc      "Mean difference"
