@@ -1,4 +1,4 @@
-(ns hypervibe.api.samples
+(ns hypervibe.core.api.samples
     (:require [clojure.core.matrix.operators :as op]
               [clojure.core.matrix :as matrix]))
 (matrix/set-current-implementation :vectorz)

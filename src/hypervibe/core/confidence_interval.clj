@@ -1,7 +1,7 @@
 
 (ns hypervibe.core.confidence_interval
-  (:require [hypervibe.api.confidence_interval :refer [cintvl]])
-  (:import [hypervibe.api.confidence_interval OneSample EqualVariance]))
+  (:require [hypervibe.core.api.confidence_interval :refer [cintvl]])
+  (:import [hypervibe.core.api.confidence_interval OneSample EqualVariance]))
 (use 'criterium.core)
 
 (defn osc-intvl

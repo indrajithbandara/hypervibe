@@ -1,5 +1,5 @@
-(ns hypervibe.api.confidence_interval
-  (:require [hypervibe.api.parallel.utils :refer [pmean diff ssdev svar pvar]]))
+(ns hypervibe.core.api.confidence_interval
+  (:require [hypervibe.core.api.utils :refer [mean diff ssdev svar pvar]]))
 
 (deftype OneSample [smpl cval hmean])
 (deftype EqualVariance [smpls cval])
@@ -35,9 +35,9 @@
 
 (defmethod cintvl OneSample [this]
   (let [[smean ssdev ssize]
-        (pvalues (pmean (.smpl this))
+        (pvalues (mean (.smpl this))
                  (ssdev (.smpl this)
-                        (pmean (.smpl this)))
+                        (mean (.smpl this)))
                  (count (.smpl this)))
          mdiff (- smean (.hmean this))]
     (one-smpl-conf-int (.smpl this)
@@ -58,9 +58,9 @@
   (let [[[smean-one smean-two]
          [svar-one svar-two]
          [ssize-one ssize-two]]
-        (pvalues (map pmean
+        (pvalues (map mean
                       (.smpls this))
-                 (map #(svar % (pmean %))
+                 (map #(svar % (mean %))
                       (.smpls this))
                  (map count
                       (.smpls this)))]

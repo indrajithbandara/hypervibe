@@ -7,6 +7,6 @@
                    [criterium "0.4.4"]
                    [net.mikera/core.matrix "0.58.0"]
                    [net.mikera/vectorz-clj "0.46.0"]]
-    :aot [hypervibe.api.distribution.t.table])
+    :aot [hypervibe.core.api.distribution.t.table])
 
 

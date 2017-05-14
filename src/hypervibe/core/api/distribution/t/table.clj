@@ -1,4 +1,4 @@
-(ns hypervibe.api.distribution.t.table)
+(ns hypervibe.core.api.distribution.t.table)
 
 
 (defn- ldof

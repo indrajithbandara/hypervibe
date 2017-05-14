@@ -1,8 +1,6 @@
-(ns hypervibe.api.test
-    (:require [hypervibe.api.parallel.utils
-               :refer [pmean pssdev diff rnull? svar pvar]]
-              [hypervibe.api.utils :refer [mean ssdev]]
-              [hypervibe.api.distribution.t.table :refer [t utail]]
+(ns hypervibe.core.api.test
+    (:require [hypervibe.core.api.utils :refer [mean ssdev diff rnull? svar pvar]]
+              [hypervibe.core.api.distribution.t.table :refer [t utail]]
               [clojure.core.matrix.operators :as op]))
 
 
@@ -12,8 +10,8 @@
 (deftype RepeatedMeasure [smpls hmeans alpha])
 (deftype Median [smpls hmeans alpha])
 
-(defmulti pttest class)
 (defmulti ttest class)
+(defmulti ttest! class)
 
 (defn one-sample-ttest
     [smpl hmean tstat
@@ -38,7 +36,7 @@
     [smpls hmeans tstat
      dof alpha cval
      rnull? diff smeans
-     pmeans pool-vars ssizes]
+     means pool-vars ssizes]
     ^{:type ::EqualVariance}
     {:smpls     smpls
      :hmeans    hmeans
@@ -49,7 +47,7 @@
      :rnull?    rnull?
      :diff      diff
      :smeans    smeans
-     :pmeans    pmeans
+     :means    means
      :pool-vars pool-vars
      :ssizes    ssizes})
 
@@ -74,7 +72,7 @@
 (defn rmsure-ttest
     [smpls hmeans tstat
      dof alpha cval
-     rnull? pmeans
+     rnull? means
      sdev ssize
      dmean]
     ^{:type ::RepeatedMeasure}
@@ -85,16 +83,16 @@
      :alpha  alpha
      :cval   cval
      :rnull? rnull?
-     :pmeans pmeans
+     :means means
      :sdev   sdev
      :ssize  ssize
      :dmean  dmean})
 
-(defmethod pttest OneSample [this]
+(defmethod ttest OneSample [this]
     (let [[smean ssdev ssize]
-          (pvalues (pmean (.smpl this))
-                   (pssdev (.smpl this)
-                          (pmean (.smpl this)))
+          (pvalues (mean (.smpl this))
+                   (ssdev (.smpl this)
+                          (mean (.smpl this)))
                    (count (.smpl this)))
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (dec ssize)}))
@@ -133,18 +131,18 @@
                           ssdev
                           ssize)))
 
-(defmethod pttest EqualVariance [this]
+(defmethod ttest EqualVariance [this]
     (let [[[smone smtwo]
            [pmone pmtwo]
            [pvone pvtwo]
            [ssone sstwo]]
-          (pvalues (map pmean
+          (pvalues (map mean
                         (.smpls this))
-                   (map pmean
+                   (map mean
                         (partition 1
                                    (.hmeans this)))
                    (map #(pvar %
-                               (pmean %)
+                               (mean %)
                                (dec (count %)))
                         (.smpls this))
                    (map count
@@ -171,14 +169,14 @@
                          [pvone pvtwo]
                          [ssone sstwo])))
 
-(defmethod pttest Welch [this]
+(defmethod ttest Welch [this]
     (let [[[mone mtwo]
            [svone svtwo]
            [ssone sstwo]]
-          (pvalues (map pmean
+          (pvalues (map mean
                         (.smpls this))
                    (map #(svar %
-                               (pmean %))
+                               (mean %))
                         (.smpls this))
                    (map count (.smpls this)))
           dof (/ (* (+ (/ svone ssone)
@@ -213,19 +211,19 @@
                      [svone svtwo]
                      [ssone sstwo])))
 
-(defmethod pttest RepeatedMeasure [this]
+(defmethod ttest RepeatedMeasure [this]
     (let [[dmean
            [pmone pmtwo]
            sdev
            ssize]
-          (pvalues (pmean (diff (.smpls this)))
-                   (map pmean
+          (pvalues (mean (diff (.smpls this)))
+                   (map mean
                         (partition 1
                                    (.hmeans this)))
-                   (pssdev (diff (.smpls this))
+                   (ssdev (diff (.smpls this))
                           (-> (.smpls this)
                               diff
-                              pmean))
+                              mean))
                    (/ (+ (count (first (.smpls this)))
                          (count (second (.smpls this))))
                       2))

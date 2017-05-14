@@ -1,6 +1,5 @@
 (ns hypervibe.core.test
-    (:require [hypervibe.api.test :refer [pttest]])
-    (:import [hypervibe.api.test OneSample EqualVariance Welch RepeatedMeasure]))
+    (:import [hypervibe.core.api.test OneSample EqualVariance Welch RepeatedMeasure]))
 (use 'criterium.core)
 
 (defn osmpl

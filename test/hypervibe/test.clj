@@ -1,7 +1,7 @@
 (ns hypervibe.test
     (:require [clojure.test :refer :all]
-              [hypervibe.api.samples :refer :all]
-              [hypervibe.api.test :refer [pttest ttest]]
+              [hypervibe.core.api.samples :refer :all]
+              [hypervibe.core.api.test :refer [ttest]]
               [hypervibe.core.test :refer [osmpl evar welch rmsure]]
               [hypervibe.core.confidence_interval :refer [osc-intvl evc-intvl]]
               [criterium.core :as cri]))
@@ -25,19 +25,6 @@
 ;TODO start implementing chart api
 ;TODO compile all distrubution tables into seperate jar files
 
-(deftest pone-sample-t-test-test
-    (is (= (pttest (osmpl {:smpl population-one :hmean 400}))
-           {:tstat  8.700992601418207,
-            :ssdev  65.05553183413554,
-            :dof    9,
-            :cval   1.83311,
-            :rnull? true,
-            :ssize  10,
-            :smean  579.0,
-            :hmean  400,
-            :alpha  0.05,
-            :smpl   [490 500 530 550 580 590 600 600 650 700],
-            :diff   6.8678826014182075})))
 
 (deftest one-sample-t-test-test
     (is (= (ttest (osmpl {:smpl population-one :hmean 400}))
@@ -53,13 +40,28 @@
             :smpl   [490 500 530 550 580 590 600 600 650 700],
             :diff   6.8678826014182075})))
 
+
+(deftest pone-sample-t-test-test
+    (is (= (ttest (osmpl {:smpl population-one :hmean 400}))
+           {:tstat  8.700992601418207,
+            :ssdev  65.05553183413554,
+            :dof    9,
+            :cval   1.83311,
+            :rnull? true,
+            :ssize  10,
+            :smean  579.0,
+            :hmean  400,
+            :alpha  0.05,
+            :smpl   [490 500 530 550 580 590 600 600 650 700],
+            :diff   6.8678826014182075})))
+
 (deftest two-sample-t-test-evariance
-    (is (= (pttest (evar {:smpls [ballet-dancers football-players]}))
+    (is (= (ttest (evar {:smpls [ballet-dancers football-players]}))
            {:tstat     1.094722972460392,
             :dof       18,
             :cval      1.73406,
             :rnull?    false,
-            :pmeans    [0.0 0.0],
+            :means    [0.0 0.0],
             :hmeans    [0 0],
             :smeans    [87.94999999999999 85.19],
             :alpha     0.05,
@@ -70,7 +72,7 @@
 
 
 (deftest two-sample-t-test-unequal-variance-welch
-    (is (= (pttest (welch {:smpls [ballet-dancers football-players]}))
+    (is (= (ttest (welch {:smpls [ballet-dancers football-players]}))
            {:tstat  1.0947229724603922,
             :dof    17.993567997176537,
             :cval   1.73406,
@@ -85,13 +87,13 @@
 
 
 (deftest two-sample-repeated-measure-test
-    (is (= (pttest (rmsure {:smpls [after before]}))
+    (is (= (ttest (rmsure {:smpls [after before]}))
            {:sdev   13.90443574307614,
             :tstat  -2.5017235438103813,
             :dof    9,
             :cval   1.83311,
             :rnull? true,
-            :pmeans [0.0 0.0],
+            :means [0.0 0.0],
             :ssize  10,
             :hmeans [0 0],
             :alpha  0.05,
@@ -123,8 +125,8 @@
             :lower  -2.536759222077789})))
 
 
-(deftest compose-one-sample-pttest-confidence-interval
-    (is (= ((comp osc-intvl) (pttest (osmpl {:smpl population-one :hmean 400})))
+(deftest compose-one-sample-ttest-confidence-interval
+    (is (= ((comp osc-intvl) (ttest (osmpl {:smpl population-one :hmean 400})))
            {:upper 216.71140891977285,
             :ssdev 65.05553183413554,
             :mdiff 179.0,
