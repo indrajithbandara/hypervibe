@@ -30,7 +30,7 @@
 
 
 (deftest one-sample-t-test-test!
-    (is (= (ttest (osmpl {:smpl (m/matrix [490 500 530 550 580 590 600 600 650 700]) :hmean 400}))
+    (is (= (ttest (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400}))
            {:tstat  8.700992601418207,
             :ssdev  65.05553183413554,
             :dof    9,
