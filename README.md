@@ -1,1 +1,1 @@
-# Clojure statistical inference
+# Learn Statistics with Clojure
