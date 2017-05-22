@@ -1,5 +1,7 @@
 (ns hypervibe.core.api.confidence_interval
-    (:require [hypervibe.core.api.utils :refer [mean diff ssdev svar pvar]]))
+    (:require
+        [clojure.core.matrix :as m]
+        [hypervibe.core.api.utils :refer [mean diff ssdev svar pvar]]))
 
 (deftype OneSample [smpl cval hmean])
 (deftype EqualVariance [smpls cval])
@@ -38,7 +40,7 @@
           (pvalues (mean (.smpl this))
                    (ssdev (.smpl this)
                           (mean (.smpl this)))
-                   (count (.smpl this)))
+                   (m/ecount (.smpl this)))
           mdiff (- smean (.hmean this))]
         (one-smpl-conf-int (.smpl this)
                            (.cval this)

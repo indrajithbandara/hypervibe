@@ -13,28 +13,19 @@
     (m/div (m/esum data)
            (m/ecount data)))
 
-(defn mean-1! [a])
-
-(defn ^double ssdev [data mean]
-    {:doc      "Sample standard deviation"
-     :arglists '([data mean])}
-    (Math/sqrt (mean-1! (map #(* (- mean %)
-                                 (- mean %))
-                             data))))
-
 (defn ^double mean-1
     {:doc      "Mean -1"
-     :arglists '([data])}
+     :arglists '([mikera.vectorz.Vector data])}
     [data]
     (m/div (m/esum data)
            (dec (m/ecount data))))
 
 (defn ^doubles diff
     {:doc      "Mean difference"
-     :arglists '([data pmean])}
-    [[sample-one sample-two]]
-    (map - sample-one
-         sample-two))
+     :arglists '([mikera.vectorz.Vector data pmean])}
+    [[data-one data-two]]
+    (map op/- data-one
+         data-two))
 
 
 (defn ^double ssdev [data mean]
