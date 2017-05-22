@@ -6,6 +6,9 @@
 (deftype OneSample [smpl cval hmean])
 (deftype EqualVariance [smpls cval])
 
+(deftype -OneSample [smpl cval hmean]
+    )
+
 (defmulti cintvl class)
 
 (defn one-smpl-conf-int

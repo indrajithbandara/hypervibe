@@ -6,6 +6,31 @@
     (:import (mikera.vectorz Vector)))
 (m/set-current-implementation :vectorz)
 
+(defprotocol IAverage
+    (-mean [this])
+    (-mean-1 [this])
+    (-mode [this])
+    (-meadian [this]))
+
+(deftype Average [data]
+    IAverage
+    (-mean [this]
+        (m/div (m/esum data)
+               (m/ecount data)))
+    (-mean-1 [this]
+        (m/div (m/esum data)
+               (dec (m/ecount data)))))
+
+(defprotocol IDifference
+    (-diff [this])
+    (-sdev [this])
+    (-psdev [this])
+    (-popvar [this])
+    (-svar [this])
+    (-poolvar [this]))
+
+(deftype Difference [data])
+
 (defn ^double mean
     {:doc      "Mean"
      :arglists '([mikera.vectorz.Vector data])}
@@ -35,7 +60,7 @@
                                 (- mean %))
                             data))))
 
-(defn ^double ps-dev
+(defn ^double psdev
     {:doc      "Population standard deviation"
      :arglists '([data pmean])}
     [data pmean]
@@ -43,7 +68,7 @@
                                (- pmean %))
                            data))))
 
-(defn ^double pop-var
+(defn ^double popvar
     {:doc      "Population variance"
      :arglists '([data pmean])}
     [data pmean]
