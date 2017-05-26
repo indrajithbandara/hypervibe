@@ -12,14 +12,18 @@
     (-mode [this])
     (-meadian [this]))
 
-(deftype Average [data]
+(defn average [type data]
+    {:data data
+     :type type})
+
+(deftype Average [avr]
     IAverage
     (-mean [this]
-        (m/div (m/esum data)
-               (m/ecount data)))
+        (m/div (m/esum (:data avr))
+               (m/ecount (:data avr))))
     (-mean-1 [this]
-        (m/div (m/esum data)
-               (dec (m/ecount data)))))
+        (m/div (m/esum (:data avr))
+               (dec (m/ecount (:data avr))))))
 
 (defprotocol IDifference
     (-diff [this])
@@ -29,15 +33,13 @@
     (-svar [this])
     (-poolvar [this]))
 
-(deftype Difference [data-one data-two]
+(deftype Difference [diff]
     IDifference
     (-diff [this]
-        (map op/- data-one
-             data-two))
-    (-ssdev [this]
-        (Math/sqrt (mean-1 (map #(* (- mean %)
-                                    (- mean %))             ;TODO fix
-                                data-one)))))
+        (map op/- {:data-one diff}
+             {:data-two diff})))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn ^double mean
     {:doc      "Mean"

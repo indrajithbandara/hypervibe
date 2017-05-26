@@ -2,7 +2,7 @@
     (:require [clojure.test :refer :all]
               [clojure.core.matrix :as m]
               [hypervibe.core.api.samples :refer :all]
-              [hypervibe.core.api.test :refer [ttest ttest!]]
+              [hypervibe.core.api.test :refer [ttest]]
               [hypervibe.core.test :refer [osmpl evar welch rmsure]]
               [hypervibe.core.confidence_interval :refer [osc-intvl evc-intvl]]
               [criterium.core :as cri]))
