@@ -12,7 +12,6 @@
 (deftype Median [smpls hmeans alpha])
 
 (defmulti ttest class)
-(defmulti ttest! class)
 
 (defn one-sample-ttest
     [smpl hmean tstat
@@ -134,10 +133,8 @@
                       (- pmone pmtwo))
                    (Math/sqrt (* (/ (+ pvone pvtwo)
                                     2)
-                                 (+ (/ 1
-                                       ssone)
-                                    (/ 1
-                                       sstwo)))))]
+                                 (+ (/ 1 ssone)
+                                    (/ 1 sstwo)))))]
         (equal-var-ttest (.smpls this)
                          (.hmeans this)
                          tstat
@@ -163,18 +160,12 @@
                        (/ svtwo sstwo))
                     (+ (/ svone ssone)
                        (/ svtwo sstwo)))
-                 (+ (/ (* (/ svone
-                             ssone)
-                          (/ svone
-                             ssone))
-                       (- ssone
-                          1))
-                    (/ (* (/ svtwo
-                             sstwo)
-                          (/ svtwo
-                             sstwo))
-                       (- sstwo
-                          1))))
+                 (+ (/ (* (/ svone ssone)
+                          (/ svone ssone))
+                       (- ssone 1))
+                    (/ (* (/ svtwo sstwo)
+                          (/ svtwo sstwo))
+                       (- sstwo 1))))
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (Math/round dof)}))
           tstat (/ (- mone mtwo)
@@ -210,8 +201,7 @@
           cval (utail (t {:Ptile (.alpha this)
                           :dof   (dec ssize)}))
           tstat (/ (- dmean
-                      (- pmone
-                         pmtwo))
+                      (- pmone pmtwo))
                    (/ sdev
                       (Math/sqrt ssize)))]
         (rmsure-ttest (.smpls this)

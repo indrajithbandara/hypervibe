@@ -29,7 +29,15 @@
     (-svar [this])
     (-poolvar [this]))
 
-(deftype Difference [data])
+(deftype Difference [data-one data-two]
+    IDifference
+    (-diff [this]
+        (map op/- data-one
+             data-two))
+    (-ssdev [this]
+        (Math/sqrt (mean-1 (map #(* (- mean %)
+                                    (- mean %))             ;TODO fix
+                                data-one)))))
 
 (defn ^double mean
     {:doc      "Mean"
