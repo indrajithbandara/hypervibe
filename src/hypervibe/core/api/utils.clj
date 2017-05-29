@@ -6,40 +6,6 @@
     (:import (mikera.vectorz Vector)))
 (m/set-current-implementation :vectorz)
 
-(defprotocol IAverage
-    (-mean [this])
-    (-mean-1 [this])
-    (-mode [this])
-    (-meadian [this]))
-
-(defn average [type data]
-    {:data data
-     :type type})
-
-(deftype Average [avr]
-    IAverage
-    (-mean [this]
-        (m/div (m/esum (:data avr))
-               (m/ecount (:data avr))))
-    (-mean-1 [this]
-        (m/div (m/esum (:data avr))
-               (dec (m/ecount (:data avr))))))
-
-(defprotocol IDifference
-    (-diff [this])
-    (-sdev [this])
-    (-psdev [this])
-    (-popvar [this])
-    (-svar [this])
-    (-poolvar [this]))
-
-(deftype Difference [diff]
-    IDifference
-    (-diff [this]
-        (map op/- {:data-one diff}
-             {:data-two diff})))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn ^double mean
     {:doc      "Mean"
