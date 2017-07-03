@@ -11,6 +11,19 @@
 (deftype RepeatedMeasure [smpls hmeans alpha])
 (deftype Median [smpls hmeans alpha])
 
+(defprotocol -Test
+    (osmpl [this] "One sample ttest")
+    (evar [this] "Equal variance ttest")
+    (welch [this] "Welch ttest for unequal variance")
+    (rmsure [this] "Repeated measure ttest"))
+
+(defrecord -TTest [args]
+    TTest
+    (osmpl [this])
+    (evar [this])
+    (welch [this])
+    (rmsure [this]))
+
 (defmulti ttest class)
 
 (defn one-sample-ttest
