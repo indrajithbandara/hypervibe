@@ -17,12 +17,27 @@
     (welch [this] "Welch ttest for unequal variance")
     (rmsure [this] "Repeated measure ttest"))
 
-(defrecord -TTest [args]
-    TTest
-    (osmpl [this])
+(defn posmpl [test]
+    (let [smpl (:smpl test)]
+        (->> (pvalues (mean smpl)
+                     (ssdev smpl (mean smpl))
+                     (m/ecount smpl))
+             (zipmap [:mean :ssdev :ssize]))))
+
+(defn osmpl-tstat [test]
+    (/ (- smean (:hmean this))
+       (/ ssdev (Math/sqrt ssize))))
+
+(defrecord -TTest [ttest]
+    -Test
+    (osmpl [this]
+        (as-> (:ttest this) test
+              (posmpl test)))
     (evar [this])
     (welch [this])
     (rmsure [this]))
+
+
 
 (defmulti ttest class)
 
