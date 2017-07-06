@@ -20,19 +20,19 @@
 (defn posmpl [test]
     (let [smpl (:smpl test)]
         (->> (pvalues (mean smpl)
-                     (ssdev smpl (mean smpl))
-                     (m/ecount smpl))
+                      (ssdev smpl (mean smpl))
+                      (m/ecount smpl))
              (zipmap [:mean :ssdev :ssize]))))
 
-(defn osmpl-tstat [test]
-    (/ (- smean (:hmean this))
-       (/ ssdev (Math/sqrt ssize))))
+#_(defmethod osmpl-tstat -TTest [test]
+    (/ (- (:smean test) (:hmean test))
+       (/ (:ssdev ssdev) (Math/sqrt (:ssize test)))))
 
 (defrecord -TTest [ttest]
     -Test
     (osmpl [this]
-        (as-> (:ttest this) test
-              (posmpl test)))
+        (as-> (posmpl ttest) pttest
+              (assoc this :ttest/result pttest)))
     (evar [this])
     (welch [this])
     (rmsure [this]))
