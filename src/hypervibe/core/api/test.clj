@@ -24,20 +24,25 @@
                       (m/ecount smpl))
              (zipmap [:mean :ssdev :ssize]))))
 
-#_(defmethod osmpl-tstat -TTest [test]
-    (/ (- (:smean test) (:hmean test))
-       (/ (:ssdev ssdev) (Math/sqrt (:ssize test)))))
-
-(defrecord -TTest [ttest]
+(defrecord -TTest [in]
     -Test
     (osmpl [this]
-        (as-> (posmpl ttest) pttest
-              (assoc this :ttest/result pttest)))
+        (as-> (posmpl in) pttest
+              (assoc this :out pttest)))
     (evar [this])
     (welch [this])
     (rmsure [this]))
 
+(defmulti os-tstat class)
 
+(defmethod os-tstat -TTest [{in :in out :out}] ;TODO fix
+    (/ (- (:mean out)
+          (:hmean in))
+       (/ (:ssdev out)
+          (Math/sqrt (:ssize out)))))
+
+#_((comp os-tstat osmpl)
+    (-TTest. {:smpl [490 500 530 550 580 590 600 600 650 700] :hmean 400}))
 
 (defmulti ttest class)
 
