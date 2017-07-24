@@ -4,6 +4,7 @@
               [hypervibe.core.api.distribution.t.table :refer [t utail]]
               [clojure.core.matrix.operators :as op]))
 
+;TODO rename file ttest
 
 (deftype OneSample [smpl hmean alpha])
 (deftype EqualVariance [smpls hmeans alpha])
@@ -11,11 +12,12 @@
 (deftype RepeatedMeasure [smpls hmeans alpha])
 (deftype Median [smpls hmeans alpha])
 
-(defprotocol -Test
+(defprotocol -TTest
     (osmpl [this] "One sample ttest")
     (evar [this] "Equal variance ttest")
     (welch [this] "Welch ttest for unequal variance")
     (rmsure [this] "Repeated measure ttest"))
+
 
 (defn posmpl [test]
     (let [smpl (:smpl test)]
@@ -24,25 +26,28 @@
                       (m/ecount smpl))
              (zipmap [:mean :ssdev :ssize]))))
 
-(defrecord -TTest [in]
-    -Test
+
+(defrecord -OneSampleTTest [in]
+    -TTest
     (osmpl [this]
         (as-> (posmpl in) pttest
-              (assoc this :out pttest)))
-    (evar [this])
-    (welch [this])
-    (rmsure [this]))
+              (assoc this :out pttest))))
 
-(defmulti os-tstat class)
 
-(defmethod os-tstat -TTest [{in :in out :out}] ;TODO fix
+(defrecord -EqualVarianceTTest [in] -TTest)
+(defrecord -WelchTTest [in] -TTest)
+(defrecord -RepeatedMeasureTTest [in] -TTest)
+(defrecord -EqualVarianceTTest [in] -TTest)
+
+(defmulti osmpl-tstat class)
+
+(defmethod osmpl-tstat -OneSampleTTest [{in :in out :out}]
     (/ (- (:mean out)
           (:hmean in))
        (/ (:ssdev out)
           (Math/sqrt (:ssize out)))))
 
-#_((comp os-tstat osmpl)
-    (-TTest. {:smpl [490 500 530 550 580 590 600 600 650 700] :hmean 400}))
+;((comp osmpl-tstat osmpl) (-OneSampleTTest. {:smpl [490 500 530 550 580 590 600 600 650 700] :hmean 400}))
 
 (defmulti ttest class)
 
