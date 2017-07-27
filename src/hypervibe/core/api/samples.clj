@@ -1,6 +1,6 @@
 (ns hypervibe.core.api.samples
-	  (:require [clojure.core.matrix.operators :as op]
-				[clojure.core.matrix :as m]))
+	(:require [clojure.core.matrix.operators :as op]
+			  [clojure.core.matrix :as m]))
 (m/set-current-implementation :vectorz)
 
 (def population-one (m/array [490 500 530 550 580 590 600 600 650 700]))
