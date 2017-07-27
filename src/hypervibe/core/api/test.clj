@@ -12,42 +12,33 @@
 (deftype RepeatedMeasure [smpls hmeans alpha])
 (deftype Median [smpls hmeans alpha])
 
-(defprotocol -TTest
-    (osmpl [this] "One sample ttest")
-    (evar [this] "Equal variance ttest")
-    (welch [this] "Welch ttest for unequal variance")
-    (rmsure [this] "Repeated measure ttest"))
 
+(defrecord _OneSample [smpl hmean])
+(defrecord _EqualVariance [smpls hmeans alpha])
+(defrecord _Welch [smpls alpha])
+(defrecord _RepeatedMeasure [smpls hmeans alpha])
+(defrecord _Median [smpls hmeans alpha])
 
-(defn posmpl [test]
-    (let [smpl (:smpl test)]
-        (->> (pvalues (mean smpl)
-                      (ssdev smpl (mean smpl))
-                      (m/ecount smpl))
+;TODO Implement function for looking up Pvalue
+
+(defmulti _ttest class)
+
+(defmethod _ttest _OneSample
+    [ttest]
+    ((comp #(assoc %
+                :hmean (:hmean ttest)
+                :tstat (/ (- (:mean %)
+                             (:hmean ttest))
+                          (/ (:ssdev %)
+                           (Math/sqrt (:ssize %))))))
+        (->> (pvalues (mean (:smpl ttest))
+                      (ssdev (:smpl ttest)
+                             (mean (:smpl ttest)))
+                      (m/ecount (:smpl ttest)))
              (zipmap [:mean :ssdev :ssize]))))
 
+(defn os-ttest [{smpl :smpl hmean :hmean :or {:hmean 0}}] (_OneSample. smpl hmean)) ;TODO move into high level api
 
-(defrecord -OneSampleTTest [in]
-    -TTest
-    (osmpl [this]
-        (as-> (posmpl in) pttest
-              (assoc this :out pttest))))
-
-
-(defrecord -EqualVarianceTTest [in] -TTest)
-(defrecord -WelchTTest [in] -TTest)
-(defrecord -RepeatedMeasureTTest [in] -TTest)
-(defrecord -EqualVarianceTTest [in] -TTest)
-
-(defmulti osmpl-tstat class)
-
-(defmethod osmpl-tstat -OneSampleTTest [{in :in out :out}]
-    (/ (- (:mean out)
-          (:hmean in))
-       (/ (:ssdev out)
-          (Math/sqrt (:ssize out)))))
-
-;((comp osmpl-tstat osmpl) (-OneSampleTTest. {:smpl [490 500 530 550 580 590 600 600 650 700] :hmean 400}))
 
 (defmulti ttest class)
 
