@@ -14,7 +14,7 @@
 
 
 (defrecord _OneSample [smpl hmean])
-(defrecord _EqualVariance [smpls hmeans alpha])
+(defrecord _EqualVariance [smpls hmeans])
 (defrecord _Welch [smpls alpha])
 (defrecord _RepeatedMeasure [smpls hmeans alpha])
 (defrecord _Median [smpls hmeans alpha])
@@ -38,6 +38,32 @@
 			 (zipmap [:mean :ssdev :ssize]))))
 
 (defn os-ttest [{smpl :smpl hmean :hmean :or {:hmean 0}}] (_OneSample. smpl hmean)) ;TODO move into high level api
+
+
+(/ (- (- smone smtwo)
+	  (- pmone pmtwo))
+   (Math/sqrt (* (/ (+ pvone pvtwo)
+					2)
+				 (+ (/ 1 ssone)
+					(/ 1 sstwo)))))
+
+
+(defmethod _ttest _EqualVariance
+	[ttest]
+	((comp #(assoc %
+				:hmeans ttest
+				:tstat ()))                                             ;TODO tstat
+		(->> (pvalues (map mean (:smpls ttest))
+					  (map mean
+						   (partition 1
+									  (:hmeans ttest)))
+					  (map #(pvar %
+								  (mean %)
+								  (dec (count %)))
+						   (:smpls ttest))
+					  (map count
+						   (:smpls ttest)))
+			 (zipmap [:smpls :pvars :ssizes]))))
 
 
 (defmulti ttest class)
