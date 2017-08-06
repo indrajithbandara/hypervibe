@@ -39,20 +39,20 @@
 
 (defn os-ttest [{smpl :smpl hmean :hmean :or {:hmean 0}}] (_OneSample. smpl hmean))
 
-
-(/ (- (- smone smtwo)
-      (- pmone pmtwo))
-   (Math/sqrt (* (/ (+ pvone pvtwo)
-                    2)
-                 (+ (/ 1 ssone)
-                    (/ 1 sstwo)))))
-
-
 (defmethod _ttest _EqualVariance
     [ttest]
     ((comp #(assoc %
-                   :hmeans ttest
-                   :tstat ()))                              ;TODO tstat
+                   :hmeans (:hmeans ttest)
+                   :tstat ((fn [{[smone smtwo] :smeans
+                                 [pmone pmtwo] :pmeans
+                                 [pvone pvtwo] :pvars
+                                 [ssone sstwo] :ssizes}]
+                               (/ (- (- smone smtwo)
+                                     (- pmone pmtwo))
+                                  (Math/sqrt (* (/ (+ pvone pvtwo)
+                                                   2)
+                                                (+ (/ 1 ssone)
+                                                   (/ 1 sstwo)))))) %)))
         (->> (pvalues (map mean (:smpls ttest))
                       (map mean
                            (partition 1
@@ -63,8 +63,9 @@
                            (:smpls ttest))
                       (map count
                            (:smpls ttest)))
-             (zipmap [:smpls :pvars :ssizes]))))
+             (zipmap [:smeans :pmeans :pvars :ssizes]))))
 
+(defn ev-ttest [{smpls :smpls hmeans :hmeans :or {:hmeans [0 0]}}] (_EqualVariance. smpls hmeans))
 
 (defmulti ttest class)
 
