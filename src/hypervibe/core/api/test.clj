@@ -20,6 +20,7 @@
 (defrecord _Median [smpls hmeans alpha])
 
 ;TODO Implement function for looking up Pvalue
+;TODO use zac tellman primitive math lib
 
 (defmulti _ttest class)
 
@@ -66,6 +67,36 @@
              (zipmap [:smeans :pmeans :pvars :ssizes]))))
 
 (defn ev-ttest [{smpls :smpls hmeans :hmeans :or {:hmeans [0 0]}}] (_EqualVariance. smpls hmeans))
+
+(defmethod _ttest _Welch                                    ;TODO fix
+    [ttest]
+    ((comp #(assoc %
+                   :tstat (/ (- ((:smeans %) 0)
+                                ((:smeans %) 1))
+                             (Math/sqrt
+                                 (+ (/ ((:svars %) 0)
+                                       ((:svars %) 1))
+                                    (/ ((:ssizes %) 0)
+                                       ((:ssizes %) 1)))))
+                   :dof ((fn [[svone ssone]
+                              [svtwo sstwo]]
+                             (/ (* (+ (/ svone ssone)
+                                      (/ svtwo sstwo))
+                                   (+ (/ svone ssone)
+                                      (/ svtwo sstwo)))
+                                (+ (/ (* (/ svone ssone)
+                                         (/ svone ssone))
+                                      (- ssone 1))
+                                   (/ (* (/ svtwo sstwo)
+                                         (/ svtwo sstwo))
+                                      (- sstwo 1))))) %))
+
+           (->> (pvalues (map mean (:smpls ttest))
+                         (map #(svar % (mean %))
+                              (:smpls ttest))
+                         (map count (:smpls ttest)))
+                (zipmap [:means :svars :ssizes])))))
+
 
 (defmulti ttest class)
 
