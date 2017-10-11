@@ -27,74 +27,94 @@
 (defmethod _ttest _OneSample
     [ttest]
     ((comp #(assoc %
-                   :hmean (:hmean ttest)
+                   :in ttest
                    :tstat (/ (- (:mean %)
                                 (:hmean ttest))
                              (/ (:ssdev %)
-                                (Math/sqrt (:ssize %))))))
+                                (Math/sqrt (:ssize %))))
+                   :dof (dec (:ssize %))))
         (->> (pvalues (mean (:smpl ttest))
                       (ssdev (:smpl ttest)
                              (mean (:smpl ttest)))
                       (m/ecount (:smpl ttest)))
              (zipmap [:mean :ssdev :ssize]))))
 
-(defn os-ttest [{smpl :smpl hmean :hmean :or {:hmean 0}}] (_OneSample. smpl hmean))
+(defn os-ttest [{smpl :smpl hmean :hmean :or {hmean 0}}] (_OneSample. smpl hmean))
 
 (defmethod _ttest _EqualVariance
     [ttest]
     ((comp #(assoc %
-                   :hmeans (:hmeans ttest)
-                   :tstat ((fn [{[smone smtwo] :smeans
-                                 [pmone pmtwo] :pmeans
-                                 [pvone pvtwo] :pvars
-                                 [ssone sstwo] :ssizes}]
-                               (/ (- (- smone smtwo)
-                                     (- pmone pmtwo))
-                                  (Math/sqrt (* (/ (+ pvone pvtwo)
-                                                   2)
-                                                (+ (/ 1 ssone)
-                                                   (/ 1 sstwo)))))) %)))
-        (->> (pvalues (map mean (:smpls ttest))
-                      (map mean
-                           (partition 1
-                                      (:hmeans ttest)))
-                      (map #(pvar %
-                                  (mean %)
-                                  (dec (count %)))
-                           (:smpls ttest))
-                      (map count
-                           (:smpls ttest)))
+                   :in ttest
+                   :tstat (/ (- (- ((:smeans %) 0)
+                                   ((:smeans %) 1))
+                                (- ((:pmeans %) 0)
+                                   ((:pmeans %) 1)))
+                             (Math/sqrt (* (/ (+ ((:pvars %) 0)
+                                                 ((:pvars %) 1))
+                                              2)
+                                           (+ (/ 1
+                                                 ((:ssizes %) 0))
+                                              (/ 1
+                                                 ((:ssizes %) 1))))))))
+        (->> (pvalues (mapv mean
+                            (:smpls ttest))
+                      (mapv mean
+                            (partition 1
+                                       (:hmeans ttest)))
+                      (mapv #(pvar %
+                                   (mean %)
+                                   (dec (count %)))
+                            (:smpls ttest))
+                      (mapv count
+                            (:smpls ttest)))
              (zipmap [:smeans :pmeans :pvars :ssizes]))))
 
-(defn ev-ttest [{smpls :smpls hmeans :hmeans :or {:hmeans [0 0]}}] (_EqualVariance. smpls hmeans))
+(defn ev-ttest [{smpls :smpls hmeans :hmeans :or {hmeans [0 0]}}] (_EqualVariance. smpls hmeans))
 
 (defmethod _ttest _Welch                                    ;TODO fix
     [ttest]
     ((comp #(assoc %
-                   :tstat (/ (- ((:smeans %) 0)
-                                ((:smeans %) 1))
-                             (Math/sqrt
-                                 (+ (/ ((:svars %) 0)
-                                       ((:svars %) 1))
-                                    (/ ((:ssizes %) 0)
-                                       ((:ssizes %) 1)))))
+                   :in ttest
+                   :tstat ((fn [{[mone mtwo]   :smeans
+                                 [svone svtwo] :svars
+                                 [ssone sstwo] :ssizes}]
+                               (/ (- mone
+                                     mtwo)
+                                  (Math/sqrt (+ (/ svone
+                                                   ssone)
+                                                (/ svtwo
+                                                   sstwo)))))
+                              %)
                    :dof ((fn [[svone ssone]
                               [svtwo sstwo]]
-                             (/ (* (+ (/ svone ssone)
-                                      (/ svtwo sstwo))
-                                   (+ (/ svone ssone)
-                                      (/ svtwo sstwo)))
-                                (+ (/ (* (/ svone ssone)
-                                         (/ svone ssone))
-                                      (- ssone 1))
-                                   (/ (* (/ svtwo sstwo)
-                                         (/ svtwo sstwo))
-                                      (- sstwo 1))))) %))
-
-           (->> (pvalues (map mean (:smpls ttest))
-                         (map #(svar % (mean %))
+                             (/ (* (+ (/ svone
+                                         ssone)
+                                      (/ svtwo
+                                         sstwo))
+                                   (+ (/ svone
+                                         ssone)
+                                      (/ svtwo
+                                         sstwo)))
+                                (+ (/ (* (/ svone
+                                            ssone)
+                                         (/ svone
+                                            ssone))
+                                      (- ssone
+                                         1))
+                                   (/ (* (/ svtwo
+                                            sstwo)
+                                         (/ svtwo
+                                            sstwo))
+                                      (- sstwo
+                                         1)))))
+                            %))
+           (->> (pvalues (map mean
                               (:smpls ttest))
-                         (map count (:smpls ttest)))
+                         (map #(svar %
+                                     (mean %))
+                              (:smpls ttest))
+                         (map count
+                              (:smpls ttest)))
                 (zipmap [:means :svars :ssizes])))))
 
 
