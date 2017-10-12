@@ -1,11 +1,11 @@
 (ns hypervibe.test
-    (:require [clojure.test :refer :all]
-              [clojure.core.matrix :as m]
-              [hypervibe.core.api.samples :refer :all]
-              [hypervibe.core.api.test :refer [ttest]]
-              [hypervibe.core.test :refer [osmpl evar welch rmsure]]
-              [hypervibe.core.confidence_interval :refer [osc-intvl evc-intvl]]
-              [criterium.core :as cri]))
+  (:require [clojure.test :refer :all]
+            [clojure.core.matrix :as m]
+            [hypervibe.core.api.samples :refer :all]
+            [hypervibe.core.api.test :refer [ttest]]
+            [hypervibe.core.test :refer [osmpl evar welch rmsure]]
+            [hypervibe.core.confidence_interval :refer [osc-intvl evc-intvl]]
+            [criterium.core :as cri]))
 (m/set-current-implementation :vectorz)
 
 ;TODO fix failing tests due to change to mikera matrix
@@ -30,117 +30,117 @@
 
 
 (deftest one-sample-t-test-test!
-    (is (= (ttest (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400}))
-           {:tstat  8.700992601418207,
-            :ssdev  65.05553183413554,
-            :dof    9,
-            :cval   1.83311,
-            :rnull? true,
-            :ssize  10,
-            :smean  579.0,
-            :hmean  400,
-            :alpha  0.05,
-            :smpl   #vectorz/vector[490 500 530 550 580 590 600 600 650 700],
-            :diff   6.8678826014182075})))
+  (is (= (ttest (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400}))
+         {:tstat  8.700992601418207,
+          :ssdev  65.05553183413554,
+          :dof    9,
+          :cval   1.83311,
+          :rnull? true,
+          :ssize  10,
+          :smean  579.0,
+          :hmean  400,
+          :alpha  0.05,
+          :smpl   #vectorz/vector[490 500 530 550 580 590 600 600 650 700],
+          :diff   6.8678826014182075})))
 
 
 (deftest one-sample-t-test-test
-    (is (= (ttest (osmpl {:smpl population-one :hmean 400}))
-           {:tstat  8.700992601418207,
-            :ssdev  65.05553183413554,
-            :dof    9,
-            :cval   1.83311,
-            :rnull? true,
-            :ssize  10,
-            :smean  579.0,
-            :hmean  400,
-            :alpha  0.05,
-            :smpl   #vectorz/vector[490 500 530 550 580 590 600 600 650 700],
-            :diff   6.8678826014182075})))
+  (is (= (ttest (osmpl {:smpl population-one :hmean 400}))
+         {:tstat  8.700992601418207,
+          :ssdev  65.05553183413554,
+          :dof    9,
+          :cval   1.83311,
+          :rnull? true,
+          :ssize  10,
+          :smean  579.0,
+          :hmean  400,
+          :alpha  0.05,
+          :smpl   #vectorz/vector[490 500 530 550 580 590 600 600 650 700],
+          :diff   6.8678826014182075})))
 
 
 (deftest two-sample-t-test-evariance
-    (is (= (ttest (evar {:smpls [ballet-dancers football-players]}))
-           {:tstat     1.094722972460392,
-            :dof       18,
-            :cval      1.73406,
-            :rnull?    false,
-            :means     [0.0 0.0],
-            :hmeans    [0 0],
-            :smeans    [87.94999999999999 85.19],
-            :alpha     0.05,
-            :pool-vars [32.382777777777775 31.181000000000015],
-            :smpls     [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-            :ssizes    [10 10],
-            :diff      -0.639337027539608})))
+  (is (= (ttest (evar {:smpls [ballet-dancers football-players]}))
+         {:tstat     1.094722972460392,
+          :dof       18,
+          :cval      1.73406,
+          :rnull?    false,
+          :means     [0.0 0.0],
+          :hmeans    [0 0],
+          :smeans    [87.94999999999999 85.19],
+          :alpha     0.05,
+          :pool-vars [32.382777777777775 31.181000000000015],
+          :smpls     [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+          :ssizes    [10 10],
+          :diff      -0.639337027539608})))
 
 
 (deftest two-sample-t-test-unequal-variance-welch
-    (is (= (ttest (welch {:smpls [ballet-dancers football-players]}))
-           {:tstat  1.0947229724603922,
-            :dof    17.993567997176537,
-            :cval   1.73406,
-            :rnull? false,
-            :svars  [32.382777777777775 31.181000000000015],
-            :smeans [87.94999999999999 85.19],
-            :alpha  0.05,
-            :smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-            :ssizes [10 10],
-            :diff   -0.6393370275396077})))
+  (is (= (ttest (welch {:smpls [ballet-dancers football-players]}))
+         {:tstat  1.0947229724603922,
+          :dof    17.993567997176537,
+          :cval   1.73406,
+          :rnull? false,
+          :svars  [32.382777777777775 31.181000000000015],
+          :smeans [87.94999999999999 85.19],
+          :alpha  0.05,
+          :smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+          :ssizes [10 10],
+          :diff   -0.6393370275396077})))
 
 
 
 (deftest two-sample-repeated-measure-test
-    (is (= (ttest (rmsure {:smpls [after before]}))
-           {:sdev   13.904435743076139,
-            :tstat  -2.5017235438103813,
-            :dof    9,
-            :cval   1.83311,
-            :rnull? true,
-            :means  [0.0 0.0],
-            :ssize  10,
-            :hmeans [0 0],
-            :alpha  0.05,
-            :smpls  [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
-            :dmean  -11.0})))
+  (is (= (ttest (rmsure {:smpls [after before]}))
+         {:sdev   13.904435743076139,
+          :tstat  -2.5017235438103813,
+          :dof    9,
+          :cval   1.83311,
+          :rnull? true,
+          :means  [0.0 0.0],
+          :ssize  10,
+          :hmeans [0 0],
+          :alpha  0.05,
+          :smpls  [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
+          :dmean  -11.0})))
 
 
 (deftest one-sample-conf-inter-test
-    (is (= (osc-intvl {:smpl population-one :cval 1.83311293265624 :hmean 400})
-           {:upper 216.71146925144888,
-            :ssdev 65.05553183413554,
-            :mdiff 179.0,
-            :cval  1.83311293265624,
-            :ssize 10,
-            :smean 579.0,
-            :lower 141.28853074855112,
-            :hmean 400,
-            :smpl  #vectorz/vector[490.0 500.0 530.0 550.0 580.0 590.0 600.0 600.0 650.0 700.0]})))
+  (is (= (osc-intvl {:smpl population-one :cval 1.83311293265624 :hmean 400})
+         {:upper 216.71146925144888,
+          :ssdev 65.05553183413554,
+          :mdiff 179.0,
+          :cval  1.83311293265624,
+          :ssize 10,
+          :smean 579.0,
+          :lower 141.28853074855112,
+          :hmean 400,
+          :smpl  #vectorz/vector[490.0 500.0 530.0 550.0 580.0 590.0 600.0 600.0 650.0 700.0]})))
 
 
 (deftest two-sample-confidence-interval-test-test
-    (is (= (evc-intvl {:smpls [ballet-dancers football-players] :cval 2.1009})
-           {:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
-                     [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-            :svars  [32.382777777777775 31.181000000000015],
-            :smeans [87.94999999999999 85.19],
-            :ssizes [10 85.19],
-            :cval   2.1009,
-            :upper  8.05675922207777,
-            :lower  -2.536759222077789})))
+  (is (= (evc-intvl {:smpls [ballet-dancers football-players] :cval 2.1009})
+         {:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+                   [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+          :svars  [32.382777777777775 31.181000000000015],
+          :smeans [87.94999999999999 85.19],
+          :ssizes [10 85.19],
+          :cval   2.1009,
+          :upper  8.05675922207777,
+          :lower  -2.536759222077789})))
 
 
 (deftest compose-one-sample-ttest-confidence-interval
-    (is (= ((comp osc-intvl) (ttest (osmpl {:smpl population-one :hmean 400})))
-           {:upper 216.71140891977285,
-            :ssdev 65.05553183413554,
-            :mdiff 179.0,
-            :cval  1.83311,
-            :ssize 10,
-            :smean 579.0,
-            :lower 141.28859108022715,
-            :hmean 400,
-            :smpl  #vectorz/vector[490.0 500.0 530.0 550.0 580.0 590.0 600.0 600.0 650.0 700.0]})))
+  (is (= ((comp osc-intvl) (ttest (osmpl {:smpl population-one :hmean 400})))
+         {:upper 216.71140891977285,
+          :ssdev 65.05553183413554,
+          :mdiff 179.0,
+          :cval  1.83311,
+          :ssize 10,
+          :smean 579.0,
+          :lower 141.28859108022715,
+          :hmean 400,
+          :smpl  #vectorz/vector[490.0 500.0 530.0 550.0 580.0 590.0 600.0 600.0 650.0 700.0]})))
 
 (def dummy1 (range 1000000))
 
