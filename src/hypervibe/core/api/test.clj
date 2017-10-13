@@ -43,48 +43,53 @@
           :dof (dec (:ssize pttest)))))
 
 (defmethod _tstat _OneSample
-  [os-tstat]
-  (assoc os-tstat
+  [tstat]
+  (assoc tstat
     :tstat
-    (/ (- (:smean os-tstat)
-          (:hmean os-tstat))
-       (/ (:ssdev os-tstat)
-          (Math/sqrt (:ssize os-tstat))))))
+    (/ (- (:smean tstat)
+          (:hmean tstat))
+       (/ (:ssdev tstat)
+          (Math/sqrt (:ssize tstat))))))
 
 ;TODO spec this function
 (defn os-ttest [{smpl :smpl hmean :hmean :or {hmean 0}}] (_OneSample. smpl hmean))
 
+;(_tstat (_ttest (os-ttest {:smpl population-one :hmean 400})))
+
 (defmethod _ttest _EqualVariance
   [ttest]
-  ((comp #(assoc %
-            :in ttest
-            :tstat (/ (- (- ((:smeans %) 0)
-                            ((:smeans %) 1))
-                         (- ((:pmeans %) 0)
-                            ((:pmeans %) 1)))
-                      (Math/sqrt (* (/ (+ ((:pvars %) 0)
-                                          ((:pvars %) 1))
-                                       2)
-                                    (+ (/ 1
-                                          ((:ssizes %) 0))
-                                       (/ 1
-                                          ((:ssizes %) 1))))))))
-    (->> (pvalues (mapv mean
-                        (:smpls ttest))
-                  (mapv mean
-                        (partition 1
-                                   (:hmeans ttest)))
-                  (mapv #(pvar %
-                               (mean %)
-                               (dec (count %)))
-                        (:smpls ttest))
-                  (mapv count
-                        (:smpls ttest)))
-         (zipmap [:smeans :pmeans :pvars :ssizes]))))
+  (as-> (->> (pvalues (mapv mean (:smpls ttest))
+                      (mapv mean (partition 1 (:hmeans ttest)))
+                      (mapv #(pvar % (mean %) (dec (count %))) (:smpls ttest))
+                      (mapv count (:smpls ttest)))
+             (zipmap [:smeans :pmeans :pvars :ssizes]))
+        pttest
+        (assoc ttest
+          :smeans (:smeans pttest)
+          :pmeans (:pmeans pttest)
+          :pvars (:pvars pttest)
+          :ssizes (:ssizes pttest)
+          :dof (- (apply + (:ssizes pttest)) 2))))
+
+(defmethod _tstat _EqualVariance
+  [tstat]
+  (assoc tstat
+    :tstat
+    (/ (- (- ((:smeans tstat) 0)
+             ((:smeans tstat) 1))
+          (- ((:pmeans tstat) 0)
+             ((:pmeans tstat) 1)))
+       (Math/sqrt (* (/ (+ ((:pvars tstat) 0)
+                           ((:pvars tstat) 1)) 2)
+                     (+ (/ 1 ((:ssizes tstat) 0))
+                        (/ 1 ((:ssizes tstat) 1))))))))
+
+;TODO spec this function
+;(_tstat (_ttest (ev-ttest {:smpls [ballet-dancers football-players]})))
 
 (defn ev-ttest [{smpls :smpls hmeans :hmeans :or {hmeans [0 0]}}] (_EqualVariance. smpls hmeans))
 
-(defmethod _ttest _Welch                                    ;TODO fix
+(defmethod _ttest _Welch
   [ttest]
   ((comp #(assoc %
             :in ttest
