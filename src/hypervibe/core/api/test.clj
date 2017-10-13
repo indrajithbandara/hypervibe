@@ -13,8 +13,8 @@
 (deftype Median [smpls hmeans alpha])
 
 
-(defrecord _OneSample [smpl hmean])
-(defrecord _EqualVariance [smpls hmeans])
+(defrecord _OneSample [smpl hmean alpha])
+(defrecord _EqualVariance [smpls hmeans alpha])
 (defrecord _Welch [smpls alpha])
 (defrecord _RepeatedMeasure [smpls hmeans alpha])
 (defrecord _Median [smpls hmeans alpha])
@@ -32,31 +32,31 @@
                       (m/ecount (:smpl ttest)))
              (zipmap [:smean :ssdev :ssize]))
         pttest
-        (assoc ttest
-          :smean (:smean pttest)
-          :ssdev (:ssdev pttest)
-          :ssize (:ssize pttest)
-          :tstat (/ (- (:smean pttest)
-                       (:hmean ttest))
-                    (/ (:ssdev pttest)
-                       (Math/sqrt (:ssize pttest))))
-          :dof (dec (:ssize pttest)))))
+        (assoc ttest :smean (:smean pttest)
+                     :ssdev (:ssdev pttest)
+                     :ssize (:ssize pttest)
+                     :alpha (:alpha ttest)
+                     :tstat (/ (- (:smean pttest)
+                                  (:hmean ttest))
+                               (/ (:ssdev pttest)
+                                  (Math/sqrt (:ssize pttest))))
+                     :dof (dec (:ssize pttest)))))
 
 (defmethod _tstat _OneSample
   [tstat]
-  (assoc tstat
-    :tstat
-    (/ (- (:smean tstat)
-          (:hmean tstat))
-       (/ (:ssdev tstat)
-          (Math/sqrt (:ssize tstat))))))
+  (assoc tstat :tstat
+               (/ (- (:smean tstat)
+                     (:hmean tstat))
+                  (/ (:ssdev tstat)
+                     (Math/sqrt (:ssize tstat))))))
 
 ;TODO spec this function
-(defn os-ttest [{smpl :smpl hmean :hmean :or {hmean 0}}] (_OneSample. smpl hmean))
+
+(defn os-ttest [{smpl :smpl hmean :hmean alpha :alpha :or {hmean 0 alpha 0.05}}] (_OneSample. smpl hmean alpha))
 
 ;(_tstat (_ttest (os-ttest {:smpl population-one :hmean 400})))
 
-(defmethod _ttest _EqualVariance
+(defmethod _ttest _EqualVariance                            ;TODO change to mikera.vectors
   [ttest]
   (as-> (->> (pvalues (mapv mean (:smpls ttest))
                       (mapv mean (partition 1 (:hmeans ttest)))
@@ -64,76 +64,76 @@
                       (mapv count (:smpls ttest)))
              (zipmap [:smeans :pmeans :pvars :ssizes]))
         pttest
-        (assoc ttest
-          :smeans (:smeans pttest)
-          :pmeans (:pmeans pttest)
-          :pvars (:pvars pttest)
-          :ssizes (:ssizes pttest)
-          :dof (- (apply + (:ssizes pttest)) 2))))
+        (assoc ttest :smeans (:smeans pttest)
+                     :pmeans (:pmeans pttest)
+                     :pvars (:pvars pttest)
+                     :ssizes (:ssizes pttest)
+                     :dof (- (apply + (:ssizes pttest)) 2))))
 
 (defmethod _tstat _EqualVariance
   [tstat]
-  (assoc tstat
-    :tstat
-    (/ (- (- ((:smeans tstat) 0)
-             ((:smeans tstat) 1))
-          (- ((:pmeans tstat) 0)
-             ((:pmeans tstat) 1)))
-       (Math/sqrt (* (/ (+ ((:pvars tstat) 0)
-                           ((:pvars tstat) 1)) 2)
-                     (+ (/ 1 ((:ssizes tstat) 0))
-                        (/ 1 ((:ssizes tstat) 1))))))))
+  (assoc tstat :tstat
+               (/ (- (- ((:smeans tstat) 0)
+                        ((:smeans tstat) 1))
+                     (- ((:pmeans tstat) 0)
+                        ((:pmeans tstat) 1)))
+                  (Math/sqrt (* (/ (+ ((:pvars tstat) 0)
+                                      ((:pvars tstat) 1)) 2)
+                                (+ (/ 1 ((:ssizes tstat) 0))
+                                   (/ 1 ((:ssizes tstat) 1))))))))
 
 ;TODO spec this function
 ;(_tstat (_ttest (ev-ttest {:smpls [ballet-dancers football-players]})))
 
-(defn ev-ttest [{smpls :smpls hmeans :hmeans :or {hmeans [0 0]}}] (_EqualVariance. smpls hmeans))
+(defn ev-ttest [{smpls :smpls hmeans :hmeans alpha :alpha :or {hmeans [0 0] alpha 0.05}}] (_EqualVariance. smpls hmeans alpha))
+
+(def ballet-dancers [89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3])
+(def football-players [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9])
+
 
 (defmethod _ttest _Welch
   [ttest]
-  ((comp #(assoc %
-            :in ttest
-            :tstat ((fn [{[mone mtwo]   :smeans
-                          [svone svtwo] :svars
-                          [ssone sstwo] :ssizes}]
-                      (/ (- mone
-                            mtwo)
-                         (Math/sqrt (+ (/ svone
-                                          ssone)
-                                       (/ svtwo
-                                          sstwo)))))
-                     %)
-            :dof ((fn [[svone ssone]
-                       [svtwo sstwo]]
-                    (/ (* (+ (/ svone
-                                ssone)
-                             (/ svtwo
-                                sstwo))
-                          (+ (/ svone
-                                ssone)
-                             (/ svtwo
-                                sstwo)))
-                       (+ (/ (* (/ svone
-                                   ssone)
-                                (/ svone
-                                   ssone))
-                             (- ssone
-                                1))
-                          (/ (* (/ svtwo
-                                   sstwo)
-                                (/ svtwo
-                                   sstwo))
-                             (- sstwo
-                                1)))))
-                   %))
-         (->> (pvalues (map mean
-                            (:smpls ttest))
-                       (map #(svar %
-                                   (mean %))
-                            (:smpls ttest))
-                       (map count
-                            (:smpls ttest)))
-              (zipmap [:means :svars :ssizes])))))
+  (as-> (->> (pvalues (mapv mean (:smpls ttest))
+                      (mapv #(svar % (mean %)) (:smpls ttest))
+                      (mapv count (:smpls ttest)))
+             (zipmap [:smeans :svars :ssizes]))
+        pttest
+        (assoc ttest :smeans (:smeans pttest)
+                     :svars (:svars pttest)
+                     :ssizes (:ssizes pttest)
+                     :alpha (:alpha ttest)
+                     :dof (/ (* (+ (/ ((:svars pttest) 0)
+                                      ((:ssizes pttest) 0))
+                                   (/ ((:svars pttest) 1)
+                                      ((:ssizes pttest) 1)))
+                                (+ (/ ((:svars pttest) 0)
+                                      ((:ssizes pttest) 0))
+                                   (/ ((:svars pttest) 1)
+                                      ((:ssizes pttest) 1))))
+                             (+ (/ (* (/ ((:svars pttest) 0)
+                                         ((:ssizes pttest) 0))
+                                      (/ ((:svars pttest) 0)
+                                         ((:ssizes pttest) 0)))
+                                   (- ((:ssizes pttest) 0) 1))
+                                (/ (* (/ ((:svars pttest) 1)
+                                         ((:ssizes pttest) 1))
+                                      (/ ((:svars pttest) 1)
+                                         ((:ssizes pttest) 1)))
+                                   (- ((:ssizes pttest) 1) 1)))))))
+
+(defmethod _tstat _Welch
+  [tstat]
+  (assoc tstat :tstat
+               (/ (- ((:smeans tstat) 0)
+                     ((:smeans tstat) 1))
+                  (Math/sqrt (+ (/ ((:svars tstat) 0)
+                                   ((:ssizes tstat) 0))
+                                (/ ((:svars tstat) 1)
+                                   ((:ssizes tstat) 1)))))))
+
+(defn _welch-ttest [{smpls :smpls alpha :alpha :or {alpha 0.05}}] (_Welch. smpls alpha))
+
+;(_tstat (_ttest (_welch-ttest {:smpls [ballet-dancers football-players]})))
 
 
 (defmulti ttest class)
