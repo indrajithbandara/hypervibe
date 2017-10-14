@@ -2,107 +2,121 @@
   (:require [clojure.test :refer :all]
             [clojure.core.matrix :as m]
             [hypervibe.core.api.samples :refer :all]
-            [hypervibe.core.api.test :refer [ttest]]
+            [hypervibe.core.api.test :refer [ttest tstat]]
             [hypervibe.core.test :refer [osmpl evar welch rmsure]]
             [hypervibe.core.confidence_interval :refer [osc-intvl evc-intvl]]
             [criterium.core :as cri]))
 (m/set-current-implementation :vectorz)
 
-;TODO fix failing tests due to change to mikera matrix
-;TODO change all input vextors to mikera matrix / vector.. also look at hip hip array (set reflection so i can manage boxing and unboxing using *, - look at Vectorz lib for core.matrix)
-;TODO specifications for all current functions input type  etc
-;TODO confidence interval for welch and repeated measure ttest
-;TODO research more into what constitutes to a rejected null hypothesis
-;TODO add alternative hypothesis
-;TODO put helper functions into utils name space
-;TODO update docs to add null hypothesis result
-;TODO create function that outputs test result
-;TODO using math.round will solve problem of dof for welch ttest
-;TODO generate chi square distribution using R
-;TODO implement Z scores using R
-;TODO Implement more tests as per http://www.ats.ucla.edu/stat/mult_pkg/whatstat/ & http://www.ats.ucla.edu/stat/spss/whatstat/whatstat.htm
-;TODO create protocol named Conduct which compares the absolute value of the t statistic with the critical value ang outputs the test result
-;TODO reference here for different distrubutions http://www.itl.nist.gov/div898/handbook/eda/section3/eda367.htm
-;TODO Levene's Test for Equality of Variances
-;TODO start implementing chart api
-;TODO compile all distrubution tables into seperate jar files
-
-
-
-(deftest one-sample-t-test-test!
-  (is (= (ttest (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400}))
-         {:tstat  8.700992601418207,
-          :ssdev  65.05553183413554,
-          :dof    9,
-          :cval   1.83311,
-          :rnull? true,
-          :ssize  10,
-          :smean  579.0,
-          :hmean  400,
-          :alpha  0.05,
-          :smpl   #vectorz/vector[490 500 530 550 580 590 600 600 650 700],
-          :diff   6.8678826014182075})))
+;TODO rename ttest to prestat or crunch
+;TODO rename tstat to ttest as it is computing the test statistic
+;TODO update docs
+;TODO make all functions use mikera vector and all accompanying api
+;TODO add critical value and critical value diff and pvalue
+;TODO confidence intervals for each test
+;TODO add specs to high level api
+;TODO Implement function for looking up Pvalue
+;TODO use zac tellman primitive math lib
+;TODO change to mikera.vectors
 
 
 (deftest one-sample-t-test-test
-  (is (= (ttest (osmpl {:smpl population-one :hmean 400}))
-         {:tstat  8.700992601418207,
-          :ssdev  65.05553183413554,
-          :dof    9,
-          :cval   1.83311,
-          :rnull? true,
-          :ssize  10,
-          :smean  579.0,
-          :hmean  400,
-          :alpha  0.05,
-          :smpl   #vectorz/vector[490 500 530 550 580 590 600 600 650 700],
-          :diff   6.8678826014182075})))
+  (is (= (ttest (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400}))
+         #hypervibe.core.api.test.OneSample{:smpl  #vectorz/vector[490.0 500.0 530.0 550.0 580.0 590.0 600.0 600.0 650.0 700.0],
+                                            :hmean 400,
+                                            :alpha 0.05,
+                                            :smean 579.0,
+                                            :ssdev 65.05553183413554,
+                                            :ssize 10,
+                                            :dof   9,
+                                            :diff  nil})))
 
+(deftest one-sample-t-test-test-tstat
+  (is (= (tstat (ttest (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400})))
+         #hypervibe.core.api.test.OneSample{:smpl  #vectorz/vector[490.0 500.0 530.0 550.0 580.0 590.0 600.0 600.0 650.0 700.0],
+                                            :hmean 400,
+                                            :alpha 0.05,
+                                            :smean 579.0,
+                                            :ssdev 65.05553183413554,
+                                            :ssize 10,
+                                            :tstat 8.700992601418207,
+                                            :dof   9,
+                                            :diff  nil})))
 
 (deftest two-sample-t-test-evariance
   (is (= (ttest (evar {:smpls [ballet-dancers football-players]}))
-         {:tstat     1.094722972460392,
-          :dof       18,
-          :cval      1.73406,
-          :rnull?    false,
-          :means     [0.0 0.0],
-          :hmeans    [0 0],
-          :smeans    [87.94999999999999 85.19],
-          :alpha     0.05,
-          :pool-vars [32.382777777777775 31.181000000000015],
-          :smpls     [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-          :ssizes    [10 10],
-          :diff      -0.639337027539608})))
+         #hypervibe.core.api.test.EqualVariance{:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+                                                         [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                                :hmeans [0 0],
+                                                :alpha  0.05,
+                                                :smeans [87.94999999999999 85.19],
+                                                :pmeans [0.0 0.0],
+                                                :pvars  [32.382777777777775 31.181000000000015],
+                                                :ssizes [10 10],
+                                                :dof    18
+                                                :diff   nil})))
 
+(deftest two-sample-t-test-evariance-tstat
+  (is (= (tstat (ttest (evar {:smpls [ballet-dancers football-players]})))
+         #hypervibe.core.api.test.EqualVariance{:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+                                                         [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                                :hmeans [0 0],
+                                                :alpha  0.05,
+                                                :smeans [87.94999999999999 85.19],
+                                                :pmeans [0.0 0.0],
+                                                :pvars  [32.382777777777775 31.181000000000015],
+                                                :ssizes [10 10],
+                                                :dof    18,
+                                                :tstat  1.094722972460392
+                                                :diff nil})))
 
 (deftest two-sample-t-test-unequal-variance-welch
   (is (= (ttest (welch {:smpls [ballet-dancers football-players]}))
-         {:tstat  1.0947229724603922,
-          :dof    17.993567997176537,
-          :cval   1.73406,
-          :rnull? false,
-          :svars  [32.382777777777775 31.181000000000015],
-          :smeans [87.94999999999999 85.19],
-          :alpha  0.05,
-          :smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3] [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
-          :ssizes [10 10],
-          :diff   -0.6393370275396077})))
+         #hypervibe.core.api.test.Welch{:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+                                                 [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                        :alpha  0.05,
+                                        :smeans [87.94999999999999 85.19],
+                                        :svars  [32.382777777777775 31.181000000000015],
+                                        :ssizes [10 10],
+                                        :dof    17.993567997176537})))
+
+(deftest two-sample-t-test-unequal-variance-welch-tstat
+  (is (= (tstat (ttest (welch {:smpls [ballet-dancers football-players]})))
+         #hypervibe.core.api.test.Welch{:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
+                                                 [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
+                                        :alpha  0.05,
+                                        :smeans [87.94999999999999 85.19],
+                                        :svars  [32.382777777777775 31.181000000000015],
+                                        :ssizes [10 10],
+                                        :tstat  1.0947229724603922,
+                                        :dof    17.993567997176537})))
 
 
 
 (deftest two-sample-repeated-measure-test
   (is (= (ttest (rmsure {:smpls [after before]}))
-         {:sdev   13.904435743076139,
-          :tstat  -2.5017235438103813,
-          :dof    9,
-          :cval   1.83311,
-          :rnull? true,
-          :means  [0.0 0.0],
-          :ssize  10,
-          :hmeans [0 0],
-          :alpha  0.05,
-          :smpls  [[200 210 210 170 220 180 190 190 220 210] [220 240 225 180 210 190 195 200 210 240]],
-          :dmean  -11.0})))
+         #hypervibe.core.api.test.RepeatedMeasure{:smpls  [[200 210 210 170 220 180 190 190 220 210]
+                                                           [220 240 225 180 210 190 195 200 210 240]],
+                                                  :hmeans [0 0],
+                                                  :alpha  0.05,
+                                                  :means  [0.0 0.0],
+                                                  :dmean  -11.0,
+                                                  :sdev   13.904435743076139,
+                                                  :ssize  10,
+                                                  :dof    9})))
+
+(deftest two-sample-repeated-measure-test-tstat
+  (is (= (tstat (ttest (rmsure {:smpls [after before]})))
+         #hypervibe.core.api.test.RepeatedMeasure{:smpls  [[200 210 210 170 220 180 190 190 220 210]
+                                                           [220 240 225 180 210 190 195 200 210 240]],
+                                                  :hmeans [0 0],
+                                                  :alpha  0.05,
+                                                  :means  [0.0 0.0],
+                                                  :dmean  -11.0,
+                                                  :sdev   13.904435743076139,
+                                                  :ssize  10,
+                                                  :dof    9,
+                                                  :tstat  -2.5017235438103813})))
 
 
 (deftest one-sample-conf-inter-test
@@ -130,8 +144,8 @@
           :lower  -2.536759222077789})))
 
 
-(deftest compose-one-sample-ttest-confidence-interval
-  (is (= ((comp osc-intvl) (ttest (osmpl {:smpl population-one :hmean 400})))
+#_(deftest compose-one-sample-ttest-confidence-interval
+  (is (= ((comp osc-intvl) (tstat (ttest (osmpl {:smpl population-one :hmean 400}))))
          {:upper 216.71140891977285,
           :ssdev 65.05553183413554,
           :mdiff 179.0,

@@ -67,7 +67,7 @@
     skills to the national average. Your sample would be pupils who received the new teaching method and your
     hypothesized population mean would be the national average score"
 
-  [{smpl :smpl hmean :hmean alpha :alpha :or {alpha 0.05}}] (OneSample. smpl hmean alpha))
+  [{smpl :smpl hmean :hmean alpha :alpha :or {hmean 0.0 alpha 0.05}}] (OneSample. smpl hmean alpha))
 
 
 (defn evar
