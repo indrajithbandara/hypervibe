@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [clojure.core.matrix :as m]
             [hypervibe.core.api.samples :refer :all]
-            [hypervibe.core.api.test :refer [ttest tstat]]
+            [hypervibe.core.api.test :refer [disc tstat]]
             [hypervibe.core.test :refer [osmpl evar welch rmsure]]
             [hypervibe.core.confidence_interval :refer [osc-intvl evc-intvl]]
             [criterium.core :as cri]))
@@ -21,7 +21,7 @@
 
 
 (deftest one-sample-t-test-test
-  (is (= (ttest (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400}))
+  (is (= (disc (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400}))
          #hypervibe.core.api.test.OneSample{:smpl  #vectorz/vector[490.0 500.0 530.0 550.0 580.0 590.0 600.0 600.0 650.0 700.0],
                                             :hmean 400,
                                             :alpha 0.05,
@@ -32,7 +32,7 @@
                                             :diff  nil})))
 
 (deftest one-sample-t-test-test-tstat
-  (is (= (tstat (ttest (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400})))
+  (is (= (tstat (disc (osmpl {:smpl (m/array [490 500 530 550 580 590 600 600 650 700]) :hmean 400})))
          #hypervibe.core.api.test.OneSample{:smpl  #vectorz/vector[490.0 500.0 530.0 550.0 580.0 590.0 600.0 600.0 650.0 700.0],
                                             :hmean 400,
                                             :alpha 0.05,
@@ -44,7 +44,7 @@
                                             :diff  nil})))
 
 (deftest two-sample-t-test-evariance
-  (is (= (ttest (evar {:smpls [ballet-dancers football-players]}))
+  (is (= (disc (evar {:smpls [ballet-dancers football-players]}))
          #hypervibe.core.api.test.EqualVariance{:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                          [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                 :hmeans [0 0],
@@ -57,7 +57,7 @@
                                                 :diff   nil})))
 
 (deftest two-sample-t-test-evariance-tstat
-  (is (= (tstat (ttest (evar {:smpls [ballet-dancers football-players]})))
+  (is (= (tstat (disc (evar {:smpls [ballet-dancers football-players]})))
          #hypervibe.core.api.test.EqualVariance{:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                          [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                                 :hmeans [0 0],
@@ -71,7 +71,7 @@
                                                 :diff nil})))
 
 (deftest two-sample-t-test-unequal-variance-welch
-  (is (= (ttest (welch {:smpls [ballet-dancers football-players]}))
+  (is (= (disc (welch {:smpls [ballet-dancers football-players]}))
          #hypervibe.core.api.test.Welch{:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                  [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                         :alpha  0.05,
@@ -81,7 +81,7 @@
                                         :dof    17.993567997176537})))
 
 (deftest two-sample-t-test-unequal-variance-welch-tstat
-  (is (= (tstat (ttest (welch {:smpls [ballet-dancers football-players]})))
+  (is (= (tstat (disc (welch {:smpls [ballet-dancers football-players]})))
          #hypervibe.core.api.test.Welch{:smpls  [[89.2 78.2 89.3 88.3 87.3 90.1 95.2 94.3 78.3 89.3]
                                                  [79.3 78.3 85.3 79.3 88.9 91.2 87.2 89.2 93.3 79.9]],
                                         :alpha  0.05,
@@ -94,7 +94,7 @@
 
 
 (deftest two-sample-repeated-measure-test
-  (is (= (ttest (rmsure {:smpls [after before]}))
+  (is (= (disc (rmsure {:smpls [after before]}))
          #hypervibe.core.api.test.RepeatedMeasure{:smpls  [[200 210 210 170 220 180 190 190 220 210]
                                                            [220 240 225 180 210 190 195 200 210 240]],
                                                   :hmeans [0 0],
@@ -106,7 +106,7 @@
                                                   :dof    9})))
 
 (deftest two-sample-repeated-measure-test-tstat
-  (is (= (tstat (ttest (rmsure {:smpls [after before]})))
+  (is (= (tstat (disc (rmsure {:smpls [after before]})))
          #hypervibe.core.api.test.RepeatedMeasure{:smpls  [[200 210 210 170 220 180 190 190 220 210]
                                                            [220 240 225 180 210 190 195 200 210 240]],
                                                   :hmeans [0 0],

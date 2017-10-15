@@ -10,96 +10,147 @@
 (defrecord RepeatedMeasure [smpls hmeans alpha])
 (defrecord Median [smpls hmeans alpha])
 
-(defmulti ttest class)
-(defmulti tstat class)
+(defmulti disc "Computes descriptive statistics" class)
+(defmulti tstat "Computes test statistics" class)
 
-(defmethod ttest OneSample
+(defmethod disc OneSample
   [ttest]
-  (->> (pvalues (mean (:smpl ttest))
-                (ssdev (:smpl ttest) (mean (:smpl ttest)))
-                (m/ecount (:smpl ttest)))
-       (zipmap [:smean :ssdev :ssize])
-       (#(assoc ttest :smean (:smean %1)
-                      :ssdev (:ssdev %1)
-                      :ssize (:ssize %1)
-                      :alpha (:alpha ttest)
-                      :dof (dec (:ssize %1))
-                      :diff nil))))
+  (->>
+    (pvalues (m/ecount (:smpl ttest))
+             (mean (:smpl ttest))
+             (ssdev (:smpl ttest)
+                    (mean (:smpl ttest))))
+    ((fn
+       [pv]
+       (cons (dec (first pv))
+             pv)))
+    (apply (fn
+             [dof ssize smean
+              ssdev]
+             (assoc ttest :smean smean
+                          :ssdev ssdev
+                          :ssize ssize
+                          :alpha (:alpha ttest)
+                          :dof dof
+                          :diff nil)))))
 
 (defmethod tstat OneSample
   [tstat]
-  (assoc tstat :tstat
-               (/ (- (:smean tstat)
-                     (:hmean tstat))
-                  (/ (:ssdev tstat)
-                     (Math/sqrt (:ssize tstat))))))
+  (assoc tstat
+    :tstat
+    (/ (- (:smean tstat)
+          (:hmean tstat))
+       (/ (:ssdev tstat)
+          (Math/sqrt (:ssize tstat))))))
 
-(defmethod ttest EqualVariance
+(defmethod disc EqualVariance
   [ttest]
-  (->> (pvalues (mapv mean (:smpls ttest))
-                (mapv mean (partition 1 (:hmeans ttest)))
-                (mapv #(pvar % (mean %) (dec (count %))) (:smpls ttest))
-                (mapv count (:smpls ttest)))
-       (zipmap [:smeans :pmeans :pvars :ssizes])
-       (#(assoc ttest :smeans (:smeans %1)
-                      :pmeans (:pmeans %1)
-                      :pvars (:pvars %1)
-                      :ssizes (:ssizes %1)
-                      :dof (- (apply + (:ssizes %1)) 2)
-                      :diff nil))))
+  (->>
+    (pvalues (mapv count
+                   (:smpls ttest))
+             (mapv mean
+                   (:smpls ttest))
+             (mapv mean
+                   (partition 1
+                              (:hmeans ttest)))
+             (mapv #(pvar %
+                          (mean %)
+                          (dec (count %)))
+                   (:smpls ttest)))
+    ((fn
+       [pv]
+       (cons (- (reduce +
+                        (first pv))
+                2)
+             pv)))
+    (apply (fn
+             [dof ssizes smeans
+              pmeans pvars]
+             (assoc ttest :smeans smeans
+                          :pmeans pmeans
+                          :pvars pvars
+                          :ssizes ssizes
+                          :dof (- (reduce + ssizes) 2)
+                          :diff nil)))))
 
 (defmethod tstat EqualVariance
   [tstat]
-  (assoc tstat :tstat
-               (/ (- (- ((:smeans tstat) 0)
-                        ((:smeans tstat) 1))
-                     (- ((:pmeans tstat) 0)
-                        ((:pmeans tstat) 1)))
-                  (Math/sqrt (* (/ (+ ((:pvars tstat) 0)
-                                      ((:pvars tstat) 1)) 2)
-                                (+ (/ 1 ((:ssizes tstat) 0))
-                                   (/ 1 ((:ssizes tstat) 1))))))))
+  (->>
+    tstat
+    ((fn
+       [{smeans :smeans
+         pmeans :pmeans
+         pvars  :pvars
+         ssizes :ssizes}]
+       (assoc tstat
+         :tstat
+         (/ (- (- (smeans 0)
+                  (smeans 1))
+               (- (pmeans 0)
+                  (pmeans 1)))
+            (Math/sqrt (* (/ (+ (pvars 0)
+                                (pvars 1))
+                             2)
+                          (+ (/ 1
+                                (ssizes 0))
+                             (/ 1 (ssizes 1)))))))))))
 
-(defmethod ttest Welch
+(defmethod disc Welch
   [ttest]
-  (->> (pvalues (mapv mean (:smpls ttest))
-                (mapv #(svar % (mean %)) (:smpls ttest))
-                (mapv count (:smpls ttest)))
-       (zipmap [:smeans :svars :ssizes])
-       (#(assoc ttest :smeans (:smeans %1)
-                      :svars (:svars %1)
-                      :ssizes (:ssizes %1)
-                      :alpha (:alpha ttest)
-                      :dof (/ (* (+ (/ ((:svars %1) 0)
-                                       ((:ssizes %1) 0))
-                                    (/ ((:svars %1) 1)
-                                       ((:ssizes %1) 1)))
-                                 (+ (/ ((:svars %1) 0)
-                                       ((:ssizes %1) 0))
-                                    (/ ((:svars %1) 1)
-                                       ((:ssizes %1) 1))))
-                              (+ (/ (* (/ ((:svars %1) 0)
-                                          ((:ssizes %1) 0))
-                                       (/ ((:svars %1) 0)
-                                          ((:ssizes %1) 0)))
-                                    (- ((:ssizes %1) 0) 1))
-                                 (/ (* (/ ((:svars %1) 1)
-                                          ((:ssizes %1) 1))
-                                       (/ ((:svars %1) 1)
-                                          ((:ssizes %1) 1)))
-                                    (- ((:ssizes %1) 1) 1))))))))
+  (->>
+    (pvalues (mapv mean
+                   (:smpls ttest))
+             (mapv #(svar %
+                          (mean %))
+                   (:smpls ttest))
+             (mapv count
+                   (:smpls ttest)))
+    ((fn
+       [[[smone smtwo]
+         [svone svtwo]
+         [szone sztwo]
+         :as all]]
+       (cons (/ (* (+ (/ svone
+                         szone)
+                      (/ svtwo
+                         sztwo))
+                   (+ (/ svone
+                         szone)
+                      (/ svtwo
+                         sztwo)))
+                (+ (/ (* (/ svone
+                            szone)
+                         (/ svone
+                            szone))
+                      (- szone 1))
+                   (/ (* (/ svtwo
+                            sztwo)
+                         (/ svtwo
+                            sztwo))
+                      (- sztwo
+                         1))))
+             all)))
+    (apply (fn
+             [dof smeans svars ssizes]
+             (assoc ttest
+               :smeans smeans
+               :svars svars
+               :ssizes ssizes
+               :alpha (:alpha ttest)
+               :dof dof)))))
 
 (defmethod tstat Welch
   [tstat]
-  (assoc tstat :tstat
-               (/ (- ((:smeans tstat) 0)
-                     ((:smeans tstat) 1))
-                  (Math/sqrt (+ (/ ((:svars tstat) 0)
-                                   ((:ssizes tstat) 0))
-                                (/ ((:svars tstat) 1)
-                                   ((:ssizes tstat) 1)))))))
+  (assoc tstat
+    :tstat
+    (/ (- ((:smeans tstat) 0)
+          ((:smeans tstat) 1))
+       (Math/sqrt (+ (/ ((:svars tstat) 0)
+                        ((:ssizes tstat) 0))
+                     (/ ((:svars tstat) 1)
+                        ((:ssizes tstat) 1)))))))
 
-(defmethod ttest RepeatedMeasure
+(defmethod disc RepeatedMeasure
   [ttest]
   (->> (pvalues (mean (diff (:smpls ttest)))
                 (mapv mean (partition 1 (:hmeans ttest)))
