@@ -8,6 +8,7 @@
             [criterium.core :as cri]))
 (m/set-current-implementation :vectorz)
 
+;TODO add benchmarks tests and compare claypool to pmap
 ;TODO rename ttest to prestat or crunch
 ;TODO rename tstat to ttest as it is computing the test statistic
 ;TODO update docs
