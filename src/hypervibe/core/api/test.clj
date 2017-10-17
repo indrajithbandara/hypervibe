@@ -1,8 +1,8 @@
 (ns hypervibe.core.api.test
   (:require [hypervibe.core.api.utils :refer [mean ssdev diff rnull? svar pvar]]
-            [clojure.core.matrix :as m]
-            [hypervibe.core.api.distribution.t.table :refer [t utail]]
-            [clojure.core.matrix.operators :as op]))
+            [hypervibe.core.api.distribution.t.table :refer [t utail]]))
+(use 'clojure.core.matrix.operators)
+(use 'clojure.core.matrix)
 
 (defrecord OneSample [smpl hmean alpha])
 (defrecord EqualVariance [smpls hmeans alpha])
@@ -16,7 +16,7 @@
 (defmethod disc OneSample
   [ttest]
   (->>
-    (pvalues (m/ecount (:smpl ttest))
+    (pvalues (ecount (:smpl ttest))
              (mean (:smpl ttest))
              (ssdev (:smpl ttest)
                     (mean (:smpl ttest))))
@@ -47,7 +47,7 @@
 (defmethod disc EqualVariance
   [ttest]
   (->>
-    (pvalues (mapv count
+    (pvalues (mapv ecount
                    (:smpls ttest))
              (mapv mean
                    (:smpls ttest))
@@ -56,7 +56,7 @@
                               (:hmeans ttest)))
              (mapv #(pvar %
                           (mean %)
-                          (dec (count %)))
+                          (dec (ecount %)))
                    (:smpls ttest)))
     ((fn
        [pv]
@@ -106,7 +106,7 @@
              (mapv #(svar %
                           (mean %))
                    (:smpls ttest))
-             (mapv count
+             (mapv ecount
                    (:smpls ttest)))
     ((fn
        [[[smone smtwo]
@@ -161,7 +161,7 @@
                       (/ (+ sone
                             stwo)
                          2))
-                    (map count
+                    (map ecount
                          (:smpls ttest)))
              (mean (diff (:smpls ttest)))
              (mapv mean
