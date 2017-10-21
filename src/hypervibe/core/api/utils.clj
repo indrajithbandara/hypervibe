@@ -1,9 +1,8 @@
 (ns hypervibe.core.api.utils
   (:require [clojure.core.reducers :as r]
-            [criterium.core :as cri]))
-(use 'clojure.core.matrix.operators)
+            [criterium.core :as cri]
+            [clojure.core.matrix.operators :as op]))
 (use 'clojure.core.matrix)
-
 (set-current-implementation :vectorz)
 
 
@@ -12,29 +11,41 @@
    :arglists '([mikera.vectorz.Vector data])}
   [data]
   (div (esum data)
-         (ecount data)))
+       (ecount data)))
 
 (defn ^double mean-1
   {:doc      "Mean -1"
    :arglists '([mikera.vectorz.Vector data])}
   [data]
   (div (esum data)
-         (dec (ecount data))))
+       (dec (ecount data))))
 
 (defn ^doubles diff
   {:doc      "Mean difference"
-   :arglists '([mikera.vectorz.Vector data pmean])}
-  [[data-one data-two]]
-  (map - data-one
-       data-two))
+   :arglists '([mikera.matrixx.Matrix data])}
+  [data]
+  (apply (fn
+           [vec-one vec-two]
+           (op/- vec-one vec-two))
+         data))
 
+#_(defn ^double ssdev [data mean]
+    {:doc      "Sample standard deviation"
+     :arglists '([data mean])}
+    (Math/sqrt (mean-1 (map #(* (- mean
+                                   %)
+                                (- mean
+                                   %))
+                            data))))
 
-(defn ^double ssdev [data mean]
+(defn ^double ssdev
+  [data]
   {:doc      "Sample standard deviation"
-   :arglists '([data mean])}
-  (Math/sqrt (mean-1 (map #(* (- mean %)
-                              (- mean %))
-                          data))))
+   :arglists '([data])}
+  (let [^double m (mean data)]
+    (Math/sqrt (mean-1 (map (fn [x] (* (- ^double m x)
+                                       (- ^double m x)))
+                            data)))))
 
 (defn ^double psdev
   {:doc      "Population standard deviation"

@@ -1,7 +1,7 @@
 (ns hypervibe.core.api.test
   (:require [hypervibe.core.api.utils :refer [mean ssdev diff rnull? svar pvar]]
-            [hypervibe.core.api.distribution.t.table :refer [t utail]]))
-(use 'clojure.core.matrix.operators)
+            [hypervibe.core.api.distribution.t.table :refer [t utail]]
+            [clojure.core.matrix.operators :as op]))
 (use 'clojure.core.matrix)
 
 (defrecord OneSample [smpl hmean alpha])
@@ -18,8 +18,7 @@
   (->>
     (pvalues (ecount (:smpl ttest))
              (mean (:smpl ttest))
-             (ssdev (:smpl ttest)
-                    (mean (:smpl ttest))))
+             (ssdev (:smpl ttest)))
     ((fn
        [pv]
        (cons (dec (first pv))
@@ -157,21 +156,13 @@
 (defmethod disc RepeatedMeasure
   [ttest]
   (->>
-    (pvalues (apply (fn [sone stwo]
-                      (/ (+ sone
-                            stwo)
-                         2))
-                    (map ecount
-                         (:smpls ttest)))
+
+    (pvalues (/ (ecount (:smpls ttest)) 2)
              (mean (diff (:smpls ttest)))
              (mapv mean
                    (partition 1
                               (:hmeans ttest)))
-             (ssdev (diff (:smpls ttest))
-                    (->
-                      (:smpls ttest)
-                      diff
-                      mean)))
+             (ssdev (diff (:smpls ttest))))
     ((fn
        [pv]
        (cons (dec (first

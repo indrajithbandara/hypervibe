@@ -40,8 +40,7 @@
 (defmethod cintvl OneSample [this]
 	(let [[smean ssdev ssize]
 		  (pvalues (mean (.smpl this))
-				   (ssdev (.smpl this)
-						  (mean (.smpl this)))
+				   (ssdev (.smpl this))
 				   (m/ecount (.smpl this)))
 		  mdiff (- smean (.hmean this))]
 		(one-smpl-conf-int (.smpl this)
