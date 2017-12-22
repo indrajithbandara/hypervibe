@@ -7,11 +7,11 @@
            (java.net URL)
            (clojure.lang PersistentArrayMap)))
 
-(def ^:const template "hypervibe.edn")
-(def ^:const template-packaged "hypervibe.json")
+(def ^:const template "template.edn")
+(def ^:const template-packaged "template-packaged.json")
 
-(defonce file-template (File. template))
-(defonce file-template-packaged (File. template-packaged))
+(def file-template (File. template))
+(def file-template-packaged (File. template-packaged))
 
 (defn ^Boolean file-exists?
   [^File file]
@@ -63,21 +63,22 @@
                 _))))
 
 (defn package
-  [& {:keys [use-json? force-upload? kms-key-id]
-      :or {kms-key-id "key" use-json? false force-upload? false}}]
+  [& {:keys [s3-bucket use-json? force-upload? kms-key-id]
+      :or {s3-bucket "hypervibe" kms-key-id "" use-json? true force-upload? false}}]
   (if-let [json (spit-json file-template
                   file-template-packaged)]
-    (shell/sh
-      "aws"
-      "cloudformation"
-      "package"
-      "--template-file" (.getAbsolutePath json)
-      "--s3-bucket" "hypervibe"
-      "--s3-prefix" "jars"
-      "--output-template-file" template-packaged
-      (if (true? use-json?) "--use-json")
-      (if (true? force-upload?) "--force-upload")
-      "--kms-key-id" kms-key-id)))
+    (apply shell/sh
+      (remove nil?
+        ["aws"
+         "cloudformation"
+         "package"
+         "--template-file" (.getAbsolutePath json)
+         "--s3-bucket" s3-bucket
+         "--s3-prefix" "jars"
+         "--output-template-file" template-packaged
+         "--kms-key-id" kms-key-id
+         (if use-json? "--use-json")
+         (if force-upload? "--force-upload")]))))
 
 (defn deploy
   [& {:keys [capabilities stack-name no-execute-changeset]
