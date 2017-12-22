@@ -2,16 +2,21 @@
   (:require [clojure.java.shell :as shell]
             [cheshire.core :as cheshire]
             [clojure.java.io :as io]
+            [clojure.string :as string]
             [clojure.edn :as edn])
   (:import (java.io FileNotFoundException File IOException)
            (java.net URL)
-           (clojure.lang PersistentArrayMap)))
+           (clojure.lang PersistentArrayMap)
+           (java.util Random)))
 
 (def ^:const template "template.edn")
 (def ^:const template-packaged "template-packaged.json")
 
 (def file-template (File. template))
 (def file-template-packaged (File. template-packaged))
+
+(defn- rand-str []
+  (string/upper-case (Long/toHexString (Double/doubleToLongBits (.nextLong (Random.))))))
 
 (defn ^Boolean file-exists?
   [^File file]
@@ -81,15 +86,18 @@
          (if force-upload? "--force-upload")]))))
 
 (defn deploy
-  [& {:keys [capabilities stack-name no-execute-changeset]
-      :or {capabilities "CAPABILITY_IAM" stack-name "hypervibe" no-execute-changeset false}}]
-  (shell/sh
-    "aws"
-    "cloudformation"
-    "deploy"
-    "--template-file" template-packaged
-    "--stack-name" stack-name
-    "--capabilities" capabilities))
+  [& {:keys [capabilities stack-name no-execute-changeset?]
+      :or {capabilities "CAPABILITY_IAM" stack-name "hypervibe" no-execute-changeset? false}}]
+  (apply
+    shell/sh
+    (remove nil?
+      ["aws"
+       "cloudformation"
+       "deploy"
+       "--template-file" template-packaged
+       "--stack-name" (str stack-name "-" (rand-str))
+       "--capabilities" capabilities
+       (if no-execute-changeset? "--no-execute-changeset")])))
 
 ;TODO
 (defn delete [])
