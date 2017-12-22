@@ -1,5 +1,5 @@
 # hypervibe
 
-A Clojure library for writing and deploying Serverless applications
+Write and deploy serverless applications using EDN and Clojure
 
 
