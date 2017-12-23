@@ -6,16 +6,13 @@
             [clojure.edn :as edn])
   (:import (java.io FileNotFoundException File IOException)
            (java.net URL)
-           (clojure.lang PersistentArrayMap)
-           (java.util Random)))
+           (clojure.lang PersistentArrayMap PersistentVector)
+           (java.util Random Vector)))
 
-(def ^:const template "template.edn")
-(def ^:const template-packaged "template-packaged.json")
+(def file-template (File. "template.edn"))
+(def file-template-packaged (File. "template-packaged.json"))
 
-(def file-template (File. template))
-(def file-template-packaged (File. template-packaged))
-
-(defn- rand-str []
+(defn- ^String rand16-char []
   (string/upper-case (Long/toHexString (Double/doubleToLongBits (.nextLong (Random.))))))
 
 (defn ^Boolean file-exists?
@@ -67,35 +64,57 @@
          (catch IOException
                 _))))
 
-(defn package
-  [& {:keys [s3-bucket use-json? force-upload? kms-key-id]
-      :or {s3-bucket "hypervibe" kms-key-id "" use-json? true force-upload? false}}]
-  (if-let [json (spit-json file-template
-                  file-template-packaged)]
+(def ^:const package-args "aws;cloudformation;package")
+
+(def ^:private ^String template-file-args
+  (if-let [json ^File (spit-json file-template file-template-packaged)]
+    (str "--template-file" ";" (.getAbsolutePath json))
+    (throw (Exception. "Error spitting JSON to file"))))
+
+#_(defn package
+    [& {:keys [s3-bucket use-json? force-upload? kms-key-id]
+        :or {kms-key-id "" use-json? true force-upload? false}}]
     (apply shell/sh
       (remove nil?
         ["aws"
          "cloudformation"
          "package"
-         "--template-file" (.getAbsolutePath json)
+         "--template-file" (.getAbsolutePath (spit-json file-template file-template-packaged))
          "--s3-bucket" s3-bucket
          "--s3-prefix" "jars"
-         "--output-template-file" template-packaged
+         "--output-template-file" "template-packaged.json"
          "--kms-key-id" kms-key-id
          (if use-json? "--use-json")
-         (if force-upload? "--force-upload")]))))
+         (if force-upload? "--force-upload")])))
+
+
+(defn package
+  [& {:keys [s3-bucket use-json? force-upload? kms-key-id]
+      :or {kms-key-id "" use-json? true force-upload? false}}]
+  (if-let [json (spit-json file-template file-template-packaged)]
+    (apply shell/sh
+      (remove nil?
+        (mapcat #(string/split % #";")
+          ["aws;cloudformation;package"
+           (str "--template-file" ";" (.getAbsolutePath json))
+           (str "--s3-bucket" ";" s3-bucket)
+           "--s3-prefix;jars"
+           "--output-template-file;template-packaged.json"
+           (str "--kms-key-id" ";" kms-key-id)
+           (if use-json? "--use-json")
+           (if force-upload? "--force-upload")])))))
 
 (defn deploy
   [& {:keys [capabilities stack-name no-execute-changeset?]
-      :or {capabilities "CAPABILITY_IAM" stack-name "hypervibe" no-execute-changeset? false}}]
+      :or {capabilities "CAPABILITY_IAM" no-execute-changeset? false}}]
   (apply
     shell/sh
     (remove nil?
       ["aws"
        "cloudformation"
        "deploy"
-       "--template-file" template-packaged
-       "--stack-name" (str stack-name "-" (rand-str))
+       "--template-file" "template-packaged.json"
+       "--stack-name" (str stack-name "-" (rand16-char))
        "--capabilities" capabilities
        (if no-execute-changeset? "--no-execute-changeset")])))
 
