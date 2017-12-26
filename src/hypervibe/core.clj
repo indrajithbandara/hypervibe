@@ -65,8 +65,6 @@
          (catch IOException
                 _))))
 
-(def ^:const package-args "aws;cloudformation;package")
-
 (def ^:private ^String template-file-args
   (if-let
     [json ^File (spit-json file-hypervibe
@@ -92,37 +90,47 @@
     [json (spit-json file-hypervibe
             file-hypervibe-packaged)]
     (apply shell/sh
-      (split-args
-        ["aws;cloudformation;package"
-         (str "--template-file"
-           ";"
-           (.getAbsolutePath json))
-         (str "--s3-bucket"
-           ";"
-           s3-bucket)
-         "--s3-prefix;jars"
-         "--output-template-file;template-packaged.json"
-         (str "--kms-key-id"
-           ";"
-           kms-key-id)
-         (if use-json?
-           "--use-json")
-         (if force-upload?
-           "--force-upload")]))
+      (remove nil?
+        ["aws"
+         "cloudformation"
+         "package"
+         "--template-file" (.getAbsolutePath json)
+         "--s3-bucket" s3-bucket
+         "--s3-prefix" "jars"
+         "--output-template-file" "template-packaged.json"
+         "--kms-key-id" kms-key-id
+         (if use-json? "--use-json")
+         (if force-upload? "--force-upload")]))
     (throw (Exception. "Failed to spit JSON"))))
 
+(defn str-eq-kv
+  [m]
+  (map (fn [[k v]]
+         (str (name k)
+           "="
+           v))
+    m))
+
 (defn deploy
-  [& {:keys [capabilities stack-name no-execute-changeset?]
+  [& {:keys [capabilities stack-name no-execute-changeset?
+             parameter-overrides]
       :or {capabilities "CAPABILITY_IAM"
+           stack-name "hypervibe"
            no-execute-changeset? false}}]
   (apply shell/sh
-    (split-args
-      ["aws;cloudformation;deploy"
-       "--template-file;template-packaged.json"
-       (str "--stack-name" ";" (str stack-name "-" (rand16-char)))
-       (str "--capabilities" ";" capabilities)
-       (if no-execute-changeset? "--no-execute-changeset")])))
+    (remove nil?
+      (into
+        ["aws"
+         "cloudformation"
+         "deploy"
+         "--template-file" "template-packaged.json"
+         "--stack-name" (str stack-name "-" (rand16-char))
+         "--capabilities" capabilities
+         (if no-execute-changeset? "--no-execute-changeset")
+         (if parameter-overrides "--parameter-overrides")]
+        (str-eq-kv parameter-overrides)))))
 
 ;TODO
 (defn delete [])
+
 
