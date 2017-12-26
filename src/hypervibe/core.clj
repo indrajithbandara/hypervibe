@@ -119,15 +119,14 @@
            no-execute-changeset? false}}]
   (apply shell/sh
     (remove nil?
-      (into
-        ["aws"
-         "cloudformation"
-         "deploy"
-         "--template-file" "template-packaged.json"
-         "--stack-name" (str stack-name "-" (rand16-char))
-         "--capabilities" capabilities
-         (if no-execute-changeset? "--no-execute-changeset")
-         (if parameter-overrides "--parameter-overrides")]
+      (into ["aws"
+             "cloudformation"
+             "deploy"
+             "--template-file" "template-packaged.json"
+             "--stack-name" (str stack-name "-" (rand16-char))
+             "--capabilities" capabilities
+             (if no-execute-changeset? "--no-execute-changeset")
+             (if parameter-overrides "--parameter-overrides")]
         (str-eq-kv parameter-overrides)))))
 
 ;TODO
