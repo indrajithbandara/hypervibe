@@ -103,7 +103,7 @@
          (if force-upload? "--force-upload")]))
     (throw (Exception. "Failed to spit JSON"))))
 
-(defn str-eq-kv
+(defn- str-eq-kv
   [m]
   (map (fn [[k v]]
          (str (name k)
@@ -111,25 +111,34 @@
            v))
     m))
 
-(defn deploy
-  [& {:keys [capabilities stack-name no-execute-changeset?
-             parameter-overrides]
-      :or {capabilities "CAPABILITY_IAM"
-           stack-name "hypervibe"
-           no-execute-changeset? false}}]
-  (apply shell/sh
-    (remove nil?
-      (into ["aws"
-             "cloudformation"
-             "deploy"
-             "--template-file" "template-packaged.json"
-             "--stack-name" (str stack-name "-" (rand16-char))
-             "--capabilities" capabilities
-             (if no-execute-changeset? "--no-execute-changeset")
-             (if parameter-overrides "--parameter-overrides")]
-        (str-eq-kv parameter-overrides)))))
+(defn- e-command
+  [^PersistentVector pv]
+  (apply shell/sh pv))
+
+(defn- d-command
+  [s-name capabilities ne-changeset?
+   p-overrides]
+  (remove nil?
+    (into ["aws"
+           "cloudformation"
+           "deploy"
+           "--template-file" "template-packaged.json"
+           "--stack-name" (str s-name "-" (rand16-char))
+           "--capabilities" capabilities
+           (if ne-changeset? "--no-execute-changeset")
+           (if p-overrides "--parameter-overrides")]
+      (str-eq-kv p-overrides))))
 
 ;TODO
-(defn delete [])
+(defn deploy
+  [{s-name :stack-name
+    capabilities :capabilities
+    ne-changeset? :no-execute-changeset?
+    p-overrides :parameter-overrides}]
+  (e-command (d-command s-name
+               capabilities
+               ne-changeset?
+               p-overrides)))
+
 
 
