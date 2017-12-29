@@ -6,89 +6,65 @@
             [clojure.edn :as edn])
   (:import (java.io FileNotFoundException File IOException)
            (java.net URL)
-           (clojure.lang PersistentArrayMap PersistentVector LazySeq)
+           (clojure.lang PersistentVector LazySeq PersistentHashMap)
            (java.util Random Vector)))
 
-(def file-hypervibe (File. "hypervibe.edn"))
-(def file-hypervibe-packaged (File. "hypervibe-packaged.json"))
+(def ^:private hyper-edn-file (File. "hypervibe.edn"))
+(def ^:private hyper-json-file (File. "hypervibe-packaged.json"))
 
-(defn- ^String rand16-char []
+(defn- ^String rand-16-char []
   (string/upper-case (Long/toHexString (Double/doubleToLongBits (.nextLong (Random.))))))
 
-(defn ^Boolean file-exists?
+(defn ^Boolean file-exi?
   [^File file]
   (.exists (.getAbsoluteFile file)))
 
-(defn ^Boolean edn-prefix?
+(defn ^Boolean edn-pref?
   [^File file]
-  (.endsWith (.getAbsolutePath file)
-    ".edn"))
+  (.endsWith (.getAbsolutePath file) ".edn"))
 
-(defn ^Boolean json-prefix?
+(defn ^Boolean json-pref?
   [^File file]
-  (.endsWith (.getAbsolutePath file)
-    ".json"))
+  (.endsWith (.getAbsolutePath file) ".json"))
 
-(defn ^Boolean json-file-exists?
+(defn ^Boolean json-file-exi?
   [^File file]
-  (and (file-exists? file)
-    (json-prefix? file)))
+  (and (file-exi? file)
+    (json-pref? file)))
 
-(defn ^Boolean edn-file-exists?
+(defn ^Boolean edn-file-exi?
   [^File file]
-  (and (file-exists? file)
-    (edn-prefix? file)))
+  (and (file-exi? file)
+    (edn-pref? file)))
 
-(defn ^PersistentArrayMap slurp-edn
+(defn ^PersistentHashMap slurp-edn
   [^File file]
-  (if (edn-file-exists? file)
+  (if (edn-file-exi? file)
     (try (edn/read-string
            (slurp (.getAbsolutePath file)))
-         (catch Exception
-                _))))
+         (catch Exception _))))
 
 (defn ^String edn->json
   [^File file]
-  (if-let
-    [edn (slurp-edn file)]
+  (if-let [edn (slurp-edn file)]
     (try (cheshire/generate-string edn
            {:pretty true})
-         (catch Exception
-                _))))
+         (catch Exception _))))
 
 (defn ^File spit-json
   [^File edn ^File json]
-  (if (json-prefix? json)
+  (if (json-pref? json)
     (try (do (spit (.getAbsolutePath json)
                (edn->json edn))
              (.getAbsoluteFile json))
-         (catch IOException
-                _))))
+         (catch IOException _))))
 
-(def ^:private ^String template-file-args
-  (if-let
-    [json ^File (spit-json file-hypervibe
-                  file-hypervibe-packaged)]
-    (str "--template-file"
-      ";"
-      (.getAbsolutePath json))
-    (throw (Exception. "Error spitting JSON to file"))))
-
-(defn- ^LazySeq split-args
-  [^PersistentVector pv]
-  (mapcat #(string/split %
-             #";")
-    (remove nil?
-      pv)))
-
-(defn ^PersistentArrayMap package
+(defn ^PersistentHashMap package
   [& {:keys [s3-bucket use-json? force-upload?
              kms-key-id]
       :or {use-json? true
            force-upload? false}}]
-  (if-let
-    [json (spit-json file-hypervibe
-            file-hypervibe-packaged)]
+  (if-let [json (spit-json hyper-edn-file hyper-json-file)]
     (apply shell/sh
       (remove nil?
         ["aws"
@@ -100,45 +76,62 @@
          "--output-template-file" "template-packaged.json"
          "--kms-key-id" kms-key-id
          (if use-json? "--use-json")
-         (if force-upload? "--force-upload")]))
-    (throw (Exception. "Failed to spit JSON"))))
+         (if force-upload? "--force-upload")]))))
 
 (defn- str-eq-kv
   [m]
   (map (fn [[k v]]
-         (str (name k)
-           "="
-           v))
-    m))
+         (str (name k) "=" v)) m))
 
-(defn- e-command
+(defn- apply-sh
   [^PersistentVector pv]
-  (apply shell/sh pv))
+  (apply shell/sh (remove nil? pv)))
 
-(defn- d-command
-  [s-name capabilities ne-changeset?
-   p-overrides]
-  (remove nil?
-    (into ["aws"
-           "cloudformation"
-           "deploy"
-           "--template-file" "template-packaged.json"
-           "--stack-name" (str s-name "-" (rand16-char))
-           "--capabilities" capabilities
-           (if ne-changeset? "--no-execute-changeset")
-           (if p-overrides "--parameter-overrides")]
-      (str-eq-kv p-overrides))))
+(defn- ^LazySeq params-over-arg [parameter-overrides]
+  (if parameter-overrides (cons "--parameter-overrides" (str-eq-kv parameter-overrides))))
 
+(defn- stack-name-arg [stack-name]
+  (if stack-name-arg
+    (str stack-name "-" (rand-16-char))
+    "hypervibe"))
+
+(defn- capab-arg
+  [capabilities]
+  (cond :CAPABILITY_IAM "CAPABILITY_IAM"
+        :CAPABILITY_NAMED_IAM "CAPABILITY_NAMED_IAM"))
+
+(defn- ^PersistentVector dep-comm
+  [stack-name capabilities no-execute-changeset?
+   parameter-overrides]
+  (into ["aws"
+         "cloudformation"
+         "deploy"
+         "--template-file" "template-packaged.json"
+         "--stack-name" (stack-name-arg stack-name)
+         "--capabilities" (capab-arg capabilities)
+         (if no-execute-changeset? "--no-execute-changeset")]
+    (params-over-arg parameter-overrides)))
+
+(defn- ^PersistentVector pack-comm
+  [template-file s3-bucket use-json?
+   force-upload? kms-key-id]
+  ["aws"
+   "cloudformation"
+   "package"
+   "--template-file" template-file
+   "--s3-bucket" s3-bucket
+   "--s3-prefix" "jars"
+   "--output-template-file" "template-packaged.json"
+   "--kms-key-id" kms-key-id
+   (if use-json? "--use-json")
+   (if force-upload? "--force-upload")])
+
+(defn ^PersistentHashMap deploy
+  [& {:keys [stack-name capabilities no-execute-changeset?
+             parameter-overrides]}]
+  (apply-sh (dep-comm stack-name capabilities no-execute-changeset?
+              parameter-overrides)))
 ;TODO
-(defn deploy
-  [{s-name :stack-name
-    capabilities :capabilities
-    ne-changeset? :no-execute-changeset?
-    p-overrides :parameter-overrides}]
-  (e-command (d-command s-name
-               capabilities
-               ne-changeset?
-               p-overrides)))
-
+;(defn package)
 
 
