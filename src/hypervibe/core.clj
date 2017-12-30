@@ -10,7 +10,7 @@
            (java.util Random)))
 
 (def ^:const ^String hyper-edn "hypervibe.edn")
-(def ^:const ^String hyper-json ".hypervibe/hypervibe.edn")
+(def ^:const ^String hyper-json ".hypervibe/hypervibe.json")
 (def ^:const ^String hyper-pack-json ".hypervibe/hypervibe-packaged.json")
 
 (defn- ^String rand-16-char []
