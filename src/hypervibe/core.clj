@@ -89,7 +89,7 @@
          "--template-file" hyper-pack-json
          "--stack-name" (stack-name-arg stack-name)
          "--capabilities" (capab-arg capabilities)
-         (if no-execute-changeset? "--no-execute-changeset")]
+         (if (true? no-execute-changeset?) "--no-execute-changeset")]
     (params-over-arg parameter-overrides)))
 
 (defn- ^PersistentVector pack-comm
