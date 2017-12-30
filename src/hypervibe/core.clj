@@ -54,10 +54,10 @@
 
 (defn ^File spit-json
   []
-  (let [hyper-pack-dir (File. hyper-json)]
-    (try (do (spit (.getAbsolutePath hyper-pack-dir)
+  (let [hyper-json-file (File. hyper-json)]
+    (try (do (spit (.getAbsolutePath hyper-json-file)
                (edn->json (File. hyper-edn)))
-             (.getAbsoluteFile hyper-pack-dir))
+             (.getAbsoluteFile hyper-json-file))
          (catch IOException _))))
 
 (defn- str-eq-kv
