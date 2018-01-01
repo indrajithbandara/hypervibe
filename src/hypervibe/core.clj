@@ -3,26 +3,53 @@
             [cheshire.core :as cheshire]
             [clojure.java.io :as io]
             [clojure.string :as string]
-            [clojure.edn :as edn])
+            [clojure.edn :as edn]
+            [com.rpl.specter :as s])
   (:import (java.io FileNotFoundException File IOException)
            (java.net URL)
            (clojure.lang PersistentVector LazySeq PersistentHashMap)
-           (java.util Random)))
+           (java.util Random)
+           (java.nio.file StandardCopyOption Files)))
 
 (def ^:const ^String hyper-edn "hypervibe.edn")
 (def ^:const ^String hyper-json ".hypervibe/hypervibe.json")
 (def ^:const ^String hyper-pack-json ".hypervibe/hypervibe-packaged.json")
 
-(defn- ^String rand-16-char []
-  (string/upper-case (Long/toHexString (Double/doubleToLongBits (.nextLong (Random.))))))
+;TODO read in hypervibe-test.edn, get packaged jar paths, move to .hypervibe
+
+
+(defn ^Boolean edn-pref?
+  [^File file]
+  (.endsWith (.getAbsolutePath file) ".edn"))
 
 (defn ^Boolean file-exist?
   [^File file]
   (.exists (.getAbsoluteFile file)))
 
-(defn ^Boolean edn-pref?
+(defn ^Boolean edn-file-exist?
   [^File file]
-  (.endsWith (.getAbsolutePath file) ".edn"))
+  (and (file-exist? file)
+    (edn-pref? file)))
+
+(defn ^PersistentHashMap slurp-edn
+  [^File file]
+  (if (edn-file-exist? file)
+    (try (edn/read-string
+           (slurp (.getAbsolutePath file)))
+         (catch Exception _))))
+
+(defn ^PersistentVector sel-code-uri
+  [^PersistentHashMap phm]
+  (s/select [:Resources s/MAP-VALS :Properties :CodeUri] phm))
+
+(defn copy-jars
+  [^PersistentVector pv]
+  (map #(Files/copy % ".hypervibe/" StandardCopyOption/ATOMIC_MOVE)
+    (into #{} (remove nil? pv))))
+
+(defn- ^String rand-16-char
+  []
+  (string/upper-case (Long/toHexString (Double/doubleToLongBits (.nextLong (Random.))))))
 
 (defn ^Boolean json-pref?
   [^File file]
@@ -37,13 +64,6 @@
   [^File file]
   (and (file-exist? file)
     (edn-pref? file)))
-
-(defn ^PersistentHashMap slurp-edn
-  [^File file]
-  (if (edn-file-exist? file)
-    (try (edn/read-string
-           (slurp (.getAbsolutePath file)))
-         (catch Exception _))))
 
 (defn ^String edn->json
   [^File file]
