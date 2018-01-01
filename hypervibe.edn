@@ -24,7 +24,7 @@
                                                          :Resource "*"}]},
                                  :MemorySize 512,
                                  :Timeout 10,
-                                 :CodeUri "target/hypervibe-0.1.0-SNAPSHOT-standalone.jar",
+                                 :CodeUri "hypervibe-0.1.0-SNAPSHOT-standalone.jar",
                                  :Events {:PostConfig {:Type "Api",
                                                        :Properties {:Path "/read",
                                                                     :RestApiId "ApiGatewayApi",
