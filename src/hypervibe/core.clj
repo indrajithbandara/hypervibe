@@ -7,7 +7,7 @@
             [com.rpl.specter :as s])
   (:import (java.io FileNotFoundException File IOException)
            (java.net URL)
-           (clojure.lang PersistentVector LazySeq PersistentHashMap)
+           (clojure.lang PersistentVector LazySeq PersistentHashMap Keyword)
            (java.util Random)
            (java.nio.file StandardCopyOption Files)))
 
@@ -42,6 +42,11 @@
   (and (file-exist? file)
     (json-pref? file)))
 
+(defn ^Boolean edn-file-exist?
+  [^File file]
+  (and (file-exist? file)
+    (edn-pref? file)))
+
 (defn ^PersistentHashMap slurp-edn
   [^File file]
   (if (edn-file-exist? file)
@@ -52,11 +57,6 @@
 (defn- ^String rand-16-char
   []
   (string/upper-case (Long/toHexString (Double/doubleToLongBits (.nextLong (Random.))))))
-
-(defn ^Boolean edn-file-exist?
-  [^File file]
-  (and (file-exist? file)
-    (edn-pref? file)))
 
 (defn ^String edn->json
   [^File file]
@@ -72,28 +72,29 @@
          (catch IOException _))))
 
 (defn- str-eq-kv
-  [m]
+  [^PersistentHashMap pers-hash-map]
   (map (fn [[k v]]
-         (str (name k) "=" v)) m))
+         (str (name k) "=" v)) pers-hash-map))
 
 (defn- apply-sh
-  [^PersistentVector pv]
-  (apply shell/sh (remove nil? pv)))
+  [^PersistentVector pers-vec]
+  (apply shell/sh (remove nil? pers-vec)))
 
-(defn- ^LazySeq params-over-arg [parameter-overrides]
-  (if parameter-overrides (cons "--parameter-overrides" (str-eq-kv parameter-overrides))))
+(defn- ^LazySeq param-over [^PersistentHashMap pers-hash-map]
+  (if pers-hash-map (cons "--parameter-overrides" (str-eq-kv pers-hash-map))))
 
-(defn- stack-name-arg
-  [stack-name]
-  (if stack-name-arg (str stack-name "-" (rand-16-char)) "hypervibe"))
+(defn- stack-name-rand-16-char
+  [^String string]
+  (if string (str string "-" (rand-16-char)) "hypervibe"))
 
-(defn- capab-arg
-  [capabilities]
-  (cond :CAPABILITY_IAM "CAPABILITY_IAM"
-        :CAPABILITY_NAMED_IAM "CAPABILITY_NAMED_IAM"))
+(defn- capab
+  [^Keyword keyword]
+  (cond
+    (= keyword :CAPABILITY_IAM) "CAPABILITY_IAM"
+    (= keyword :CAPABILITY_NAMED_IAM) "CAPABILITY_NAMED_IAM"))
 
 (defn- ^PersistentVector pack-comm
-  [s3-bucket force-upload? kms-key-id]
+  [^String s3-bucket ^Boolean force-upload? ^String kms-key-id]
   (do (spit-json)
       ["aws"
        "cloudformation"
@@ -107,16 +108,16 @@
        (if (true? force-upload?) "--force-upload")]))
 
 (defn- ^PersistentVector dep-comm
-  [stack-name capabilities no-execute-changeset?
-   parameter-overrides]
+  [^String stack-name ^Keyword capabilities ^Boolean no-execute-changeset?
+   ^PersistentHashMap parameter-overrides]
   (into ["aws"
          "cloudformation"
          "deploy"
          "--template-file" hyper-targ-pack-json
-         "--stack-name" (stack-name-arg stack-name)
-         "--capabilities" (capab-arg capabilities)
+         "--stack-name" (stack-name-rand-16-char stack-name)
+         "--capabilities" (capab capabilities)
          (if (true? no-execute-changeset?) "--no-execute-changeset")]
-    (params-over-arg parameter-overrides)))
+    (param-over parameter-overrides)))
 
 (defn ^PersistentHashMap package
   [& {:keys [s3-bucket force-upload? kms-key-id]}]
