@@ -89,9 +89,9 @@
 
 (defn- capab
   [^Keyword keyword]
-  (cond
-    (= keyword :CAPABILITY_IAM) "CAPABILITY_IAM"
-    (= keyword :CAPABILITY_NAMED_IAM) "CAPABILITY_NAMED_IAM"))
+  (condp = keyword
+    :CAPABILITY_IAM (name keyword)
+    :CAPABILITY_NAMED_IAM (name keyword)))
 
 (defn- ^PersistentVector pack-comm
   [^String s3-bucket ^Boolean force-upload? ^String kms-key-id]
