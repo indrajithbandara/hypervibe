@@ -68,12 +68,10 @@
 
 (defn ^File spit-json
   []
-  (let [hyper-targ-json-file (File. hyper-targ-json)]
-    (try (do
-           (spit hyper-targ-json-file
-             (edn->json (File. hyper-edn)))
-           (.getAbsoluteFile hyper-targ-json-file))
-         (catch IOException _))))
+  (try
+    (spit (File. hyper-targ-json)
+      (edn->json (File. hyper-edn)))
+    (catch IOException _)))
 
 (defn- str-eq-kv
   [^PersistentHashMap params]
@@ -110,18 +108,18 @@
 
 (defn- ^PersistentVector pack-comm
   [^String s3-buck ^Boolean force-uplo? ^String kms-key-id]
-  (if-let [targ-abs-path ^File (spit-json)]
+  (do
+    (spit-json)
     ["aws"
      "cloudformation"
      "package"
-     "--template-file" (.getAbsolutePath targ-abs-path)
+     "--template-file" hyper-targ-json
      "--s3-bucket" s3-buck
      "--s3-prefix" "jars"
      "--output-template-file" hyper-targ-pack-json
      "--kms-key-id" kms-key-id
      "--use-json"
-     (if (true? force-uplo?) "--force-upload")]
-    (throw (IOException. "Error creating template JSON template file"))))
+     (if (true? force-uplo?) "--force-upload")]))
 
 (defn- ^PersistentVector dep-comm
   [^String stack-name ^Keyword capab ^Boolean no-exec-chan?
