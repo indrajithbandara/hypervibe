@@ -5,10 +5,11 @@
             [clojure.string :as string]
             [clojure.edn :as edn]
             [com.rpl.specter :as s])
-  (:import (java.io FileNotFoundException File IOException)
-           (java.net URL)
-           (clojure.lang PersistentVector LazySeq PersistentHashMap Keyword)
+  (:import (java.net URL)
            (java.util Random)
+           (java.lang ProcessBuilder)
+           (java.io FileNotFoundException File IOException)
+           (clojure.lang PersistentVector LazySeq PersistentHashMap Keyword)
            (java.nio.file StandardCopyOption Files)))
 
 ;TODO Parse AWS response response from package and deploy
@@ -67,14 +68,21 @@
 
 (defn ^File spit-json
   []
-  (try (spit (File. hyper-targ-json)
-         (edn->json (File. hyper-edn)))
-       (catch IOException _)))
+  (let [hyper-targ-json-file (File. hyper-targ-json)]
+    (try (do
+           (spit hyper-targ-json-file
+             (edn->json (File. hyper-edn)))
+           (.getAbsoluteFile hyper-targ-json-file))
+         (catch IOException _))))
 
 (defn- str-eq-kv
   [^PersistentHashMap params]
   (map (fn [[k v]]
          (str (name k) "=" v)) params))
+
+(defn- exec
+  [^PersistentVector args]
+  (.waitFor (.start (.inheritIO (ProcessBuilder. ^PersistentVector (remove nil? args))))))
 
 (defn- apply-sh
   [^PersistentVector aws-cli-args]
@@ -98,23 +106,22 @@
 
 (defn- packaged?
   [^PersistentHashMap out-info]
-  (condp = (:out out-info)
-    0 true
-    1 false))
+  (if (zero? (:out out-info)) true false))
 
 (defn- ^PersistentVector pack-comm
   [^String s3-buck ^Boolean force-uplo? ^String kms-key-id]
-  (do (spit-json)
-      ["aws"
-       "cloudformation"
-       "package"
-       "--template-file" hyper-targ-json
-       "--s3-bucket" s3-buck
-       "--s3-prefix" "jars"
-       "--output-template-file" hyper-targ-pack-json
-       "--kms-key-id" kms-key-id
-       "--use-json"
-       (if (true? force-uplo?) "--force-upload")]))
+  (if-let [targ-abs-path ^File (spit-json)]
+    ["aws"
+     "cloudformation"
+     "package"
+     "--template-file" (.getAbsolutePath targ-abs-path)
+     "--s3-bucket" s3-buck
+     "--s3-prefix" "jars"
+     "--output-template-file" hyper-targ-pack-json
+     "--kms-key-id" kms-key-id
+     "--use-json"
+     (if (true? force-uplo?) "--force-upload")]
+    (throw (IOException. "Error creating template JSON template file"))))
 
 (defn- ^PersistentVector dep-comm
   [^String stack-name ^Keyword capab ^Boolean no-exec-chan?
@@ -131,6 +138,10 @@
 (defn ^PersistentHashMap package
   [& {:keys [s3-bucket force-upload? kms-key-id]}]
   (split-out-info (apply-sh (pack-comm s3-bucket force-upload? kms-key-id))))
+
+(defn ^PersistentHashMap -package
+  [& {:keys [s3-bucket force-upload? kms-key-id]}]
+  (exec (pack-comm s3-bucket force-upload? kms-key-id)))
 
 (defn ^PersistentHashMap deploy
   [& {:keys [stack-name capabilities no-execute-changeset?
