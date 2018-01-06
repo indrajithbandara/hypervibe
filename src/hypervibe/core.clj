@@ -68,10 +68,9 @@
 
 (defn ^File spit-json
   []
-  (try
-    (spit (File. hyper-targ-json)
-      (edn->json (File. hyper-edn)))
-    (catch IOException _)))
+  (try (spit (File. hyper-targ-json)
+         (edn->json (File. hyper-edn)))
+       (catch IOException _)))
 
 (defn- str-eq-kv
   [^PersistentHashMap params]
@@ -107,7 +106,7 @@
   (if (zero? (:out out-info)) true false))
 
 (defn- ^PersistentVector pack-comm
-  [^String s3-buck ^Boolean force-uplo? ^String kms-key-id]
+  [^String s3-buck ^Boolean force-upl? ^String kms-key-id]
   (do
     (spit-json)
     ["aws"
@@ -119,7 +118,7 @@
      "--output-template-file" hyper-targ-pack-json
      "--kms-key-id" kms-key-id
      "--use-json"
-     (if (true? force-uplo?) "--force-upload")]))
+     (if (true? force-upl?) "--force-upload")]))
 
 (defn- ^PersistentVector dep-comm
   [^String stack-name ^Keyword capab ^Boolean no-exec-chan?
@@ -135,16 +134,12 @@
 
 (defn ^PersistentHashMap package
   [& {:keys [s3-bucket force-upload? kms-key-id]}]
-  (split-out-info (apply-sh (pack-comm s3-bucket force-upload? kms-key-id))))
-
-(defn ^PersistentHashMap -package
-  [& {:keys [s3-bucket force-upload? kms-key-id]}]
   (exec (pack-comm s3-bucket force-upload? kms-key-id)))
 
 (defn ^PersistentHashMap deploy
   [& {:keys [stack-name capabilities no-execute-changeset?
              parameter-overrides]}]
-  (split-out-info (apply-sh (dep-comm stack-name capabilities no-execute-changeset?
-                              parameter-overrides))))
+  (exec (dep-comm stack-name capabilities no-execute-changeset?
+          parameter-overrides)))
 
 
