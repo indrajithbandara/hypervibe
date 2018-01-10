@@ -12,134 +12,186 @@
            (clojure.lang PersistentVector LazySeq PersistentHashMap Keyword)
            (java.nio.file StandardCopyOption Files)))
 
-;TODO Parse AWS response response from package and deploy
+(def dirs {:targ "target/"})
+(def files {:hyper "hypervibe" :hyper-pack "hypervibe-packaged"})
+(def exten {:edn ".edn" :json ".json"})
 
-(def ^:const ^String targ-dir "target")
-(def ^:const ^String hyper-edn "hypervibe.edn")
-(def ^:const ^String hyper-json "hypervibe.json")
-(def ^:const ^String hyper-pack-json "hypervibe-packaged.json")
-(def ^:const ^String hyper-targ-json (str targ-dir "/" hyper-json))
-(def ^:const ^String hyper-targ-pack-json (str targ-dir "/" hyper-pack-json))
-
-(defn ^Boolean edn-pref?
+(defn- ^Boolean edn-pref?
   [^File edn-file]
-  (.endsWith (.getAbsolutePath edn-file) ".edn"))
+  (.endsWith (.getAbsolutePath edn-file)
+    ".edn"))
 
-(defn ^Boolean file-exist?
+(defn- ^Boolean file-exist?
   [^File file]
   (.exists (.getAbsoluteFile file)))
 
-(defn ^Boolean edn-file-exist?
+(defn- ^Boolean edn-file-exist?
   [^File edn-file]
   (and (file-exist? edn-file)
     (edn-pref? edn-file)))
 
-(defn ^Boolean json-pref?
+(defn- ^Boolean json-pref?
   [^File json-file]
-  (.endsWith (.getAbsolutePath json-file) ".json"))
+  (.endsWith (.getAbsolutePath json-file)
+    ".json"))
 
-(defn ^Boolean json-file-exist?
+(defn- ^PersistentVector json-file-exist?
   [^File json-file]
   (and (file-exist? json-file)
     (json-pref? json-file)))
 
-(defn ^Boolean edn-file-exist?
+(defn- ^Boolean edn-file-exist?
   [^File edn-file]
   (and (file-exist? edn-file)
     (edn-pref? edn-file)))
 
-(defn ^PersistentHashMap slurp-edn
+(defn- ^PersistentHashMap slurp-edn
   [^File edn-file]
   (if (edn-file-exist? edn-file)
     (try (edn/read-string
            (slurp (.getAbsolutePath edn-file)))
-         (catch Exception _))))
+         (catch Exception
+                _))))
 
 (defn- ^String rand-16-char
   []
   (string/upper-case (Long/toHexString (Double/doubleToLongBits (.nextLong (Random.))))))
 
-(defn ^String edn->json
+(defn- ^String edn->json
   [^File edn-file]
   (if-let [edn (slurp-edn edn-file)]
-    (try (cheshire/generate-string edn
+    (try (cheshire/generate-string
+           edn
            {:pretty true})
-         (catch Exception _))))
+         (catch Exception
+                _))))
 
-(defn ^File spit-json
+(defn- ^File spit-json
   []
-  (try (spit (File. hyper-targ-json)
-         (edn->json (File. hyper-edn)))
-       (catch IOException _)))
+  (try (spit
+         (File. (str
+                  (dirs :targ)
+                  (files :hyper)
+                  (exten :json)))
+         (edn->json
+           (File. (str
+                    (files :hyper)
+                    (exten :edn)))))
+       (catch IOException
+              _)))
 
 (defn- str-eq-kv
   [^PersistentHashMap params]
   (map (fn [[k v]]
-         (str (name k) "=" v)) params))
+         (str
+           (name k)
+           "=" v))
+    params))
 
 (defn- exec
   [^PersistentVector args]
   (.waitFor (.start (.inheritIO (ProcessBuilder. ^PersistentVector (remove nil? args))))))
 
-(defn- apply-sh
-  [^PersistentVector aws-cli-args]
-  (apply shell/sh (remove nil? aws-cli-args)))
-
-(defn- ^LazySeq cons-param-over [^PersistentHashMap params]
-  (if params (cons "--parameter-overrides" (str-eq-kv params))))
+(defn- ^LazySeq cons-param-over
+  [^PersistentHashMap params]
+  (if params
+    (cons "--parameter-overrides"
+      (str-eq-kv params))))
 
 (defn- stack-name-rand-16-char
   [^String stack-name]
-  (if stack-name (str stack-name "-" (rand-16-char)) "hypervibe"))
+  (if stack-name
+    (str
+      stack-name
+      "-"
+      (rand-16-char))
+    "hypervibe"))
 
 (defn- cond-capab
   [^Keyword capab]
-  (cond (= capab :CAPABILITY_IAM) (name capab)
-        (= capab :CAPABILITY_NAMED_IAM) (name capab)))
-
-(defn- split-out-info
-  [^PersistentHashMap out-info]
-  (update out-info :out #(string/split % #"\r")))
-
-(defn- packaged?
-  [^PersistentHashMap out-info]
-  (if (zero? (:out out-info)) true false))
+  (cond (= capab
+          :CAPABILITY_IAM)
+        (name capab)
+        (= capab
+          :CAPABILITY_NAMED_IAM)
+        (name capab)))
 
 (defn- ^PersistentVector pack-comm
-  [^String s3-buck ^Boolean force-upl? ^String kms-key-id]
+  [^String s3-buck
+   ^Boolean force-upl?
+   ^String kms-key-id]
   (do
     (spit-json)
     ["aws"
      "cloudformation"
      "package"
-     "--template-file" hyper-targ-json
+     "--template-file"
+     (str
+       (dirs :targ)
+       (files :hyper)
+       (exten :json))
      "--s3-bucket" s3-buck
      "--s3-prefix" "jars"
-     "--output-template-file" hyper-targ-pack-json
+     "--output-template-file"
+     (str
+       (dirs :targ)
+       (files :hyper-pack)
+       (exten :json))
      "--kms-key-id" kms-key-id
      "--use-json"
-     (if (true? force-upl?) "--force-upload")]))
+     (if (true? force-upl?)
+       "--force-upload")]))
 
 (defn- ^PersistentVector dep-comm
-  [^String stack-name ^Keyword capab ^Boolean no-exec-chan?
+  [^String stack-name
+   ^Keyword capab
+   ^Boolean no-exec-chan?
    ^PersistentHashMap param-over]
   (into ["aws"
          "cloudformation"
          "deploy"
-         "--template-file" hyper-targ-pack-json
+         "--template-file"
+         (str
+           (dirs :targ)
+           (files :hyper-pack)
+           (exten :json))
          "--stack-name" (stack-name-rand-16-char stack-name)
          "--capabilities" (cond-capab capab)
-         (if (true? no-exec-chan?) "--no-execute-changeset")]
+         (if (true? no-exec-chan?)
+           "--no-execute-changeset")]
     (cons-param-over param-over)))
 
-(defn ^PersistentHashMap package
-  [& {:keys [s3-bucket force-upload? kms-key-id]}]
-  (exec (pack-comm s3-bucket force-upload? kms-key-id)))
+(defn package
+  [& {:keys
+      [s3-buck
+       force-upl?
+       kms-key-id]}]
+  (if ((every-pred json-file-exist?)
+        (str
+          (dirs :targ)
+          (files :hyper)
+          (exten :json))
+        (str
+          (dirs :targ)
+          (files :hyper-pack)
+          (exten :json)))
+    (exec (pack-comm
+            s3-buck
+            force-upl?
+            kms-key-id))
+    (throw
+      (FileNotFoundException.
+        "JSON template was unavailable
+         when attempting to package
+         artifact."))))
 
 (defn ^PersistentHashMap deploy
-  [& {:keys [stack-name capabilities no-execute-changeset?
-             parameter-overrides]}]
-  (exec (dep-comm stack-name capabilities no-execute-changeset?
-          parameter-overrides)))
+  [& {:keys [stack-name capab no-exec-chan?
+             param-over]}]
+  (exec (dep-comm
+          stack-name
+          capab
+          no-exec-chan?
+          param-over)))
 
 
