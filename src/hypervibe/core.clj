@@ -85,7 +85,8 @@
   (map (fn [[k v]]
          (str
            (name k)
-           "=" v))
+           "="
+           v))
     params))
 
 (defn- exec
@@ -155,8 +156,10 @@
            (dirs :targ)
            (files :hyper-pack)
            (exten :json))
-         "--stack-name" (stack-name-rand-16-char stack-name)
-         "--capabilities" (cond-capab capab)
+         "--stack-name"
+         (stack-name-rand-16-char stack-name)
+         "--capabilities"
+         (cond-capab capab)
          (if (true? no-exec-chan?)
            "--no-execute-changeset")]
     (cons-param-over param-over)))
@@ -175,23 +178,26 @@
           (dirs :targ)
           (files :hyper-pack)
           (exten :json)))
-    (exec (pack-comm
-            s3-buck
-            force-upl?
-            kms-key-id))
+    (exec (apply pack-comm
+            [s3-buck
+             force-upl?
+             kms-key-id]))
     (throw
       (FileNotFoundException.
         "JSON template was unavailable
          when attempting to package
          artifact."))))
 
-(defn ^PersistentHashMap deploy
-  [& {:keys [stack-name capab no-exec-chan?
-             param-over]}]
-  (exec (dep-comm
-          stack-name
-          capab
-          no-exec-chan?
-          param-over)))
+(defn deploy
+  [& {:keys
+      [stack-name
+       capab
+       no-exec-chan?
+       param-over]}]
+  (exec (apply dep-comm
+          [stack-name
+           capab
+           no-exec-chan?
+           param-over])))
 
 
