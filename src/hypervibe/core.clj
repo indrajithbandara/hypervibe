@@ -50,20 +50,21 @@
   (if (edn-file-exist? edn-file)
     (try (edn/read-string
            (slurp (.getAbsolutePath edn-file)))
-         (catch Exception
-                _))))
+         (catch Exception _))))
 
 (defn- ^String rand-16-char
   []
-  (string/upper-case (Long/toHexString (Double/doubleToLongBits (.nextLong (Random.))))))
+  (string/upper-case (.. Random
+                       nextLong
+                       Double/doubleToLongBits
+                       Long/toHexString)))
 
 (defn- ^String edn->json
   [edn-file]
   (if-let [edn (slurp-edn edn-file)]
     (try (cheshire/generate-string edn
            {:pretty true})
-         (catch Exception
-                _))))
+         (catch Exception _))))
 
 (defn- ^File spit-json
   []
@@ -73,16 +74,14 @@
                   (exten :json)))
          (edn->json (File. (str (files :hyper)
                              (exten :edn)))))
-       (catch IOException
-              _)))
+       (catch IOException _)))
 
 (defn- str-eq-kv
   [^PersistentHashMap params]
   (map (fn [[k v]]
          (str (name k)
            "="
-           v))
-    params))
+           v)) params))
 
 (defn- exec
   [args]
@@ -166,8 +165,7 @@
                           (files :hyper-pack)
                           (exten :json))]
     (if (apply (every-pred json-file-exist?)
-          [hyper-json
-           hyper-pack-json])
+          [hyper-json hyper-pack-json])
       (exec (apply pack-comm
               [s3-buck force-upl?
                kms-key-id]))
