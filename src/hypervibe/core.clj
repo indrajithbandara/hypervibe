@@ -17,36 +17,36 @@
 (def exten {:edn ".edn" :json ".json"})
 
 (defn- ^Boolean edn-pref?
-  [^File edn-file]
+  [edn-file]
   (.endsWith (.getAbsolutePath edn-file)
     ".edn"))
 
 (defn- ^Boolean file-exist?
-  [^File file]
+  [file]
   (.exists (.getAbsoluteFile file)))
 
 (defn- ^Boolean edn-file-exist?
-  [^File edn-file]
+  [edn-file]
   (and (file-exist? edn-file)
     (edn-pref? edn-file)))
 
 (defn- ^Boolean json-pref?
-  [^File json-file]
+  [json-file]
   (.endsWith (.getAbsolutePath json-file)
     ".json"))
 
 (defn- ^PersistentVector json-file-exist?
-  [^File json-file]
+  [json-file]
   (and (file-exist? json-file)
     (json-pref? json-file)))
 
 (defn- ^Boolean edn-file-exist?
-  [^File edn-file]
+  [edn-file]
   (and (file-exist? edn-file)
     (edn-pref? edn-file)))
 
 (defn- ^PersistentHashMap slurp-edn
-  [^File edn-file]
+  [edn-file]
   (if (edn-file-exist? edn-file)
     (try (edn/read-string
            (slurp (.getAbsolutePath edn-file)))
@@ -58,10 +58,9 @@
   (string/upper-case (Long/toHexString (Double/doubleToLongBits (.nextLong (Random.))))))
 
 (defn- ^String edn->json
-  [^File edn-file]
+  [edn-file]
   (if-let [edn (slurp-edn edn-file)]
-    (try (cheshire/generate-string
-           edn
+    (try (cheshire/generate-string edn
            {:pretty true})
          (catch Exception
                 _))))
@@ -69,47 +68,45 @@
 (defn- ^File spit-json
   []
   (try (spit
-         (File. (str
-                  (dirs :targ)
+         (File. (str (dirs :targ)
                   (files :hyper)
                   (exten :json)))
-         (edn->json
-           (File. (str
-                    (files :hyper)
-                    (exten :edn)))))
+         (edn->json (File. (str (files :hyper)
+                             (exten :edn)))))
        (catch IOException
               _)))
 
 (defn- str-eq-kv
   [^PersistentHashMap params]
   (map (fn [[k v]]
-         (str
-           (name k)
+         (str (name k)
            "="
            v))
     params))
 
 (defn- exec
-  [^PersistentVector args]
-  (.waitFor (.start (.inheritIO (ProcessBuilder. ^PersistentVector (remove nil? args))))))
+  [args]
+  (.. (ProcessBuilder. (remove nil? args))
+    inheritIO
+    start
+    waitFor))
 
 (defn- ^LazySeq cons-param-over
-  [^PersistentHashMap params]
+  [params]
   (if params
     (cons "--parameter-overrides"
       (str-eq-kv params))))
 
-(defn- stack-name-rand-16-char
-  [^String stack-name]
+(defn- ^String stack-name-rand-16-char
+  [stack-name]
   (if stack-name
-    (str
-      stack-name
+    (str stack-name
       "-"
       (rand-16-char))
     "hypervibe"))
 
 (defn- cond-capab
-  [^Keyword capab]
+  [capab]
   (cond (= capab
           :CAPABILITY_IAM)
         (name capab)
@@ -118,42 +115,36 @@
         (name capab)))
 
 (defn- ^PersistentVector pack-comm
-  [^String s3-buck
-   ^Boolean force-upl?
-   ^String kms-key-id]
-  (do
-    (spit-json)
-    ["aws"
-     "cloudformation"
-     "package"
-     "--template-file"
-     (str
-       (dirs :targ)
-       (files :hyper)
-       (exten :json))
-     "--s3-bucket" s3-buck
-     "--s3-prefix" "jars"
-     "--output-template-file"
-     (str
-       (dirs :targ)
-       (files :hyper-pack)
-       (exten :json))
-     "--kms-key-id" kms-key-id
-     "--use-json"
-     (if (true? force-upl?)
-       "--force-upload")]))
+  [s3-buck force-upl?
+   kms-key-id]
+  (do (spit-json)
+      ["aws"
+       "cloudformation"
+       "package"
+       "--template-file"
+       (str (dirs :targ)
+         (files :hyper)
+         (exten :json))
+       "--s3-bucket" s3-buck
+       "--s3-prefix" "jars"
+       "--output-template-file"
+       (str (dirs :targ)
+         (files :hyper-pack)
+         (exten :json))
+       "--kms-key-id" kms-key-id
+       "--use-json"
+       (if (true? force-upl?)
+         "--force-upload")]))
 
 (defn- ^PersistentVector dep-comm
-  [^String stack-name
-   ^Keyword capab
-   ^Boolean no-exec-chan?
-   ^PersistentHashMap param-over]
+  [stack-name capab
+   no-exec-chan?
+   param-over]
   (into ["aws"
          "cloudformation"
          "deploy"
          "--template-file"
-         (str
-           (dirs :targ)
+         (str (dirs :targ)
            (files :hyper-pack)
            (exten :json))
          "--stack-name"
@@ -166,37 +157,30 @@
 
 (defn package
   [& {:keys
-      [s3-buck
-       force-upl?
+      [s3-buck force-upl?
        kms-key-id]}]
-  (if ((every-pred json-file-exist?)
-        (str
-          (dirs :targ)
-          (files :hyper)
-          (exten :json))
-        (str
-          (dirs :targ)
-          (files :hyper-pack)
-          (exten :json)))
-    (exec (apply pack-comm
-            [s3-buck
-             force-upl?
-             kms-key-id]))
-    (throw
-      (FileNotFoundException.
-        "JSON template was unavailable
-         when attempting to package
-         artifact."))))
+  (let [hyper-json (str (dirs :targ)
+                     (files :hyper)
+                     (exten :json))
+        hyper-pack-json (str (dirs :targ)
+                          (files :hyper-pack)
+                          (exten :json))]
+    (if (apply (every-pred json-file-exist?)
+          [hyper-json
+           hyper-pack-json])
+      (exec (apply pack-comm
+              [s3-buck force-upl?
+               kms-key-id]))
+      (apply io/input-stream
+        [hyper-json hyper-pack-json]))))
 
 (defn deploy
   [& {:keys
-      [stack-name
-       capab
+      [stack-name capab
        no-exec-chan?
        param-over]}]
   (exec (apply dep-comm
-          [stack-name
-           capab
+          [stack-name capab
            no-exec-chan?
            param-over])))
 
