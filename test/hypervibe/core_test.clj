@@ -4,7 +4,8 @@
 
 (deftest test-target-dir
   (testing
-    "Hypervibe artifact target directory"
+    "Hypervibe artifact target
+     directory"
     (is (= (:targ hyper/dirs)
           "target/"))))
 
@@ -16,7 +17,8 @@
         "hypervibe-packaged"))))
 
 (deftest test-file-extensions
-  (testing "FIXME, I fail."
+  (testing "Hypervibe template file
+            extensions"
     (is (and (= (:edn hyper/exten)
                ".edn")
           (= (:json hyper/exten)
