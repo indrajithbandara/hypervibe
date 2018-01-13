@@ -122,8 +122,7 @@
         (name capab)))
 
 (defn- ^PersistentVector pack-comm
-  [s3-buck force-upl?
-   kms-key-id]
+  [s3-buck force-upl? kms-key-id]
   ["aws"
    "cloudformation"
    "package"
@@ -146,9 +145,7 @@
      "--force-upload")])
 
 (defn- ^PersistentVector dep-comm
-  [stack-name
-   capab
-   no-exec-chan?
+  [stack-name capab no-exec-chan?
    param-over]
   (into ["aws"
          "cloudformation"
@@ -166,9 +163,7 @@
     (cons-param-over param-over)))
 
 (defn package
-  [& {:keys [s3-buck
-             force-upl?
-             kms-key-id]}]
+  [& {:keys [s3-buck force-upl? kms-key-id]}]
   (if (json-file-exist? (spit-json))
     {:status (exec (pack-comm s3-buck force-upl?
                      kms-key-id))}
@@ -180,9 +175,7 @@
                " cannot be found")))))
 
 (defn deploy
-  [& {:keys [stack-name
-             capab
-             no-exec-chan?
+  [& {:keys [stack-name capab no-exec-chan?
              param-over]}]
   (let [hyper-json-pack
         (str (dirs :targ)
