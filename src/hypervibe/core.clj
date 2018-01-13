@@ -54,8 +54,7 @@
 
 (defn- ^String rand-16-char
   []
-  (string/upper-case (.. Random
-                       nextLong
+  (string/upper-case (.. (.nextLong (Random.))
                        Double/doubleToLongBits
                        Long/toHexString)))
 
@@ -65,6 +64,9 @@
     (try (cheshire/generate-string edn
            {:pretty true})
          (catch Exception _))))
+
+(edn->json (File. (str (files :hyper)
+                    (exten :edn))))
 
 (defn- ^File spit-json
   []
@@ -116,24 +118,26 @@
 (defn- ^PersistentVector pack-comm
   [s3-buck force-upl?
    kms-key-id]
-  (do (spit-json)
-      ["aws"
-       "cloudformation"
-       "package"
-       "--template-file"
-       (str (dirs :targ)
-         (files :hyper)
-         (exten :json))
-       "--s3-bucket" s3-buck
-       "--s3-prefix" "jars"
-       "--output-template-file"
-       (str (dirs :targ)
-         (files :hyper-pack)
-         (exten :json))
-       "--kms-key-id" kms-key-id
-       "--use-json"
-       (if (true? force-upl?)
-         "--force-upload")]))
+  ["aws"
+   "cloudformation"
+   "package"
+   "--template-file"
+   (str (dirs :targ)
+     (files :hyper)
+     (exten :json))
+   "--s3-bucket"
+   s3-buck
+   "--s3-prefix"
+   "hypervibe"
+   "--output-template-file"
+   (str (dirs :targ)
+     (files :hyper-pack)
+     (exten :json))
+   "--kms-key-id"
+   kms-key-id
+   "--use-json"
+   (if (true? force-upl?)
+     "--force-upload")])
 
 (defn- ^PersistentVector dep-comm
   [stack-name capab
@@ -160,26 +164,29 @@
        kms-key-id]}]
   (let [hyper-json (str (dirs :targ)
                      (files :hyper)
-                     (exten :json))
-        hyper-pack-json (str (dirs :targ)
-                          (files :hyper-pack)
-                          (exten :json))]
-    (if (apply (every-pred json-file-exist?)
-          [hyper-json hyper-pack-json])
-      (exec (apply pack-comm
-              [s3-buck force-upl?
-               kms-key-id]))
-      (apply io/input-stream
-        [hyper-json hyper-pack-json]))))
+                     (exten :json))]
+    (spit-json)                                             ;TODO return file path from spit-jsoon
+    (if (json-file-exist? (File. hyper-json))
+      {:status (exec (pack-comm s3-buck force-upl?
+                       kms-key-id))}
+      (throw (FileNotFoundException.
+               (str "file: "
+                 hyper-json
+                 " cannot be found"))))))
 
 (defn deploy
   [& {:keys
       [stack-name capab
        no-exec-chan?
        param-over]}]
-  (exec (apply dep-comm
-          [stack-name capab
-           no-exec-chan?
-           param-over])))
-
-
+  (let [hyper-json-pack (str (dirs :targ)
+                          (files :hyper-pack)
+                          (exten :json))]                   ;;Todo check if jar exists
+    (if (json-file-exist? hyper-json-pack)
+      (exec (dep-comm stack-name capab
+              no-exec-chan?
+              param-over))
+      (throw (FileNotFoundException.
+               (str "file:"
+                 hyper-json-pack
+                 " cannot be found"))))))
