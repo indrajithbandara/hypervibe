@@ -16,7 +16,7 @@
 (def files {:hyper "hypervibe" :hyper-pack "hypervibe-packaged"})
 (def exten {:edn ".edn" :json ".json"})
 
-(defn- ^Boolean edn-pref?
+(defn ^Boolean edn-pref?
   [edn-file]
   (.endsWith (.getAbsolutePath edn-file)
     ".edn"))
