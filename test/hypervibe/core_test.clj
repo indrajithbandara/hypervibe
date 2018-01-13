@@ -1,7 +1,10 @@
 (ns hypervibe.core-test
   (:require [clojure.test :refer :all]
-            [hypervibe.core :refer :all]))
+            [hypervibe.core :as hyper]))
 
-(deftest a-test
+(deftest test-target-dir
   (testing "FIXME, I fail."
-    (is (= 0 1))))
+    (is (= (:targ hyper/dirs)
+          "target/"))))
+
+

@@ -1,8 +1,8 @@
 (ns hypervibe.core
   (:require [clojure.java.shell :as shell]
-            [cheshire.core :as cheshire]
+            [cheshire.core :as cc]
             [clojure.java.io :as io]
-            [clojure.string :as string]
+            [clojure.string :as cs]
             [clojure.edn :as edn]
             [com.rpl.specter :as s])
   (:import (java.net URL)
@@ -50,44 +50,50 @@
   (if (edn-file-exist? edn-file)
     (try (edn/read-string
            (slurp (.getAbsolutePath edn-file)))
-         (catch Exception _))))
+         (catch Exception
+                _))))
 
 (defn- ^String rand-16-char
   []
-  (string/upper-case (.. (.nextLong (Random.))
-                       Double/doubleToLongBits
-                       Long/toHexString)))
+  (cs/upper-case (Long/toHexString
+                   (Double/doubleToLongBits
+                     (.nextLong (Random.))))))
 
 (defn- ^String edn->json
   [edn-file]
-  (if-let [edn (slurp-edn edn-file)]
-    (try (cheshire/generate-string edn
+  (if-let [edn
+           (slurp-edn edn-file)]
+    (try (cc/generate-string edn
            {:pretty true})
-         (catch Exception _))))
-
-(edn->json (File. (str (files :hyper)
-                    (exten :edn))))
+         (catch Exception
+                _))))
 
 (defn- ^File spit-json
   []
-  (try (spit
-         (File. (str (dirs :targ)
-                  (files :hyper)
-                  (exten :json)))
-         (edn->json (File. (str (files :hyper)
-                             (exten :edn)))))
-       (catch IOException _)))
+  (let [hyper-json
+        (str (dirs :targ)
+          (files :hyper)
+          (exten :json))]
+    (try (do
+           (spit (File. hyper-json)
+             (edn->json (File. (str (files :hyper)
+                                 (exten :edn)))))
+           (.getAbsoluteFile (File. hyper-json)))
+         (catch IOException
+                _))))
 
 (defn- str-eq-kv
   [^PersistentHashMap params]
   (map (fn [[k v]]
          (str (name k)
            "="
-           v)) params))
+           v))
+    params))
 
 (defn- exec
   [args]
-  (.. (ProcessBuilder. (remove nil? args))
+  (..
+    (ProcessBuilder. (remove nil? args))
     inheritIO
     start
     waitFor))
@@ -140,7 +146,8 @@
      "--force-upload")])
 
 (defn- ^PersistentVector dep-comm
-  [stack-name capab
+  [stack-name
+   capab
    no-exec-chan?
    param-over]
   (into ["aws"
@@ -159,29 +166,28 @@
     (cons-param-over param-over)))
 
 (defn package
-  [& {:keys
-      [s3-buck force-upl?
-       kms-key-id]}]
-  (let [hyper-json (str (dirs :targ)
-                     (files :hyper)
-                     (exten :json))]
-    (spit-json)                                             ;TODO return file path from spit-jsoon
-    (if (json-file-exist? (File. hyper-json))
-      {:status (exec (pack-comm s3-buck force-upl?
-                       kms-key-id))}
-      (throw (FileNotFoundException.
-               (str "file: "
-                 hyper-json
-                 " cannot be found"))))))
+  [& {:keys [s3-buck
+             force-upl?
+             kms-key-id]}]
+  (if (json-file-exist? (spit-json))
+    {:status (exec (pack-comm s3-buck force-upl?
+                     kms-key-id))}
+    (throw (FileNotFoundException.
+             (str "file: "
+               (str (dirs :targ)
+                 (files :hyper)
+                 (exten :json))
+               " cannot be found")))))
 
 (defn deploy
-  [& {:keys
-      [stack-name capab
-       no-exec-chan?
-       param-over]}]
-  (let [hyper-json-pack (str (dirs :targ)
-                          (files :hyper-pack)
-                          (exten :json))]                   ;;Todo check if jar exists
+  [& {:keys [stack-name
+             capab
+             no-exec-chan?
+             param-over]}]
+  (let [hyper-json-pack
+        (str (dirs :targ)
+          (files :hyper-pack)
+          (exten :json))]                                   ;;Todo check if jar exists
     (if (json-file-exist? hyper-json-pack)
       (exec (dep-comm stack-name capab
               no-exec-chan?
@@ -190,3 +196,5 @@
                (str "file:"
                  hyper-json-pack
                  " cannot be found"))))))
+
+
