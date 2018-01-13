@@ -123,23 +123,19 @@
 
 (defn- ^PersistentVector pack-comm
   [s3-buck force-upl? kms-key-id]
-  ["aws"
-   "cloudformation"
-   "package"
+  ["aws" "cloudformation" "package"
    "--template-file"
    (str (dirs :targ)
      (files :hyper)
      (exten :json))
-   "--s3-bucket"
-   s3-buck
+   "--s3-bucket" s3-buck
    "--s3-prefix"
    "hypervibe"
    "--output-template-file"
    (str (dirs :targ)
      (files :hyper-pack)
      (exten :json))
-   "--kms-key-id"
-   kms-key-id
+   "--kms-key-id" kms-key-id
    "--use-json"
    (if (true? force-upl?)
      "--force-upload")])
@@ -147,9 +143,7 @@
 (defn- ^PersistentVector dep-comm
   [stack-name capab no-exec-chan?
    param-over]
-  (into ["aws"
-         "cloudformation"
-         "deploy"
+  (into ["aws" "cloudformation" "deploy"
          "--template-file"
          (str (dirs :targ)
            (files :hyper-pack)
