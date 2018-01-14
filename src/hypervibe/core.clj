@@ -18,8 +18,9 @@
 
 (defn ^Boolean edn-pref?
   [edn-file]
-  (.endsWith (.getAbsolutePath edn-file)
-    ".edn"))
+  (if-let [ef edn-file]
+   (.endsWith (.getAbsolutePath ef)
+              ".edn")))
 
 (defn- ^Boolean file-exist?
   [file]
@@ -75,10 +76,10 @@
           (files :hyper)
           (exten :json))]
     (try (do
-           (spit (File. hyper-json)
-             (edn->json (File. (str (files :hyper)
+           (spit (io/file hyper-json)
+             (edn->json (io/file (str (files :hyper)
                                  (exten :edn)))))
-           (.getAbsoluteFile (File. hyper-json)))
+           (.getAbsoluteFile (io/file hyper-json)))
          (catch IOException
                 _))))
 
@@ -129,8 +130,7 @@
      (files :hyper)
      (exten :json))
    "--s3-bucket" s3-buck
-   "--s3-prefix"
-   "hypervibe"
+   "--s3-prefix" "hypervibe"
    "--output-template-file"
    (str (dirs :targ)
      (files :hyper-pack)

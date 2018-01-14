@@ -1,7 +1,10 @@
 (ns hypervibe.core-test
   (:require [clojure.test :refer :all]
-            [hypervibe.core :as hyper])
+            [hypervibe.core :as hyper]
+            [clojure.java.io :as io])
   (:import (java.io File)))
+
+;TODO use spec for tests
 
 (def ^:const ^String hyper-edn-file (str (:hyper hyper/files) (:edn hyper/exten)))
 
@@ -29,8 +32,10 @@
 (deftest test-edn-prefix
   (testing "Hypervibe test template
             has .edn prefix"
-    (is (true? (hyper/edn-pref? (File. hyper-edn-file))))
-    (is (boolean? (hyper/edn-pref? (File. hyper-edn-file))))))
+    (is (nil? (hyper/edn-pref? nil)))
+    (is (nil? (hyper/edn-pref? (io/file nil))))
+    (is (true? (hyper/edn-pref? (io/file hyper-edn-file))))
+    (is (boolean? (hyper/edn-pref? (io/file hyper-edn-file))))))
 
 
 
